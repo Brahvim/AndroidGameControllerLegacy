@@ -1,0 +1,31 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "AndroidGameController_ButtonUpdate/lib/udp.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/core.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-linux-aarch64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-linux-amd64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-linux-armv6hf.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-linux-i586.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-macosx-universal.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-windows-amd64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/gluegen-rt-natives-windows-i586.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-linux-aarch64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-linux-amd64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-linux-armv6hf.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-linux-i586.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-macosx-universal.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-windows-amd64.jar",
+        "AndroidGameController_ButtonUpdate/lib/Processing/jogl-all-natives-windows-i586.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/annotations-16.0.1.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/apiguardian-api-1.1.0.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/colorpicker-1.1.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/filters-2.0.235.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/flatlaf-1.5.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/swing-worker-1.1.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/swingx-1.6.1.jar",
+        "AndroidGameController_ButtonUpdate/lib/UiBooster/UiBooster.jar"
+    ]
+}
