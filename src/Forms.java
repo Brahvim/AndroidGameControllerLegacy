@@ -26,7 +26,10 @@ public class Forms {
     }
 
     static String getString(String p_key) {
-        return strTable.get(p_key);
+        String ret = strTable.get(p_key);
+        if (ret == null)
+            System.err.printf("Key `%s` not found!\n", p_key);
+        return ret;
     }
 
     static FormBuilder createDeviceSelectionForm(HashMap<String, String> p_clients) {

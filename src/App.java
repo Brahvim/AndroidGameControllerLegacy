@@ -38,7 +38,7 @@ public class App extends PApplet {
     UdpSocket socket;
     Robot robot;
     UiBooster ui;
-    HashMap<String, String> strTable = parseRequestCodesFromFile("AGC_StringTable.ini");
+    HashMap<String, String> strTable = parseStringTableFromFile("AGC_StringTable.ini");
     ArrayList<String> possibleClients, connectedClients;
     PGraphics gr;
     boolean hasOneConnection;
@@ -408,10 +408,15 @@ public class App extends PApplet {
             try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
                 int eqPos;
                 for (String line; (line = reader.readLine()) != null;) {
-                    if (line.charAt(0) == '#')
+
+                    if (line.isBlank() || line.charAt(0) == '#')
                         continue;
 
                     eqPos = line.indexOf('=');
+
+                    if (eqPos == -1)
+                        continue;
+
                     parsedMap.put(
                             line.substring(0, eqPos),
                             line.substring(eqPos + 1, line.length()));
@@ -433,7 +438,7 @@ public class App extends PApplet {
             try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
                 String section = null, content = null;
                 StringBuilder parsedContent;
-                int eqPos = 0, lineLen = 0, newLineCharPos = 0, contentLen;
+                int eqPos = 0, lineLen = 0, newLineCharPos = 0;
 
                 // Remember that this loop goes through EACH LINE!
                 // Not each *character!* :joy::
@@ -459,16 +464,17 @@ public class App extends PApplet {
                     content = line.substring(eqPos + 1, lineLen);
 
                     // Parse out `\n`s!:
-                    contentLen = content.length();
                     parsedContent = new StringBuilder(content);
 
                     while ((newLineCharPos = parsedContent.indexOf("\\n")) != -1) {
+                        // Causes an infinite loop, and I won't be writing `\n` anywhere, anyway:
+                        // if (parsedContent.charAt(newLineCharPos - 1) == '\\')
+                        // continue;
+
                         for (int i = 0; i < 2; i++)
                             parsedContent.deleteCharAt(newLineCharPos);
                         parsedContent.insert(newLineCharPos, '\n');
                     }
-
-                    System.out.println(parsedContent);
 
                     // if (content.contains("<br>"))
                     // content = content.replace("\\\\n", App.NEWLINE);
