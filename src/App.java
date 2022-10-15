@@ -31,6 +31,7 @@ import uibooster.model.UiBoosterOptions;
 public class App extends PApplet {
     // #region Fields.
     final static AppWithScenes SKETCH = new AppWithScenes();
+    final static String VERSION = "v1.0";
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
@@ -47,7 +48,7 @@ public class App extends PApplet {
 
     // #region Exit fade animation variables.
     int bgColor = color(0, 150);
-    SineWave exitFadeWave;
+    SineWave windowFadeWave;
     // #endregion
 
     // #region Window coordinates and states.
@@ -91,8 +92,10 @@ public class App extends PApplet {
     }
 
     public void setup() {
+        System.out.printf("Welcome to the AndroidGameController Server application `%s`!\n\n", App.VERSION);
+
         // Window setup:
-        surface.setTitle("AndroidGameController Server");
+        surface.setTitle("AndroidGameController Server ".concat(App.VERSION));
         surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
         minExtent = new PVector();
         maxExtent = new PVector(displayWidth - width, displayHeight - height);
@@ -214,7 +217,7 @@ public class App extends PApplet {
         pPsdY = mouseY;
 
         if (mouseButton == MouseEvent.BUTTON3) {
-            if (isOpen(Forms.settingsForm)) {
+            if (isFormOpen(Forms.settingsForm)) {
             } else if ((Forms.settingsForm = showForm(
                     Forms.settingsForm, Forms.settingsFormBuild)) != null) {
                 Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
@@ -240,16 +243,15 @@ public class App extends PApplet {
     }
 
     public void agcExit() {
-        Scene.setScene(App.SKETCH.exitingScene);
+        Scene.setScene(App.SKETCH.exitScene);
 
-        exitFadeWave = new SineWave(0.0008f);
-        exitFadeWave.zeroWhenInactive = true;
-        exitFadeWave.endWhenAngleIs(90);
-        exitFadeWave.start();
+        windowFadeWave = new SineWave(0.0008f);
+        windowFadeWave.zeroWhenInactive = true;
+        windowFadeWave.endWhenAngleIs(90);
+        windowFadeWave.start();
 
-        if (Forms.settingsForm != null)
-            if (!Forms.settingsForm.isClosedByUser())
-                Forms.settingsForm.close();
+        if (isFormOpen(Forms.settingsForm))
+            Forms.settingsForm.close();
     }
 
     public void prepareJPanel() {
@@ -380,7 +382,7 @@ public class App extends PApplet {
         return ret;
     }
 
-    public boolean isOpen(Form p_form) {
+    public boolean isFormOpen(Form p_form) {
         // if (p_form == null)
         // return false;
         // else if (p_form.isClosedByUser())

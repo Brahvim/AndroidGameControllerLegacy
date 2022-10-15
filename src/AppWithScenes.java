@@ -37,17 +37,25 @@ public class AppWithScenes extends App {
         // #endregion
     };
 
-    Scene exitingScene = new Scene() {
+    Scene exitScene = new Scene() {
+        String thankYouText;
+
+        @Override
+        void setup() {
+            thankYouText = Forms.getString("ExitScene.text");
+        }
+
         // #region "Exiting" scene.
         @Override
         public void draw() {
             gr.textAlign(CENTER);
             gr.textSize(28);
             gr.fill(255, alpha(bgColor));
-            gr.text("Thank you for\nusing\nAndroidGameController!", cx, qy);
+            gr.text(thankYouText, cx, qy);
 
-            float wave = exitFadeWave.get();
+            float wave = windowFadeWave.get();
             if (wave == 0) {
+                windowFadeWave.end();
                 while (!Forms.settingsForm.isClosedByUser())
                     ;
                 delay(100);
