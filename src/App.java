@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -547,8 +549,17 @@ public class App extends PApplet {
     }
 
     public static void sockTest() {
+        InetAddress localhost = null;
+        try {
+            localhost = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("\n\n\nSent data on click!\n\n\n");
+
         SKETCH.socket.send(RequestCode.toBytes("CLIENT_CLOSE"),
-                "localhost", 8000);
+                localhost.getHostAddress(), 8000);
     }
     // #endregion
 }

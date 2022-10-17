@@ -23,14 +23,15 @@ public class UdpSocket {
                 public void run() {
                     in = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
                     while (doRun) {
-                        System.out.println("Attempting to receive data...");
+                        // System.out.println("Attempting to receive data...");
                         try {
                             System.out.println("Looking for data for the next 5 seconds...");
                             sock.receive(in);
                             System.out.println("Got data!");
                         } catch (IOException e) {
                             if (e instanceof SocketTimeoutException)
-                                System.out.println("Just a timeout, continuing...");
+                                ;
+                            // System.out.println("Just a timeout, continuing...");
                             else
                                 e.printStackTrace();
                         }
