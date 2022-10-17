@@ -21,25 +21,31 @@ public class UdpSocket {
         Receiver(UdpSocket p_parent) {
             this.task = new Runnable() {
                 public void run() {
-                    // in = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
+                    byte[] byteData = new byte[65535];
                     while (doRun) {
                         // System.out.println("Attempting to receive data...");
                         try {
-                            System.out.println("Looking for data for the next 5 seconds...");
+                            in = new DatagramPacket(byteData, byteData.length);
+                            // System.out.println("Looking for data after a second...");
                             sock.receive(in);
-                            System.out.println("Got data!");
+                            // System.out.println("Got data!");
                         } catch (IOException e) {
-                            if (e instanceof SocketTimeoutException)
-                                ;
-                            // System.out.println("Just a timeout, continuing...");
-                            else
+                            if (e instanceof SocketTimeoutException) {
+                                System.out.println(new String(byteData));
+                                System.out.println("Timeout ended! Continuing...");
+                            } else
                                 e.printStackTrace();
                         }
 
                         if (in != null) {
                             InetAddress addr = in.getAddress();
-                            if (addr == null)
+
+                            System.out.println(RequestCode.fromBytes(in.getData()));
+                            System.out.println(in.getData().length);
+                            if (addr == null) {
+                                System.out.println("...but the address was `null`...");
                                 continue;
+                            }
 
                             String ip = addr.toString();
                             int port = in.getPort();
@@ -76,10 +82,13 @@ public class UdpSocket {
     UdpSocket() {
         try {
             this.sock = new DatagramSocket();
-            this.sock.setSoTimeout(5);
+            this.sock.setSoTimeout(1000);
         } catch (SocketException e) {
             e.printStackTrace();
         }
+
+        System.out.println(this.sock.getLocalPort());
+        System.out.println(this.sock.getLocalAddress());
 
         this.receiver = new Receiver(this);
         this.onStart();
@@ -88,6 +97,10 @@ public class UdpSocket {
     // #region Getters
     public int getPort() {
         return this.sock.getLocalPort();
+    }
+
+    public InetAddress getIp() {
+        return this.sock.getLocalAddress();
     }
 
     public DatagramPacket getLastPacketSent() {

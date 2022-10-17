@@ -563,10 +563,10 @@ public class App extends PApplet {
             e.printStackTrace();
         }
 
-        System.out.println("\n\n\nSent data on click!\n\n\n");
+        System.out.println("\nSent data on click!\n");
 
         SKETCH.socket.send(RequestCode.toBytes("CLIENT_CLOSE"),
-                localhost.getHostAddress(), 8000);
+                localhost.getHostAddress(), SKETCH.socket.getPort());
     }
     // #endregion
 }
