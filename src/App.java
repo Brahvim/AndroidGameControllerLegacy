@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.event.MouseAdapter;
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,6 +32,8 @@ public class App extends PApplet {
     // #region Fields.
     final static AppWithScenes SKETCH = new AppWithScenes();
     final static String VERSION = "v1.0";
+    final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+            .getDisplayMode().getRefreshRate();
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
@@ -40,7 +42,10 @@ public class App extends PApplet {
     Robot robot;
     UiBooster ui;
     HashMap<String, String> strTable = parseStringTableFromFile("AGC_StringTable.ini");
+    // `possibleClients` can be removed by using a more functional pattern...
     ArrayList<String> possibleClients, connectedClients;
+    ArrayList<Integer> clientPorts;
+    int numClients;
     PGraphics gr;
     boolean hasOneConnection;
     float frameStartTime, deltaTime, pframeTime, frameTime;
@@ -83,16 +88,23 @@ public class App extends PApplet {
 
     // #region Processing's windowing callbacks.
     public void dispose() {
-        if (!(connectedClients == null || server == null))
-            for (String s : connectedClients)
-                server.send(requestCodeToBytes("SERVER_CLOSE"), s);
+        if (socket != null) {
+            if (numClients != 0) {
+                for (int i = 0; i < numClients; i++)
+                    socket.send(RequestCode.toBytes("SERVER_CLOSE"),
+                            connectedClients.get(i), clientPorts.get(i));
+            }
+            socket.close();
+        }
 
         // Exit the sketch:
         super.dispose();
     }
 
     public void setup() {
-        System.out.printf("Welcome to the AndroidGameController Server application `%s`!\n\n", App.VERSION);
+        System.out.printf(
+                "Welcome to the AndroidGameController Server application `%s`!\n\n",
+                App.VERSION);
 
         // Window setup:
         surface.setTitle("AndroidGameController Server ".concat(App.VERSION));
@@ -112,25 +124,33 @@ public class App extends PApplet {
 
         // Stuff with processing!:
         updateRatios();
-        frameRate(240);
-        surface.setVisible(false); // Visible after it has connected.
+        System.out.printf("Running on a `%d`Hz display.\n", REFRESH_RATE);
+        frameRate(REFRESH_RATE);
+        // surface.setVisible(false); // Visible after it has connected.
         prepareJPanel();
 
-        Forms.showFindingConnectionDialog();
+        // Forms.showFindingConnectionDialog();
 
         // Networking:
         possibleClients = getNetworks();
         System.out.printf("Possible clients:\n%s\n", possibleClients.toString());
-        server = new UDP(this);
+        // server = new UDP(this);
+        initSocket();
 
         for (String s : possibleClients)
-            server.send(requestCodeToBytes("FINDING_DEVICES"), s);
+            socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
+        // socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, socket.getPort());
+
+        // Forms.newFindingConnectionsForm =
+        // Forms.createFindingConnectionsDialogNew().run();
+        // JDialog win = Forms.newFindingConnectionsForm.getWindow();
+        // win.setResizable(false);
 
         // while (!hasOneConnection)
         // ;
-        surface.setVisible(true);
-        Forms.findingDevicesDialog.close();
-        surface.setVisible(true);
+        // surface.setVisible(false);
+        // Forms.findingDevicesDialog.close();
+        // surface.setVisible(true);
     }
 
     public void pre() {
@@ -216,6 +236,8 @@ public class App extends PApplet {
         pPsdX = mouseX;
         pPsdY = mouseY;
 
+        App.sockTest();
+
         if (mouseButton == MouseEvent.BUTTON3) {
             if (isFormOpen(Forms.settingsForm)) {
             } else if ((Forms.settingsForm = showForm(
@@ -228,10 +250,6 @@ public class App extends PApplet {
     // #endregion
 
     // #region Custom methods.
-    public byte[] requestCodeToBytes(String p_req) {
-        return ByteBuffer.allocate(Integer.BYTES)
-                .putInt(RequestCode.values.get(p_req)).array();
-    }
 
     public void updateRatios() {
         cx = width * 0.5f;
@@ -401,6 +419,15 @@ public class App extends PApplet {
         return p_form;
     }
 
+    public Form showBlockingForm(Form p_form, FormBuilder p_formBuild) {
+        if (p_form != null)
+            if (!p_form.isClosedByUser())
+                p_form.close();
+
+        p_form = p_formBuild.show();
+        return p_form;
+    }
+
     public static HashMap<String, String> parseRequestCodesFromFile(String p_fileName) {
         HashMap<String, String> parsedMap = new HashMap<>();
         File tableFile = new File("data", p_fileName);
@@ -493,6 +520,35 @@ public class App extends PApplet {
             }
         }
         return parsedMap;
+    }
+
+    public void initSocket() {
+        socket = new UdpSocket() {
+            @Override
+            protected void onStart() {
+                System.out.println("The socket has begun, boiiii!");
+            }
+
+            @Override
+            public void onReceive(byte[] p_data, String p_ip, int p_port) {
+                System.out.printf(
+                        "The socket has RECEIVED data from IP: `%s`, port: `%d`:\n",
+                        p_ip, p_port);
+                System.out.println(RequestCode.fromBytes(p_data));
+                System.out.println("------End of data------");
+                Scene.currentScene.receive(p_data, p_ip, p_port);
+            }
+
+            @Override
+            protected void onClose() {
+                System.out.println("The socket's been disposed off, thanks for taking the service :)");
+            }
+        };
+    }
+
+    public static void sockTest() {
+        SKETCH.socket.send(RequestCode.toBytes("CLIENT_CLOSE"),
+                "localhost", 8000);
     }
     // #endregion
 }

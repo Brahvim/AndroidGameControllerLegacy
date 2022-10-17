@@ -21,7 +21,7 @@ public class AppWithScenes extends App {
         public void draw() {
             gr.textAlign(CENTER);
             gr.textSize(28);
-            gr.text(shownText, cx, cy);
+            gr.text(shownText, cx + sin(millis() * 0.001f) * 25, cy);
         }
         // #endregion
     };

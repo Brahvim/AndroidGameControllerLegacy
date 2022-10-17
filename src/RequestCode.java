@@ -1,13 +1,27 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Map;
 
 public final class RequestCode {
     static HashMap<String, Integer> values;
+    static HashMap<Integer, String> keys; // ...not in the mood to uyse `BiDiMap`/`BiMap`!
+    // ...apparently it's from a library, "Guava". No. Please no.
+    // No more dependencies!
 
     static int get(String p_key) {
         return values.get(p_key);
+    }
+
+    public static byte[] toBytes(String p_req) {
+        return ByteBuffer.allocate(Integer.BYTES)
+                .putInt(RequestCode.values.get(p_req)).array();
+    }
+
+    public static String fromBytes(byte[] p_bytes) {
+        return keys.get(ByteBuffer.wrap(p_bytes).getInt());
     }
 
     static { // Parse `AGC_RequestCodes.properties`.
@@ -35,6 +49,14 @@ public final class RequestCode {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
+        // Revert the `values` `HashMap` and store the reverted values into `keys`.
+        // Too lazy to use `BiDiMap`/`BiMap`! :joy:
+        // ...apparently it's from a library, "Guava". No. Please no.
+        // No more dependencies!
+        keys = new HashMap<Integer, String>();
+
+        for (Map.Entry<String, Integer> entry : values.entrySet())
+            keys.put(entry.getValue(), entry.getKey());
+    }
 }
