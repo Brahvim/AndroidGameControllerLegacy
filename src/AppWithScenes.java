@@ -38,6 +38,7 @@ public class AppWithScenes extends App {
     };
 
     Scene exitScene = new Scene() {
+        // #region "Exiting" scene.
         String thankYouText;
 
         @Override
@@ -45,7 +46,6 @@ public class AppWithScenes extends App {
             thankYouText = Forms.getString("ExitScene.text");
         }
 
-        // #region "Exiting" scene.
         @Override
         public void draw() {
             gr.textAlign(CENTER);
@@ -66,4 +66,5 @@ public class AppWithScenes extends App {
         }
         // #endregion
     };
+
 }

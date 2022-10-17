@@ -19,7 +19,6 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import hypermedia.net.UDP;
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -39,7 +38,6 @@ public class App extends PApplet {
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
-    UDP server;
     UdpSocket socket;
     Robot robot;
     UiBooster ui;
@@ -102,6 +100,13 @@ public class App extends PApplet {
         // Exit the sketch:
         super.dispose();
     }
+
+    // `dipose()` calls `exit()`?!
+
+    // @Override
+    // public void exit() {
+    // agcExit();
+    // }
 
     public void setup() {
         System.out.printf(
@@ -214,25 +219,27 @@ public class App extends PApplet {
     // #endregion
 
     // #region Processing and other libraries' input callbacks.
-    public void receive(byte[] p_data, String p_ip, int p_port) {
-        String request = new String(p_data);
-        switch (request) {
-            case "FINDING_DEVICES":
-                break;
+    // UDP, unused...?:
 
-            case "ADD_ME":
-                connectedClients.add(p_ip);
+    // public void receive(byte[] p_data, String p_ip, int p_port) {
+    // String request = new String(p_data);
+    // switch (request) {
+    // case "FINDING_DEVICES":
+    // break;
 
-                if (connectedClients.size() > 0)
-                    hasOneConnection = true;
-                break;
+    // case "ADD_ME":
+    // connectedClients.add(p_ip);
 
-            case "CLIENT_CLOSE":
-                connectedClients.remove(p_ip);
-                break;
-        }
+    // if (connectedClients.size() > 0)
+    // hasOneConnection = true;
+    // break;
 
-    }
+    // case "CLIENT_CLOSE":
+    // connectedClients.remove(p_ip);
+    // break;
+    // }
+
+    // }
 
     public void mousePressed() {
         pPsdX = mouseX;
@@ -527,11 +534,6 @@ public class App extends PApplet {
     public void initSocket() {
         socket = new UdpSocket() {
             @Override
-            protected void onStart() {
-                System.out.println("The socket has begun, boiiii!");
-            }
-
-            @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
                 System.out.printf(
                         "The socket has RECEIVED data from IP: `%s`, port: `%d`:\n",
@@ -539,6 +541,11 @@ public class App extends PApplet {
                 System.out.println(RequestCode.fromBytes(p_data));
                 System.out.println("------End of data------");
                 Scene.currentScene.receive(p_data, p_ip, p_port);
+            }
+
+            @Override
+            protected void onStart() {
+                System.out.println("The socket has begun, boiiii!");
             }
 
             @Override

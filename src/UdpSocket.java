@@ -21,7 +21,7 @@ public class UdpSocket {
         Receiver(UdpSocket p_parent) {
             this.task = new Runnable() {
                 public void run() {
-                    in = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
+                    // in = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
                     while (doRun) {
                         // System.out.println("Attempting to receive data...");
                         try {
@@ -60,7 +60,6 @@ public class UdpSocket {
             this.thread = new Thread(this.task);
             // this.thread.setDaemon(true);
             this.thread.start();
-
         }
 
         public void stop() {
@@ -92,11 +91,11 @@ public class UdpSocket {
     }
 
     public DatagramPacket getLastPacketSent() {
-        return out;
+        return this.out;
     }
 
     public DatagramPacket getLastPacketGot() {
-        return in;
+        return this.in;
     }
     // #endregion
 
