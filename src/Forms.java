@@ -1,5 +1,3 @@
-import java.util.HashMap;
-
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
 import uibooster.components.WindowSetting;
@@ -11,7 +9,6 @@ public class Forms {
     // #region Fields.
     // From `App`:
     static UiBooster ui; // = App.ui;
-    static HashMap<String, String> strTable;
 
     static Form deviceSelectionForm, settingsForm, newFindingConnectionsForm;
 
@@ -20,13 +17,12 @@ public class Forms {
     static WaitingDialog findingDevicesDialog;
     // #endregion
 
-    static void init(UiBooster p_ui, HashMap<String, String> p_strTable) {
+    static void init(UiBooster p_ui) {
         Forms.ui = p_ui;
-        Forms.strTable = p_strTable;
     }
 
     static String getString(String p_key) {
-        String ret = strTable.get(p_key);
+        String ret = StringTable.get(p_key);
         if (ret == null)
             System.err.printf("Key `%s` not found!\n", p_key);
         return ret;
