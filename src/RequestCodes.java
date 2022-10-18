@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RequestCode {
+public final class RequestCodes {
     static HashMap<String, Integer> values;
     static HashMap<Integer, String> keys; // ...not in the mood to uyse `BiDiMap`/`BiMap`!
     // ...apparently it's from a library, "Guava". No. Please no.
@@ -17,7 +17,7 @@ public final class RequestCode {
 
     public static byte[] toBytes(String p_req) {
         return ByteBuffer.allocate(Integer.BYTES)
-                .putInt(RequestCode.values.get(p_req)).array();
+                .putInt(RequestCodes.values.get(p_req)).array();
     }
 
     public static String fromBytes(byte[] p_bytes) {

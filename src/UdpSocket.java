@@ -8,51 +8,47 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 public class UdpSocket {
+    public final static int DEFAULT_TIMEOUT = 32;
+
     private Receiver receiver;
     private DatagramSocket sock;
     private DatagramPacket in, out;
 
     // Threading stuff *haha:*
-    class Receiver {
-        Thread thread;
+    public class Receiver {
+        Thread thread; // Ti's but a daemon thread.
         private boolean doRun;
         private Runnable task;
 
         Receiver(UdpSocket p_parent) {
             this.task = new Runnable() {
                 public void run() {
-                    byte[] byteData = new byte[65535];
+                    byte[] byteData = new byte[65535]; // B I G ___ A L L O C A T I O N
+
+                    // We got some work?
                     while (doRun) {
-                        // System.out.println("Attempting to receive data...");
                         try {
                             in = new DatagramPacket(byteData, byteData.length);
-                            // System.out.println("Looking for data after a second...");
-                            sock.receive(in);
-                            // System.out.println("Got data!");
+                            sock.receive(in); // Fetch it well!
                         } catch (IOException e) {
                             if (e instanceof SocketTimeoutException) {
-                                System.out.println(new String(byteData));
-                                System.out.println("Timeout ended! Continuing...");
+                                // ¯\_(ツ)_/¯
+                                // System.out.println("Timeout ended! Continuing...");
                             } else
-                                e.printStackTrace();
+                                e.printStackTrace(); // ¯\_(ツ)_/¯
                         }
 
+                        // Callback!:
                         if (in != null) {
                             InetAddress addr = in.getAddress();
 
-                            System.out.println(RequestCode.fromBytes(in.getData()));
-                            System.out.println(in.getData().length);
-                            if (addr == null) {
-                                System.out.println("...but the address was `null`...");
+                            if (addr == null)
                                 continue;
-                            }
 
-                            String ip = addr.toString();
-                            int port = in.getPort();
-
-                            System.out.println("Calling `onReceive()`!");
-                            onReceive(in.getData(), ip, port);
-                            break;
+                            // System.out.println("Calling `onReceive()`!");
+                            onReceive(in.getData(),
+                                    addr.toString().substring(1),
+                                    in.getPort());
                         }
                     }
                 }
@@ -64,7 +60,7 @@ public class UdpSocket {
         public void start() {
             this.doRun = true;
             this.thread = new Thread(this.task);
-            // this.thread.setDaemon(true);
+            this.thread.setDaemon(true);
             this.thread.start();
         }
 
@@ -79,22 +75,28 @@ public class UdpSocket {
         }
     }
 
-    UdpSocket() {
+    // #region Construction!~
+    public UdpSocket() {
+        this(UdpSocket.DEFAULT_TIMEOUT);
+    }
+
+    public UdpSocket(int p_timeout) {
         try {
             this.sock = new DatagramSocket();
-            this.sock.setSoTimeout(1000);
+            this.sock.setSoTimeout(p_timeout);
         } catch (SocketException e) {
             e.printStackTrace();
         }
 
-        System.out.println(this.sock.getLocalPort());
-        System.out.println(this.sock.getLocalAddress());
+        // System.out.println(this.sock.getLocalPort());
+        // System.out.println(this.sock.getLocalAddress());
 
         this.receiver = new Receiver(this);
         this.onStart();
     }
+    // #endregion
 
-    // #region Getters
+    // #region Getters. They're all `public`.
     public int getPort() {
         return this.sock.getLocalPort();
     }
@@ -114,7 +116,7 @@ public class UdpSocket {
 
     // #region `public` methods!:
     public void send(byte[] p_data, String p_ip, int p_port) {
-        System.out.println("The socket sent some data!");
+        // System.out.println("The socket sent some data!");
         try {
             this.sock.send(out = new DatagramPacket(
                     p_data, p_data.length, InetAddress.getByName(p_ip), p_port));
@@ -140,11 +142,11 @@ public class UdpSocket {
         this.onClose();
         this.receiver.stop();
         this.sock.close();
-        System.out.println("Socket closed...");
+        // System.out.println("Socket closed...");
     }
     // #endregion
 
-    // #region Callbacks.
+    // #region Callbacks. These are what you get. LOOK HERE!
     protected void onStart() {
     }
 

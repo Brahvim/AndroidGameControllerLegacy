@@ -33,8 +33,8 @@ public class App extends PApplet {
     // #region Fields.
     final static AppWithScenes SKETCH = new AppWithScenes();
     final static String VERSION = "v1.0";
-    final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-            .getDisplayMode().getRefreshRate();
+    final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
+            .getScreenDevices()[0].getDisplayMode().getRefreshRate();
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
@@ -91,7 +91,7 @@ public class App extends PApplet {
         if (socket != null) {
             if (numClients != 0) {
                 for (int i = 0; i < numClients; i++)
-                    socket.send(RequestCode.toBytes("SERVER_CLOSE"),
+                    socket.send(RequestCodes.toBytes("SERVER_CLOSE"),
                             connectedClients.get(i), clientPorts.get(i));
             }
             socket.close();
@@ -145,7 +145,7 @@ public class App extends PApplet {
         initSocket();
 
         for (String s : possibleClients)
-            socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
+            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
         // socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, socket.getPort());
 
         // Forms.newFindingConnectionsForm =
@@ -246,6 +246,14 @@ public class App extends PApplet {
         pPsdY = mouseY;
 
         App.sockTest();
+
+        possibleClients = getNetworks();
+
+        for (String s : possibleClients) {
+            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
+            System.out.print("Sent `FINDING_DEVICES` request to IP: ");
+            System.out.println(s);
+        }
 
         if (mouseButton == MouseEvent.BUTTON3) {
             if (isFormOpen(Forms.settingsForm)) {
@@ -536,10 +544,8 @@ public class App extends PApplet {
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
                 System.out.printf(
-                        "The socket has RECEIVED data from IP: `%s`, port: `%d`:\n",
-                        p_ip, p_port);
-                System.out.println(RequestCode.fromBytes(p_data));
-                System.out.println("------End of data------");
+                        "The socket has RECEIVED the code `%s` from IPaddr `%s` on port: `%d`:\n",
+                        RequestCodes.fromBytes(p_data), p_ip, p_port);
                 Scene.currentScene.receive(p_data, p_ip, p_port);
             }
 
@@ -563,9 +569,7 @@ public class App extends PApplet {
             e.printStackTrace();
         }
 
-        System.out.println("\nSent data on click!\n");
-
-        SKETCH.socket.send(RequestCode.toBytes("CLIENT_CLOSE"),
+        SKETCH.socket.send(RequestCodes.toBytes("CLIENT_CLOSE"),
                 localhost.getHostAddress(), SKETCH.socket.getPort());
     }
     // #endregion
