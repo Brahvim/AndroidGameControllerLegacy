@@ -11,8 +11,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,13 +33,14 @@ public class App extends PApplet {
     final static String VERSION = "v1.0";
     final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
+    final static int CLIENT_PORT = 62_038, SERVER_PORT = 55_595;
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
     UdpSocket socket;
     Robot robot;
     UiBooster ui;
-    // `possibleClients` can be removed by using a more functional pattern...
+    // `possibleClients` SHOULD be removed by using a more functional pattern...
     ArrayList<String> possibleClients, connectedClients;
     ArrayList<Integer> clientPorts;
     int numClients;
@@ -97,7 +96,7 @@ public class App extends PApplet {
         }
 
         // Exit the sketch:
-        super.dispose();
+        super.exit();
     }
 
     // `dipose()` calls `exit()`?!
@@ -120,7 +119,6 @@ public class App extends PApplet {
 
         // Forms:
         ui = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
-        // strTable = parseIniFile("AGC_StringTable.ini");
 
         Forms.init(ui);
         Forms.createSettingsForm();
@@ -144,7 +142,7 @@ public class App extends PApplet {
         initSocket();
 
         for (String s : possibleClients)
-            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
+            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, App.SERVER_PORT);
         // socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, socket.getPort());
 
         // Forms.newFindingConnectionsForm =
@@ -475,7 +473,7 @@ public class App extends PApplet {
     }
 
     public void initSocket() {
-        socket = new UdpSocket() {
+        socket = new UdpSocket(App.SERVER_PORT, 0) {
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
                 System.out.printf(
@@ -487,6 +485,9 @@ public class App extends PApplet {
             @Override
             protected void onStart() {
                 System.out.println("The socket has begun, boiiii!");
+
+                // System.out.printf("Running a `UdpSocket` on port: `%d` for IPaddr: `%s`.\n",
+                // this.getPort(), this.getIp());
             }
 
             @Override
@@ -497,15 +498,15 @@ public class App extends PApplet {
     }
 
     public static void sockTest() {
-        InetAddress localhost = null;
-        try {
-            localhost = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        // InetAddress localhost = null;
+        // try {
+        // localhost = InetAddress.getLocalHost();
+        // } catch (UnknownHostException e) {
+        // e.printStackTrace();
+        // }
 
-        SKETCH.socket.send(RequestCodes.toBytes("CLIENT_CLOSE"),
-                localhost.getHostAddress(), SKETCH.socket.getPort());
+        // SKETCH.socket.send(RequestCodes.toBytes("CLIENT_CLOSE"),
+        // localhost.getHostAddress(), SKETCH.socket.getPort());
     }
     // #endregion
 }

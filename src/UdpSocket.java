@@ -75,14 +75,18 @@ public class UdpSocket {
         }
     }
 
-    // #region Construction!~
+    // region Construction!~
     public UdpSocket() {
-        this(UdpSocket.DEFAULT_TIMEOUT);
+        this(0, UdpSocket.DEFAULT_TIMEOUT);
     }
 
-    public UdpSocket(int p_timeout) {
+    public UdpSocket(int p_port) {
+        this(p_port, UdpSocket.DEFAULT_TIMEOUT);
+    }
+
+    public UdpSocket(int p_port, int p_timeout) {
         try {
-            this.sock = new DatagramSocket();
+            this.sock = new DatagramSocket(p_port);
             this.sock.setSoTimeout(p_timeout);
         } catch (SocketException e) {
             e.printStackTrace();
@@ -94,9 +98,17 @@ public class UdpSocket {
         this.receiver = new Receiver(this);
         this.onStart();
     }
-    // #endregion
+    // endregion
 
-    // #region Getters. They're all `public`.
+    // region Getters and setters. They're all `public`.
+    public void setTimeout(int p_timeout) {
+        try {
+            this.sock.setSoTimeout(p_timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getPort() {
         return this.sock.getLocalPort();
     }
@@ -112,9 +124,9 @@ public class UdpSocket {
     public DatagramPacket getLastPacketGot() {
         return this.in;
     }
-    // #endregion
+    // endregion
 
-    // #region `public` methods!:
+    // region `public` methods!:
     public void send(byte[] p_data, String p_ip, int p_port) {
         // System.out.println("The socket sent some data!");
         try {
@@ -144,9 +156,9 @@ public class UdpSocket {
         this.sock.close();
         // System.out.println("Socket closed...");
     }
-    // #endregion
+    // endregion
 
-    // #region Callbacks. These are what you get. LOOK HERE!
+    // region Callbacks. These are what you get. LOOK HERE!
     protected void onStart() {
     }
 
@@ -156,6 +168,6 @@ public class UdpSocket {
 
     protected void onClose() {
     }
-    // #endregion
+    // endregion
 
 }
