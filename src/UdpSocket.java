@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -10,15 +11,27 @@ import java.nio.charset.StandardCharsets;
 public class UdpSocket {
     public final static int DEFAULT_TIMEOUT = 32;
 
-    private Receiver receiver;
+    /**
+     * The internal {@linkplain DatagramSocket} that takes care of
+     * networking.<br>
+     * <br>
+     * If you need to change it, consider using the
+     * {@link UdpSocket#setSocket(DatagramSocket)}
+     * method (it pauses the receiving thread, swaps the socket, and resumes
+     * listening).<br>
+     * <br>
+     * {@link UdpSocket#getSocket()} <b>should</b> be used for equality checks,
+     * etcetera.
+     */
     private DatagramSocket sock;
+    private Receiver receiver;
     private DatagramPacket in, out;
 
     // Threading stuff *haha:*
     public class Receiver {
         Thread thread; // Ti's but a daemon thread.
         private boolean doRun;
-        private Runnable task;
+        Runnable task;
 
         Receiver(UdpSocket p_parent) {
             this.task = new Runnable() {
@@ -34,6 +47,9 @@ public class UdpSocket {
                             if (e instanceof SocketTimeoutException) {
                                 // ¯\_(ツ)_/¯
                                 // System.out.println("Timeout ended! Continuing...");
+                            } else if (e instanceof SocketException) {
+                                doRun = false;
+                                return;
                             } else
                                 e.printStackTrace(); // ¯\_(ツ)_/¯
                         }
@@ -59,6 +75,7 @@ public class UdpSocket {
 
         public void start() {
             this.doRun = true;
+            // Yes. If `task` is `null`, throw an error.
             this.thread = new Thread(this.task);
             this.thread.setDaemon(true);
             this.thread.start();
@@ -76,29 +93,161 @@ public class UdpSocket {
     }
 
     // #region Construction!~
+
     public UdpSocket() {
-        this(UdpSocket.DEFAULT_TIMEOUT);
+        this(0, UdpSocket.DEFAULT_TIMEOUT);
     }
 
-    public UdpSocket(int p_timeout) {
+    public UdpSocket(int p_port) {
+        this(p_port, UdpSocket.DEFAULT_TIMEOUT);
+    }
+
+    UdpSocket(DatagramSocket p_sock) {
+        this.sock = p_sock;
+        this.receiver = new Receiver(this);
+    }
+
+    public static DatagramSocket createSocketForcingPort(int p_port, int p_timeout) {
+        DatagramSocket ret = null;
+
         try {
-            this.sock = new DatagramSocket();
+            ret = new DatagramSocket(null);
+            ret.setReuseAddress(true);
+            ret.bind(new InetSocketAddress(p_port));
+            ret.setSoTimeout(p_timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public UdpSocket(int p_port, int p_timeout) {
+        try {
+            this.sock = new DatagramSocket(p_port);
             this.sock.setSoTimeout(p_timeout);
         } catch (SocketException e) {
             e.printStackTrace();
         }
 
-        // System.out.println(this.sock.getLocalPort());
+        // #region Old "force port" method:
+        // try {
+        // this.sock = new DatagramSocket(p_port);
+        // if (this.getPort() != p_port) {
+        // System.out.printf("Could not bind to port `%d`. Forcing the OS...\n",
+        // p_port);
+        // this.forcePort(p_port);
+        // }
+        // this.sock.setSoTimeout(p_timeout);
+        // } catch (SocketException e) {
+        // e.printStackTrace();
+        // try {
+        // if (this.sock != null)
+        // this.sock.close();
+        // this.sock = new DatagramSocket(null);
+        // this.sock.setReuseAddress(true);
+        // this.sock.bind(new InetSocketAddress(p_port));
+        // this.sock.setSoTimeout(p_timeout);
+        // } catch (SocketException f) {
+        // f.printStackTrace();
+        // }
+        // }
+        // #endregion
+
+        System.out.printf("Socket port: `%d`.\n", this.sock.getLocalPort());
         // System.out.println(this.sock.getLocalAddress());
 
-        this.receiver = new Receiver(this);
+        if (this.receiver == null)
+            this.receiver = new Receiver(this);
         this.onStart();
     }
     // #endregion
 
-    // #region Getters. They're all `public`.
+    // #region Callbacks. These are what you get. LOOK HERE!
+    /**
+     * Simply called by the constructor of {@code UdpSocket}, really.
+     */
+    protected void onStart() {
+    }
+
+    /**
+     * @apiNote {@code public} so you can generate fake events ;) *
+     * @param p_data Always of length {@code 65535}. No more, no less!
+     *               If you wish to make a string out of it, use the constructor
+     *               {@code new String(p_data, 0, p_data.length)}. The {@code 0} is
+     *               the first character of the string.
+     * @param p_ip
+     * @param p_port
+     */
+    public void onReceive(byte[] p_data, String p_ip, int p_port) {
+    }
+
+    /**
+     * Called before {@code .close()} closes the thread and socket.
+     */
+    protected void onClose() {
+    }
+    // #endregion
+
+    // region Getters and setters. They're all `public`.
+    public DatagramSocket getSocket() {
+        return this.sock;
+    }
+
+    public void setSocket(DatagramSocket p_sock) {
+        this.receiver.stop();
+        this.sock = p_sock;
+        this.receiver.start();
+    }
+
+    public int getTimeout(int p_timeout) {
+        try {
+            return this.sock.getSoTimeout();
+        } catch (SocketException e) {
+            // Hope this never happens!:
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public void setTimeout(int p_timeout) {
+        try {
+            this.sock.setSoTimeout(p_timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getPort() {
         return this.sock.getLocalPort();
+    }
+
+    public void setPort(int p_port) {
+        try {
+            InetAddress previous = this.sock.getLocalAddress();
+            // boolean receiverWasNull = receiver == null;
+            // ^^^ Used when the function is called from constructors.
+
+            // if (!receiverWasNull)
+            // this.receiver.stop();
+            this.receiver.stop(); // Necessary to call either way!
+            this.sock.close();
+
+            this.sock = new DatagramSocket(null);
+            this.sock.setReuseAddress(true);
+            this.sock.bind(new InetSocketAddress(previous, p_port));
+
+            // if (receiverWasNull)
+            // this.receiver = new Receiver(this);
+
+            this.receiver.start();
+
+            System.out.printf("Successfully forced the port to: `%d`.\n", this.sock.getLocalPort());
+        } catch (SocketException e) {
+            System.out.printf("Setting the port to `%d` failed!\n", p_port);
+            System.out.printf("Had to revert to port `%d`...\n", this.sock.getLocalPort());
+            e.printStackTrace();
+        }
     }
 
     public InetAddress getIp() {
@@ -109,12 +258,12 @@ public class UdpSocket {
         return this.out;
     }
 
-    public DatagramPacket getLastPacketGot() {
+    public DatagramPacket getLastPacketReceived() {
         return this.in;
     }
     // #endregion
 
-    // #region `public` methods!:
+    // #region Other `public` methods!:
     public void send(byte[] p_data, String p_ip, int p_port) {
         // System.out.println("The socket sent some data!");
         try {
@@ -140,22 +289,17 @@ public class UdpSocket {
 
     public void close() {
         this.onClose();
+        this.setTimeout(0);
         this.receiver.stop();
+
+        try {
+            this.sock.setReuseAddress(false);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
         this.sock.close();
         // System.out.println("Socket closed...");
     }
     // #endregion
-
-    // #region Callbacks. These are what you get. LOOK HERE!
-    protected void onStart() {
-    }
-
-    // `public` so you can generate fake events ;)
-    public void onReceive(byte[] p_data, String p_ip, int p_port) {
-    }
-
-    protected void onClose() {
-    }
-    // #endregion
-
 }

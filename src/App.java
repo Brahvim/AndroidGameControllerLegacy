@@ -35,6 +35,7 @@ public class App extends PApplet {
     final static String VERSION = "v1.0";
     final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
+    final static int SERVER_PORT = 6443, CLIENT_PORT = 6443;
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
@@ -475,7 +476,7 @@ public class App extends PApplet {
     }
 
     public void initSocket() {
-        socket = new UdpSocket() {
+        socket = new UdpSocket() { // RequestCodes.get("SERVER_PORT")) {
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
                 System.out.printf(
@@ -486,7 +487,10 @@ public class App extends PApplet {
 
             @Override
             protected void onStart() {
+                this.setPort(RequestCodes.get("SERVER_PORT"));
                 System.out.println("The socket has begun, boiiii!");
+                System.out.printf("Socket-Stats!:\n\t- IP: `%s`\n\t- Port: `%d`\n", this.getIp(), this.getPort());
+                System.out.println(this.getPort());
             }
 
             @Override
