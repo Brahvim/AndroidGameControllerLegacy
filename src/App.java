@@ -481,6 +481,7 @@ public class App extends PApplet {
         return p_form;
     }
 
+    @Deprecated
     public static HashMap<String, String> parseRequestCodesFromFile(String p_fileName) {
         HashMap<String, String> parsedMap = new HashMap<>();
         File tableFile = new File("data", p_fileName);

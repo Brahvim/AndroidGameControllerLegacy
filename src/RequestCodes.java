@@ -23,11 +23,14 @@ public final class RequestCodes {
     }
 
     public static String fromBytes(byte[] p_bytes) {
-        return keys.get(ByteBuffer.wrap(p_bytes).getInt());
+        byte[] firstInt = new byte[Integer.BYTES];
+        System.arraycopy(p_bytes, 0, firstInt, 0, firstInt.length);
+
+        return keys.get(ByteBuffer.wrap(firstInt).getInt());
     }
 
     static { // Parse `AGC_RequestCodes.properties`.
-        values = new HashMap<>();
+        values = new HashMap<String, Integer>();
 
         File file = new File("data", "AGC_RequestCodes.properties");
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

@@ -28,7 +28,7 @@ public class StringTable {
                         continue;
 
                     // Skipping comments and registering sections,
-                    // and skipi this iteration if they exist:
+                    // and skip this iteration if they exist:
                     switch (line.charAt(0)) {
                         case '#':
                             continue;
