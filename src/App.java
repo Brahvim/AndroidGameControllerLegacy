@@ -245,29 +245,11 @@ public class App extends PApplet {
         pPsdX = mouseX;
         pPsdY = mouseY;
 
-        App.sockTest();
-
-        possibleClients = getNetworks();
-
-        for (String s : possibleClients) {
-            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
-            System.out.print("Sent `FINDING_DEVICES` request to IP: ");
-            System.out.println(s);
-        }
-
-        if (mouseButton == MouseEvent.BUTTON3) {
-            if (isFormOpen(Forms.settingsForm)) {
-            } else if ((Forms.settingsForm = showForm(
-                    Forms.settingsForm, Forms.settingsFormBuild)) != null) {
-                Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
-                Forms.settingsForm.getWindow().setResizable(false);
-            }
-        }
+        Scene.currentScene.mousePressed();
     }
     // #endregion
 
     // #region Custom methods.
-
     public void updateRatios() {
         cx = width * 0.5f;
         cy = height * 0.5f;
@@ -482,6 +464,8 @@ public class App extends PApplet {
                 System.out.printf(
                         "The socket has RECEIVED the code `%s` from IPaddr `%s` on port: `%d`:\n",
                         RequestCodes.fromBytes(p_data), p_ip, p_port);
+
+                System.out.printf("Length of `byte[]` received: `%d`.\n", p_data.length);
                 Scene.currentScene.receive(p_data, p_ip, p_port);
             }
 
@@ -489,8 +473,7 @@ public class App extends PApplet {
             protected void onStart() {
                 this.setPort(RequestCodes.get("SERVER_PORT"));
                 System.out.println("The socket has begun, boiiii!");
-                System.out.printf("Socket-Stats!:\n\t- IP: `%s`\n\t- Port: `%d`\n", this.getIp(), this.getPort());
-                System.out.println(this.getPort());
+                System.out.printf("Socket-Stats!:\n\t- IP: `%s`\n\t- Port: `%d`\n", super.getIp(), super.getPort());
             }
 
             @Override

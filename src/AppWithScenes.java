@@ -1,3 +1,5 @@
+import java.awt.event.MouseEvent;
+
 public class AppWithScenes extends App {
     void initFirstScene() {
         Scene firstScene = awaitingConnectionScene;
@@ -6,6 +8,17 @@ public class AppWithScenes extends App {
         firstScene.setup();
         Scene.currentScene = firstScene;
         // #endregion
+    }
+
+    public void settingsMenuCheck() {
+        if (mouseButton == MouseEvent.BUTTON3) {
+            if (isFormOpen(Forms.settingsForm)) {
+            } else if ((Forms.settingsForm = showForm(
+                    Forms.settingsForm, Forms.settingsFormBuild)) != null) {
+                Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
+                Forms.settingsForm.getWindow().setResizable(false);
+            }
+        }
     }
 
     Scene awaitingConnectionScene = new Scene() {
@@ -23,6 +36,20 @@ public class AppWithScenes extends App {
             gr.textSize(28);
             gr.text(shownText, cx + sin(millis() * 0.001f) * 25, cy);
         }
+
+        @Override
+        public void mousePressed() {
+            App.sockTest();
+
+            possibleClients = getNetworks();
+
+            for (String s : possibleClients) {
+                socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
+                System.out.print("Sent `FINDING_DEVICES` request to IP: ");
+                System.out.println(s);
+            }
+            settingsMenuCheck();
+        }
         // #endregion
     };
 
@@ -33,6 +60,11 @@ public class AppWithScenes extends App {
             gr.textAlign(CENTER);
             gr.textSize(28);
             gr.text("AndroidGameController!", cx, cy);
+        }
+
+        @Override
+        public void mousePressed() {
+            settingsMenuCheck();
         }
         // #endregion
     };

@@ -36,7 +36,8 @@ public class UdpSocket {
         Receiver(UdpSocket p_parent) {
             this.task = new Runnable() {
                 public void run() {
-                    byte[] byteData = new byte[65535]; // B I G ___ A L L O C A T I O N
+                    byte[] byteData = new byte[65535], // B I G ___ A L L O C A T I O N !
+                            actualData; // This one's size is a bit random everytime. May the JVM handle it well!
 
                     // We got some work?
                     while (doRun) {
@@ -55,13 +56,19 @@ public class UdpSocket {
                         }
 
                         // Callback!:
-                        if (in != null) {
+                        if (in != null) { // This block also makes `actualData` remain on the stack!
                             InetAddress addr = in.getAddress();
 
                             if (addr == null)
                                 continue;
 
                             // System.out.println("Calling `onReceive()`!");
+
+                            actualData = new byte[in.getLength()];
+                            System.arraycopy(byteData, 0, actualData, 0, actualData.length);
+                            for (int i = 0; i < actualData.length; i++)
+                                actualData[i] = byteData[i];
+
                             onReceive(in.getData(),
                                     addr.toString().substring(1),
                                     in.getPort());
@@ -83,7 +90,6 @@ public class UdpSocket {
 
         public void stop() {
             this.doRun = false;
-
             try {
                 this.thread.join();
             } catch (InterruptedException e) {
@@ -290,15 +296,15 @@ public class UdpSocket {
     public void close() {
         this.onClose();
         this.setTimeout(0);
-        this.receiver.stop();
 
+        // No need to stop the receiving thread!
         try {
             this.sock.setReuseAddress(false);
+            this.sock.close();
         } catch (SocketException e) {
             e.printStackTrace();
         }
 
-        this.sock.close();
         // System.out.println("Socket closed...");
     }
     // #endregion
