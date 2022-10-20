@@ -3,15 +3,15 @@ import java.util.ArrayList;
 import processing.event.MouseEvent;
 
 class Scene {
-    final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
-    static Scene currentScene;
+    public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
+    public static Scene currentScene;
 
-    static void setScene(Scene p_scene) {
+    public static void setScene(Scene p_scene) {
         Scene.currentScene = p_scene;
         p_scene.setup();
     }
 
-    Scene() {
+    public Scene() {
         SCENES.add(this);
     }
 
@@ -33,33 +33,40 @@ class Scene {
     // #endregion
 
     // #region Mouse callbacks.
-    void mousePressed() {
+    public void mousePressed() {
     }
 
-    void mouseMoved() {
+    public void mouseMoved() {
     }
 
-    void mouseWheel(MouseEvent p_event) {
+    public void mouseWheel(MouseEvent p_event) {
     }
 
-    void mouseClicked() {
+    public void mouseClicked() {
     }
 
-    void mouseDragged() {
+    public void mouseDragged() {
     }
 
-    void mouseReleased() {
+    public void mouseReleased() {
+    }
+
+    public void mouseExited() {
+    }
+
+    public void mouseEntered() {
     }
     // #endregion
 
     // #region Keyboard callbacks.
-    void keyPressed() {
+    public void keyPressed() {
     }
 
-    void keyTyped() {
+    public void keyTyped() {
     }
 
-    void keyReleased() {
+    public void keyReleased() {
     }
     // #endregion
+
 }

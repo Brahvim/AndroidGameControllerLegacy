@@ -19,6 +19,8 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.jetbrains.annotations.TestOnly;
+
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -241,12 +243,63 @@ public class App extends PApplet {
 
     // }
 
+    // #region Keyboard event callbacks.
+    @Override
+    public void keyPressed() {
+        Scene.currentScene.keyPressed();
+    }
+
+    @Override
+    public void keyReleased() {
+        Scene.currentScene.keyReleased();
+    }
+
+    @Override
+    public void keyTyped() {
+        Scene.currentScene.keyTyped();
+    }
+
+    // #endregion
+
+    // #region Mouse event callbacks.
+    @Override
+    public void mouseMoved() {
+        Scene.currentScene.mouseMoved();
+    }
+
+    @Override
+    public void mouseWheel(processing.event.MouseEvent p_event) {
+        Scene.currentScene.mouseWheel(p_event);
+    }
+
+    @Override
+    public void mouseClicked() {
+        Scene.currentScene.mouseClicked();
+    }
+
+    @Override
+    public void mouseDragged() {
+        Scene.currentScene.mouseDragged();
+    }
+
+    @Override
+    public void mouseExited() {
+        Scene.currentScene.mouseExited();
+    }
+
+    @Override
+    public void mouseEntered() {
+        Scene.currentScene.mouseEntered();
+    }
+
+    @Override
     public void mousePressed() {
         pPsdX = mouseX;
         pPsdY = mouseY;
 
         Scene.currentScene.mousePressed();
     }
+    // #endregion
     // #endregion
 
     // #region Custom methods.
@@ -332,6 +385,7 @@ public class App extends PApplet {
     }
 
     // Using `netsh interface ip show address`:
+    @Deprecated
     public HashMap<String, String> getNetworksOld() {
         Process wlan = null;
         try {
@@ -458,7 +512,7 @@ public class App extends PApplet {
     }
 
     public void initSocket() {
-        socket = new UdpSocket() { // RequestCodes.get("SERVER_PORT")) {
+        socket = new UdpSocket(RequestCodes.get("SERVER_PORT")) {
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
                 System.out.printf(
@@ -483,6 +537,7 @@ public class App extends PApplet {
         };
     }
 
+    @TestOnly
     public static void sockTest() {
         InetAddress localhost = null;
         try {
