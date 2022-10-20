@@ -8,6 +8,15 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * The {@code UdpSocket} class! This class helps two applications running on
+ * different machines connect via networks following the "User Datagrm Protocol"
+ * and let them listen to each other on a different thread for easier
+ * asynchronous multitasking.<br>
+ * <br>
+ * Of course, it is based on classes from the
+ * {@code java.net} package ;)
+ */
 public class UdpSocket {
     public final static int DEFAULT_TIMEOUT = 32;
 
@@ -24,10 +33,32 @@ public class UdpSocket {
      * etcetera.
      */
     private DatagramSocket sock;
+    /**
+     * The internal, {@code private} {@linkplain UdpSocket.Receiver} instance.
+     * In abstract words, it handles threading for receiving messages.
+     */
     private Receiver receiver;
-    private DatagramPacket in, out;
+
+    /**
+     * Holds the previous {@code DatagramPacket} that was received.
+     */
+    private DatagramPacket in;
+    /**
+     * Holds the previous {@code DatagramPacket} that was sent.
+     */
+    private DatagramPacket out;
 
     // Threading stuff *haha:*
+    /**
+     * The {@code UdpSocket.Receiver} class helps {@code UdpSocket}s receive data on
+     * a separate thread. Other than aiding with application performance and modern
+     * hardware programming practices, it is useful on systems like Android, where
+     * receiving tasks must be done asynchronously.
+     * 
+     * @see UdpSocket
+     * 
+     * @author Brahvim
+     */
     public class Receiver {
         Thread thread; // Ti's but a daemon thread.
         private boolean doRun;
