@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 import java.util.ArrayList;
 
 import processing.event.MouseEvent;
@@ -11,11 +13,15 @@ class Scene {
         p_scene.setup();
     }
 
+    public static void addScene(Scene p_scene) {
+        Scene.SCENES.add(p_scene);
+    }
+
     public Scene() {
         SCENES.add(this);
     }
 
-    // #region Application callback structure:
+    // #region Application callback structure.
     void setup() {
     }
 
@@ -28,11 +34,11 @@ class Scene {
     void post() {
     }
 
-    void receive(byte[] p_data, String p_ip, int p_port) {
+    void onReceive(byte[] p_data, String p_ip, int p_port) {
     }
     // #endregion
 
-    // #region Mouse callbacks.
+    // #region Mouse events.
     public void mousePressed() {
     }
 
@@ -58,7 +64,7 @@ class Scene {
     }
     // #endregion
 
-    // #region Keyboard callbacks.
+    // #region Keyboard events.
     public void keyPressed() {
     }
 

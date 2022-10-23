@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,7 +18,7 @@ import java.nio.charset.StandardCharsets;
  * <br>
  * Of course, it is based on classes from the
  * {@code java.net} package :)
- * 
+ *
  * @author Brahvim Bhaktvatsal
  */
 public class UdpSocket {
@@ -24,7 +26,7 @@ public class UdpSocket {
     /**
      * The default timeout value, in milliseconds, for each {@code UdpSocket}. Used
      * if a timeout value is not specified in the constructor.
-     * 
+     *
      * @implSpec Should be {@code 32}.
      */
     public final static int DEFAULT_TIMEOUT = 32;
@@ -58,28 +60,29 @@ public class UdpSocket {
      * Holds the previous {@code DatagramPacket} that was sent.
      */
     private DatagramPacket out;
-
     // #endregion
 
     // Threading stuff *haha:*
+
     /**
      * The {@code UdpSocket.Receiver} class helps {@code UdpSocket}s receive data on
      * a separate thread. Other than aiding with application performance and modern
      * hardware programming practices, it is useful on systems like Android, where
      * receiving tasks must be done asynchronously.
-     * 
-     * @see UdpSocket
-     * 
+     *
      * @author Brahvim Bhaktvatsal
+     * @see UdpSocket
      */
     public class Receiver {
         // #region Fields.
+
+        static int NUMBER_OF_THREADS = 0;
+
         /**
          * The {@code Thread} that handles the network's receive calls.
-         * 
+         *
          * @implSpec {@linkplain UdpSocket.Receiver#start()}
          *           should set this to be a daemon thread.
-         * 
          * @see UdpSocket.Receiver#start()
          * @see UdpSocket.Receiver#stop()
          */
@@ -88,17 +91,18 @@ public class UdpSocket {
         /**
          * Sets the size of the buffer (in bytes) data is received into. The maximum
          * possible size is {@code 65535} bytes.
-         * 
+         *
          * @implNote Should be {@code 576} by default. To know why, please see
-         *           {@link https://stackoverflow.com/a/9235558/13951505}.
+         *           {@link <a href=
+         *           "https://stackoverflow.com/a/9235558/13951505">...</a>}.
          */
-        public short byteArrayMaxSize = 576;
+        public short byteArrayMaxSize = 576; // PS a more precise number is `543` bytes.
 
         /**
          * An internal {@code private} variable that lets the thread know whether or not
          * to continue execution, so that it can be joined back into the current
          * (usually main) thread.
-         * 
+         *
          * @see UdpSocket.Receiver#start()
          * @see UdpSocket.Receiver#stop()
          */
@@ -107,34 +111,38 @@ public class UdpSocket {
         /**
          * This {@code Runnable} defines the actual code executed in the
          * {@linkplain UdpSocket.Receiver#thread} thread.
-         * 
+         * <p>
          * You may choose to modify it since it has been declared {@code public}.
-         * 
+         *
          * @see UdpSocket.Receiver#Receiver(UdpSocket)
          */
         public Runnable task;
         // #endregion
 
         /**
-         * Given the 'parent' {@linkplain UdpSocket} that obects of this class are to be
+         * Given the 'parent' {@linkplain UdpSocket} that objects of this class are to
+         * be
          * attached to, this class will
-         * 
+         *
          * @param p_parent The {@code UdpSocket} instance.
          * @implNote {@code p_parent} may not be used since {@code Receiver} is a class
          *           nested inside {@linkplain UdpSocket}
          */
         Receiver(UdpSocket p_parent) {
+            Receiver.NUMBER_OF_THREADS++;
+
             this.task = new Runnable() {
                 // Sure, we have lambda expressions, but I won't be using them, haha.
                 public void run() {
-                    byte[] byteData = new byte[65535], // B I G ___ A L L O C A T I O N !
-                            actualData; // This one's size is a bit random everytime. May the JVM handle it well!
+                    byte[] byteData = new byte[byteArrayMaxSize /* 65535 */];
+                    // ^^^ B I G ___ A L L O C A T I O N !
 
                     // We got some work?
                     while (doRun) {
                         try {
                             in = new DatagramPacket(byteData, byteData.length);
-                            sock.receive(in); // Fetch it well!
+                            if (sock != null)
+                                sock.receive(in); // Fetch it well!
                         } catch (IOException e) {
                             if (e instanceof SocketTimeoutException) {
                                 // ¯\_(ツ)_/¯
@@ -147,18 +155,13 @@ public class UdpSocket {
                         }
 
                         // Callback!:
-                        if (in != null) { // This block also makes `actualData` remain on the stack!
+                        if (in != null) {
                             InetAddress addr = in.getAddress();
 
                             if (addr == null)
                                 continue;
 
                             // System.out.println("Calling `onReceive()`!");
-
-                            actualData = new byte[in.getLength()];
-                            System.arraycopy(byteData, 0, actualData, 0, actualData.length);
-                            for (int i = 0; i < actualData.length; i++)
-                                actualData[i] = byteData[i];
 
                             onReceive(in.getData(),
                                     addr.toString().substring(1),
@@ -175,11 +178,14 @@ public class UdpSocket {
             this.doRun = true;
             // Yes. If `task` is `null`, throw an error.
             this.thread = new Thread(this.task);
+
+            this.thread.setName("`UdpSocket.Receiver` Thread " + Receiver.NUMBER_OF_THREADS);
             this.thread.setDaemon(true);
             this.thread.start();
         }
 
         public void stop() {
+            Receiver.NUMBER_OF_THREADS--;
             this.doRun = false;
             try {
                 this.thread.join();
@@ -190,11 +196,12 @@ public class UdpSocket {
     }
 
     // #region Construction!~
+
     /**
      * Constructs a {@code UdpSocket} with an empty port requested from the OS, the
      * receiver thread of which will time-out every
      * {@linkplain UdpSocket#DEFAULT_TIMEOUT} milliseconds.
-     * 
+     *
      * @implSpec {@linkplain UdpSocket#DEFAULT_TIMEOUT} should be {@code 32}.
      */
     public UdpSocket() {
@@ -205,7 +212,7 @@ public class UdpSocket {
      * Constructs a {@code UdpSocket} with the specified port, the receiver thread
      * of which will time-out every {@linkplain UdpSocket#DEFAULT_TIMEOUT}
      * milliseconds.
-     * 
+     *
      * @implSpec {@linkplain UdpSocket#DEFAULT_TIMEOUT} should be {@code 32}.
      */
     public UdpSocket(int p_port) {
@@ -223,42 +230,42 @@ public class UdpSocket {
     /**
      * Constructs a {@code UdpSocket} with the specified port and receiver thread
      * timeout (in milliseconds).
-     * 
+     *
      * @apiNote This constructor used to try to force the OS into giving the port of
      *          the user's choice. This functionality has now been split. Please see
      *          {@linkplain UdpSocket#createSocketForcingPort(int, int)} and
      *          {@linkplain UdpSocket#UdpSocket(DatagramSocket)}.
      */
     public UdpSocket(int p_port, int p_timeout) {
-        try {
-            this.sock = new DatagramSocket(p_port);
-            this.sock.setSoTimeout(p_timeout);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        // #region Old "force port" method:
         // try {
         // this.sock = new DatagramSocket(p_port);
-        // if (this.getPort() != p_port) {
-        // System.out.printf("Could not bind to port `%d`. Forcing the OS...\n",
-        // p_port);
-        // this.forcePort(p_port);
-        // }
         // this.sock.setSoTimeout(p_timeout);
         // } catch (SocketException e) {
         // e.printStackTrace();
-        // try {
-        // if (this.sock != null)
-        // this.sock.close();
-        // this.sock = new DatagramSocket(null);
-        // this.sock.setReuseAddress(true);
-        // this.sock.bind(new InetSocketAddress(p_port));
-        // this.sock.setSoTimeout(p_timeout);
-        // } catch (SocketException f) {
-        // f.printStackTrace();
         // }
-        // }
+
+        // #region Old "force port" method:
+        try {
+            this.sock = new DatagramSocket(p_port);
+            if (this.getPort() != p_port) {
+                System.out.printf("Could not bind to port `%d`. Forcing the OS...\n",
+                        p_port);
+                this.setPort(p_port);
+            }
+            this.sock.setSoTimeout(p_timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            try {
+                if (this.sock != null)
+                    this.sock.close();
+                this.sock = new DatagramSocket(null);
+                this.sock.setReuseAddress(true);
+                this.sock.bind(new InetSocketAddress(p_port));
+                this.sock.setSoTimeout(p_timeout);
+            } catch (SocketException f) {
+                f.printStackTrace();
+            }
+        }
         // #endregion
 
         // System.out.printf("Socket port: `%d`.\n", this.sock.getLocalPort());
@@ -271,6 +278,7 @@ public class UdpSocket {
     // #endregion
 
     // #region Callbacks. These are what you get. LOOK HERE!
+
     /**
      * Simply called by the constructor of {@code UdpSocket}, really.
      */
@@ -278,13 +286,13 @@ public class UdpSocket {
     }
 
     /**
-     * @apiNote {@code public} so you can generate fake events ;) *
      * @param p_data Always of length {@code 65535}. No more, no less!
      *               If you wish to make a string out of it, use the constructor
      *               {@code new String(p_data, 0, p_data.length)}. The {@code 0} is
      *               the first character of the string.
      * @param p_ip
      * @param p_port
+     * @apiNote {@code public} so you can generate fake events ;) *
      */
     public void onReceive(byte[] p_data, String p_ip, int p_port) {
     }
@@ -296,7 +304,7 @@ public class UdpSocket {
     }
     // #endregion
 
-    // region Getters and setters. They're all `public`.
+    // #region Getters and setters. They're all `public`.
     public DatagramSocket getSocket() {
         return this.sock;
     }
@@ -371,6 +379,7 @@ public class UdpSocket {
     // #endregion
 
     // #region Other `public` methods!:
+
     /**
      * Sends over a {@code byte[]} to the specified IP address and port.
      */
@@ -417,14 +426,13 @@ public class UdpSocket {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-
         // System.out.println("Socket closed...");
     }
 
     /**
      * Tries to 'force' the OS into constructing a socket with the port specified
      * using {@code DatagramSocket.setReuseAddress(boolean)}.
-     * 
+     *
      * @param p_port    The port to use,
      * @param p_timeout The timeout for the port's receiving thread.
      * @return A {@code java.net.DatagramSocket}.
@@ -443,6 +451,6 @@ public class UdpSocket {
 
         return ret;
     }
-
     // #endregion
+
 }

@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 public enum OldRequestCodes {
     /**
      * AGC pings all on your network with this request
@@ -16,5 +18,5 @@ public enum OldRequestCodes {
      * The client application is exiting.
      */
     CLIENT_CLOSE;
-    
+
 }

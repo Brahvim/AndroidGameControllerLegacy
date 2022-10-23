@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -129,37 +131,21 @@ public class App extends PApplet {
         Forms.createSettingsForm();
 
         // First scene! AFTER THE S-T-R TABLE GHSBSAJDHHSDVHJVASHj:
-        App.SKETCH.initFirstScene();
 
         // Stuff with processing!:
         updateRatios();
         System.out.printf("Running on a `%d`Hz display.\n", REFRESH_RATE);
         frameRate(REFRESH_RATE);
-        // surface.setVisible(false); // Visible after it has connected.
+
         prepareJPanel();
 
         // Forms.showFindingConnectionDialog();
 
         // Networking:
-        possibleClients = getNetworks();
-        System.out.printf("Possible clients:\n%s\n", possibleClients.toString());
-        // server = new UDP(this);
         initSocket();
 
-        for (String s : possibleClients)
-            socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
-        // socket.send(RequestCode.toBytes("FINDING_DEVICES"), s, socket.getPort());
-
-        // Forms.newFindingConnectionsForm =
-        // Forms.createFindingConnectionsDialogNew().run();
-        // JDialog win = Forms.newFindingConnectionsForm.getWindow();
-        // win.setResizable(false);
-
-        // while (!hasOneConnection)
-        // ;
-        // surface.setVisible(false);
-        // Forms.findingDevicesDialog.close();
-        // surface.setVisible(true);
+        // The very LAST thing to do:
+        App.SKETCH.initFirstScene();
     }
 
     public void pre() {
@@ -221,27 +207,6 @@ public class App extends PApplet {
     // #endregion
 
     // #region Processing and other libraries' input callbacks.
-    // UDP, unused...?:
-
-    // public void receive(byte[] p_data, String p_ip, int p_port) {
-    // String request = new String(p_data);
-    // switch (request) {
-    // case "FINDING_DEVICES":
-    // break;
-
-    // case "ADD_ME":
-    // connectedClients.add(p_ip);
-
-    // if (connectedClients.size() > 0)
-    // hasOneConnection = true;
-    // break;
-
-    // case "CLIENT_CLOSE":
-    // connectedClients.remove(p_ip);
-    // break;
-    // }
-
-    // }
 
     // #region Keyboard event callbacks.
     @Override
@@ -290,6 +255,11 @@ public class App extends PApplet {
     @Override
     public void mouseEntered() {
         Scene.currentScene.mouseEntered();
+    }
+
+    @Override
+    public void mouseReleased() {
+        Scene.currentScene.mouseReleased();
     }
 
     @Override
@@ -516,17 +486,12 @@ public class App extends PApplet {
         socket = new UdpSocket(RequestCodes.get("SERVER_PORT")) {
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                System.out.printf(
-                        "The socket has RECEIVED the code `%s` from IPaddr `%s` on port: `%d`:\n",
-                        RequestCodes.fromBytes(p_data), p_ip, p_port);
-
-                System.out.printf("Length of `byte[]` received: `%d`.\n", p_data.length);
-                Scene.currentScene.receive(p_data, p_ip, p_port);
+                Scene.currentScene.onReceive(p_data, p_ip, p_port);
             }
 
             @Override
             protected void onStart() {
-                this.setPort(RequestCodes.get("SERVER_PORT"));
+                // this.setPort(RequestCodes.get("SERVER_PORT"));
                 System.out.println("The socket has begun, boiiii!");
                 System.out.printf("Socket-Stats!:\n\t- IP: `%s`\n\t- Port: `%d`\n", super.getIp(), super.getPort());
             }
@@ -547,6 +512,7 @@ public class App extends PApplet {
             e.printStackTrace();
         }
 
+        // System.out.println("Sending test message to " + localhost.getHostAddress());
         SKETCH.socket.send(RequestCodes.toBytes("CLIENT_CLOSE"),
                 localhost.getHostAddress(), SKETCH.socket.getPort());
     }

@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 import java.awt.event.MouseEvent;
 
 public class AppWithScenes extends App {
@@ -39,17 +41,14 @@ public class AppWithScenes extends App {
 
         @Override
         public void mousePressed() {
-            App.sockTest();
-
-            possibleClients = getNetworks();
-
-            for (String s : possibleClients) {
-                socket.send(RequestCodes.toBytes("FINDING_DEVICES"), s, (int) random(49152, 65535));
-                System.out.print("Sent `FINDING_DEVICES` request to IP: ");
-                System.out.println(s);
-            }
             settingsMenuCheck();
         }
+
+        @Override
+        void onReceive(byte[] p_data, String p_ip, int p_port) {
+            System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
+                    p_data.length, new String(p_data), p_ip, p_port);
+        };
         // #endregion
     };
 

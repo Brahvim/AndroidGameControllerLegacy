@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
 import uibooster.components.WindowSetting;

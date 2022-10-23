@@ -1,3 +1,5 @@
+package com.brahvim.androidgamecontroller;
+
 class SineWave {
     // #region Fields.
     public float angleOffset, freqMult, freq;
