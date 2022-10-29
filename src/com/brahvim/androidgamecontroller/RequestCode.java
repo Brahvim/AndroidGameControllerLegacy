@@ -1,21 +1,27 @@
 package com.brahvim.androidgamecontroller;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
 /*
  *
  * Guys,
  * seriously,
- * a BIG thanks,
- * to Java,
- * ...for handling endinanness and a bunch of other low-level stuff ";D!~ 👏
- *
+ * BIG thanks,
+ * ...to Java,
+ * ...for handling endinanness and a bunch of other low-level stuff! ":D!~ 👏
+ * ...AND STILL BEING BLAZING FAST!
  */
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
-// I still put brackets around enum fields so I can put values in there
-// later if I ever make a constructor.
 public enum RequestCode {
+  // #region Finally, here are da ENUMERATION values!
+  //
+  // SUPER IMPORTANT *Convention Note:*
+  // I put brackets around enum fields so I can put values in there
+  // later if I ever make a constructor. Will it happen *now?* No!
+  // ...but safety's good!
+  //
+
   /**
    * AGC pings all on your network with this request
    * so they respond and it can connect to them :D
@@ -28,7 +34,6 @@ public enum RequestCode {
   ADD_ME(),
 
   // region Reasons from the client for exiting.
-
   /**
    * The server application is exiting.
    */
@@ -51,7 +56,6 @@ public enum RequestCode {
    * this over:
    */
   CLIENT_LOW_BATTERY(),
-
   // endregion
 
   /**
@@ -59,7 +63,13 @@ public enum RequestCode {
    * Sorry, smaller brothers, ...who want to spoil their bigger brother's gaming
    * sessions using my app!
    */
-  MAX_DEVICES();
+  MAX_DEVICES(),
+
+  /**
+   * If the server accepts a client's `ADD_ME`, the server sends this.
+   */
+  CLIENT_WAS_REGISTERED();
+  // #endregion
 
   public static final int SERVER_PORT = 6443;
   public final static byte[] CODE_SUFFIX = "CODE".getBytes(StandardCharsets.UTF_8);
@@ -68,8 +78,14 @@ public enum RequestCode {
   // `CODE` + <the request code> + `_` + <extra data, preferably separated by
   // underscores..?>.
 
-  public byte[] toBytes() {
-    return ByteBuffer.allocate(Integer.BYTES).putInt(this.ordinal()).array();
+  // #region Static stuff comes first, here...
+  public static boolean isPacketCode(byte[] p_pack) {
+    // If the first bytes don't say "CODE", it's not a packet of code, it's data!
+    // Lazy method: `return new String(p_pack).startsWith("CODE");` 🤣
+    for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
+      if (p_pack[i] != RequestCode.CODE_SUFFIX[i])
+        return false;
+    return true;
   }
 
   public static RequestCode fromPacket(byte[] p_bytes) {
@@ -87,7 +103,7 @@ public enum RequestCode {
 
     // Copy da bytes!11!:
     for (int i = 0; i < Integer.BYTES; i++) { // Funny how this could fit in a byte as well!
-      System.out.printf("Read byte: `%c`, iterator: `%d`.\n", (char) i, i);
+      // System.out.printf("Read byte: `%c`, iterator: `%d`.\n", (char) i, i);
       bytes[i] = p_bytes[RequestCode.CODE_SUFFIX.length + i];
     }
 
@@ -95,12 +111,19 @@ public enum RequestCode {
     return RequestCode.values()[ByteBuffer.wrap(bytes).getInt()];
   }
 
-  public RequestCode fromBytes(byte[] p_bytes) {
-    return RequestCode.values()[ByteBuffer.wrap(p_bytes).getInt()];
-  }
-
   // public static byte[] toBytes(RequestCodes p_code) {
   // // return p_code.toBytes();
   // return ByteBuffer.allocate(Integer.BYTES).putInt(p_code.ordinal()).array();
   // }
+  // #endregion
+
+  // region INSTANCE methods!:
+  public RequestCode fromBytes(byte[] p_bytes) {
+    return RequestCode.values()[ByteBuffer.wrap(p_bytes).getInt()];
+  }
+
+  public byte[] toBytes() {
+    return ByteBuffer.allocate(Integer.BYTES).putInt(this.ordinal()).array();
+  }
+  // #endregion
 }

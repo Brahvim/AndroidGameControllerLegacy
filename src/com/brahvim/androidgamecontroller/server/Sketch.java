@@ -49,7 +49,6 @@ public class Sketch extends PApplet {
     // `possibleClients` can be removed by using a more functional pattern...
     ArrayList<String> possibleClients, connectedClients;
     ArrayList<Integer> clientPorts;
-    int numClients;
     PGraphics gr;
     boolean hasOneConnection;
     float frameStartTime, pframeTime, frameTime;
@@ -69,8 +68,8 @@ public class Sketch extends PApplet {
 
     int pwinMouseX, pwinMouseY;
     int winMouseX, winMouseY;
-    int sfX, sfY; // Used to constrain the position of the overlay.
-    int pPsdX, pPsdY; // Where was the mouse when it was last clicked?
+    int surfaceX, surfaceY; // Used to constrain the position of the overlay.
+    int pMousePsdX, pMousePsdY; // Where was the mouse when it was last clicked?
     boolean mouseInWin;
     // #endregion
     // #endregion Fields.
@@ -93,6 +92,7 @@ public class Sketch extends PApplet {
     // #region Processing's windowing callbacks.
     public void dispose() {
         if (socket != null) {
+            int numClients = socket.clients.size();
             if (numClients != 0) {
                 for (int i = 0; i < numClients; i++)
                     socket.sendCode(RequestCode.SERVER_CLOSE, socket.clients.get(i));
@@ -166,22 +166,22 @@ public class Sketch extends PApplet {
         winMouseY = MouseInfo.getPointerInfo().getLocation().y;
 
         if (mousePressed) {
-            sfX = winMouseX - pPsdX;
-            sfY = winMouseY - pPsdY;
+            surfaceX = winMouseX - pMousePsdX;
+            surfaceY = winMouseY - pMousePsdY;
 
-            if (sfX < minExtent.x)
-                sfX = (int) minExtent.x;
+            if (surfaceX < minExtent.x)
+                surfaceX = (int) minExtent.x;
 
-            if (sfY < minExtent.y)
-                sfY = (int) minExtent.y;
+            if (surfaceY < minExtent.y)
+                surfaceY = (int) minExtent.y;
 
-            if (sfX > maxExtent.x)
-                sfX = (int) maxExtent.x;
+            if (surfaceX > maxExtent.x)
+                surfaceX = (int) maxExtent.x;
 
-            if (sfY > maxExtent.y)
-                sfY = (int) maxExtent.y;
+            if (surfaceY > maxExtent.y)
+                surfaceY = (int) maxExtent.y;
 
-            surface.setLocation(sfX, sfY);
+            surface.setLocation(surfaceX, surfaceY);
         }
 
         mouseInWin = winMouseX > frame.getX() &&
@@ -263,8 +263,8 @@ public class Sketch extends PApplet {
 
     @Override
     public void mousePressed() {
-        pPsdX = mouseX;
-        pPsdY = mouseY;
+        pMousePsdX = mouseX;
+        pMousePsdY = mouseY;
 
         Scene.currentScene.mousePressed();
     }

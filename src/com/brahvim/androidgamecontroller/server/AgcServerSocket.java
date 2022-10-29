@@ -119,6 +119,7 @@ public class AgcServerSocket extends UdpSocket {
 
     AgcServerSocket() {
         super(RequestCode.SERVER_PORT);
+        this.clients = new ArrayList<>();
     }
 
     void addClientIfAbsent(AgcClient p_client) {
