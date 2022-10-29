@@ -427,7 +427,11 @@ public class UdpSocket {
     this.onClose();
     this.setTimeout(0);
 
+    // LIAR:
     // No need to stop the receiving thread!
+
+    this.receiver.stop();
+
     try {
       this.sock.setReuseAddress(false);
       this.sock.close();

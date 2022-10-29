@@ -143,8 +143,14 @@ public class SketchWithScenes extends Sketch {
 
         @Override
         public void setup() {
+            windowFadeWave = new SineWave(0.0008f);
+            windowFadeWave.zeroWhenInactive = true;
+            windowFadeWave.endWhenAngleIs(90);
+            windowFadeWave.start();
+
             thankYouText = Forms.getString("ExitScene.text");
             socket.tellAllClients(RequestCode.SERVER_CLOSE);
+            socket.close();
         }
 
         @Override
