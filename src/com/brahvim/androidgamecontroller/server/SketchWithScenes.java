@@ -51,22 +51,15 @@ public class SketchWithScenes extends Sketch {
 
         @Override
         public void onReceive(byte[] p_data, String p_ip, int p_port) {
-            System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port:`%d`.\n",
-                    p_data.length, new String(p_data), p_ip, p_port);
+            System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n", p_data.length,
+                    new String(p_data), p_ip, p_port);
 
-            boolean isCode = true;
-            for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++) {
-                if (p_data[i] != RequestCode.CODE_SUFFIX[i]) {
-                    isCode = false;
-                    break;
-                }
-            }
-
-            if (isCode) {
+            if (RequestCode.packetHasCode(p_data)) {
                 switch (RequestCode.fromPacket(p_data)) {
-                    case ADD_ME: { // Limits the stack so that `client` is namespaced here :D
-                        System.out.printf("Client joined! IP: `%s`, port: `%d`.\n",
-                                p_ip, p_port);
+                    case ADD_ME: { // Limits the stack so
+                                   // that `client` is
+                                   // namespaced here :D
+                        System.out.printf("Client joined! IP: `%s`, port: `%d`.\n", p_ip, p_port);
 
                         AgcServerSocket.AgcClient client;
                         String[] names; // The Android client device's names.
@@ -112,6 +105,10 @@ public class SketchWithScenes extends Sketch {
                         // ...just like the initial plan!
 
                         socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, client);
+
+                        // ...so we finally have a client!:
+                        if (socket.clients.size() != 0)
+                            Scene.setScene(workingScene);
                     }
                         break;
                     default:
@@ -147,6 +144,7 @@ public class SketchWithScenes extends Sketch {
         @Override
         public void setup() {
             thankYouText = Forms.getString("ExitScene.text");
+            socket.tellAllClients(RequestCode.SERVER_CLOSE);
         }
 
         @Override

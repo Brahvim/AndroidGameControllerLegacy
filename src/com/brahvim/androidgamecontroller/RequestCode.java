@@ -4,11 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /*
- *
  * Guys,
  * seriously,
- * BIG thanks,
- * ...to Java,
+ * BIG thanks to Java!
  * ...for handling endinanness and a bunch of other low-level stuff! ":D!~ 👏
  * ...AND STILL BEING BLAZING FAST!
  */
@@ -75,11 +73,10 @@ public enum RequestCode {
   public final static byte[] CODE_SUFFIX = "CODE".getBytes(StandardCharsets.UTF_8);
 
   // I want to send request codes in this manner:
-  // `CODE` + <the request code> + `_` + <extra data, preferably separated by
-  // underscores..?>.
+  // `CODE` + <request code> + <extra data, separated by underscores..?>.
 
   // #region Static stuff comes first, here...
-  public static boolean isPacketCode(byte[] p_pack) {
+  public static boolean packetHasCode(byte[] p_pack) {
     // If the first bytes don't say "CODE", it's not a packet of code, it's data!
     // Lazy method: `return new String(p_pack).startsWith("CODE");` 🤣
     for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
@@ -111,6 +108,10 @@ public enum RequestCode {
     return RequestCode.values()[ByteBuffer.wrap(bytes).getInt()];
   }
 
+  public static RequestCode fromBytes(byte[] p_bytes) {
+    return RequestCode.values()[ByteBuffer.wrap(p_bytes).getInt()];
+  }
+
   // public static byte[] toBytes(RequestCodes p_code) {
   // // return p_code.toBytes();
   // return ByteBuffer.allocate(Integer.BYTES).putInt(p_code.ordinal()).array();
@@ -118,10 +119,6 @@ public enum RequestCode {
   // #endregion
 
   // region INSTANCE methods!:
-  public RequestCode fromBytes(byte[] p_bytes) {
-    return RequestCode.values()[ByteBuffer.wrap(p_bytes).getInt()];
-  }
-
   public byte[] toBytes() {
     return ByteBuffer.allocate(Integer.BYTES).putInt(this.ordinal()).array();
   }

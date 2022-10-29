@@ -142,17 +142,79 @@ public class AgcServerSocket extends UdpSocket {
         this.sendCode(p_code, p_extraData, p_client.ip, p_client.port);
     }
 
+    public void tellAllClients(RequestCode p_code) {
+        for (AgcClient c : this.clients)
+            this.sendCode(p_code, c);
+    }
+
+    public void tellAllClients(RequestCode p_code, String p_extraData) {
+        for (AgcClient c : this.clients)
+            this.sendCode(p_code, p_extraData, c);
+    }
+
+    /*
+     * Older versions:
+     * public void sendCode(RequestCode p_code, String p_ip, int p_port) {
+     * byte[] toSend = new byte[RequestCode.CODE_SUFFIX.length + Integer.BYTES];
+     * 
+     * // Copy over the suffix,
+     * for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
+     * toSend[i] = RequestCode.CODE_SUFFIX[i];
+     * 
+     * // Put the code in!:
+     * for (int i = RequestCode.CODE_SUFFIX.length; i < toSend.length; i++)
+     * toSend[i] = RequestCode.CODE_SUFFIX[i];
+     * 
+     * super.send(toSend, p_ip, p_port);
+     * }
+     * 
+     * public void sendCode(RequestCode p_code, String p_extraData, String p_ip, int
+     * p_port) {
+     * byte[] extraBytes = p_extraData.getBytes(StandardCharsets.UTF_8);
+     * 
+     * byte[] toSend = new byte[RequestCode.CODE_SUFFIX.length + Integer.BYTES +
+     * extraBytes.length];
+     * 
+     * // Copy over the suffix,
+     * for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
+     * toSend[i] = RequestCode.CODE_SUFFIX[i];
+     * 
+     * // Put the code in!:
+     * byte[] codeBytes = p_code.toBytes();
+     * for (int i = RequestCode.CODE_SUFFIX.length; i < toSend.length; i++)
+     * toSend[i] = codeBytes[i];
+     * 
+     * super.send(toSend, p_ip, p_port);
+     * }
+     */
+
     public void sendCode(RequestCode p_code, String p_ip, int p_port) {
-        byte[] toSend = new byte[RequestCode.CODE_SUFFIX.length + Integer.BYTES];
+        byte[] codeBytes = p_code.toBytes();
+        byte[] toSend = new byte[codeBytes.length + RequestCode.CODE_SUFFIX.length];
+
+        // System.out.printf("Copying the suffix, which takes `%d` out of `%d`
+        // bytes.\n",
+        /// RequestCode.CODE_SUFFIX.length, toSend.length);
+
+        int i = 0;
 
         // Copy over the suffix,
-        for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
+        for (; i < RequestCode.CODE_SUFFIX.length; i++) {
+            // System.out.printf("Value of iterator: `%d`.\n", i);
             toSend[i] = RequestCode.CODE_SUFFIX[i];
+        }
+
+        // System.out.printf("Copying the CODE, which takes `%d` out of `%d` bytes.\n",
+        // codeBytes.length, toSend.length);
 
         // Put the code in!:
-        for (int i = RequestCode.CODE_SUFFIX.length; i < toSend.length; i++)
-            toSend[i] = RequestCode.CODE_SUFFIX[i];
+        for (i = 0; i < Integer.BYTES; i++) {
+            // System.out.printf("Value of iterator: `%d`.\n",
+            // RequestCode.CODE_SUFFIX.length + i);
+            toSend[RequestCode.CODE_SUFFIX.length + i] = codeBytes[i];
+        }
 
+        System.out.printf("Sent `%s` to IP: `%s`, port: `%d`.\n", new String(toSend), p_ip, p_port);
         super.send(toSend, p_ip, p_port);
     }
 
@@ -160,16 +222,44 @@ public class AgcServerSocket extends UdpSocket {
         byte[] extraBytes = p_extraData.getBytes(StandardCharsets.UTF_8);
 
         byte[] toSend = new byte[RequestCode.CODE_SUFFIX.length + Integer.BYTES + extraBytes.length];
+        byte[] codeBytes = p_code.toBytes();
+
+        // System.out.printf("Copying the suffix, which takes `%d` out of `%d`
+        // bytes.\n",
+        /// RequestCode.CODE_SUFFIX.length, toSend.length);
+
+        int i = 0;
 
         // Copy over the suffix,
-        for (int i = 0; i < RequestCode.CODE_SUFFIX.length; i++)
+        for (; i < RequestCode.CODE_SUFFIX.length; i++) {
+            // System.out.printf("Value of iterator: `%d`.\n", i);
             toSend[i] = RequestCode.CODE_SUFFIX[i];
+        }
+
+        // System.out.printf("Copying the CODE, which takes `%d` out of `%d` bytes.\n",
+        // codeBytes.length, toSend.length);
 
         // Put the code in!:
-        byte[] codeBytes = p_code.toBytes();
-        for (int i = RequestCode.CODE_SUFFIX.length; i < toSend.length; i++)
-            toSend[i] = codeBytes[i];
+        for (i = 0; i < Integer.BYTES; i++) {
+            // System.out.printf("Value of iterator: `%d`.\n",
+            // RequestCode.CODE_SUFFIX.length + i);
+            toSend[RequestCode.CODE_SUFFIX.length + i] = codeBytes[i];
+        }
 
+        // System.out.printf("Copying EXTRA DATA, which takes `%d` out of `%d`
+        // bytes.\n",
+        // extraBytes.length, toSend.length);
+
+        // Copy over extra bytes!:
+        int startIdExtDataCopy = RequestCode.CODE_SUFFIX.length + codeBytes.length;
+        for (i = 0; i < extraBytes.length; i++) {
+            // System.out.printf("Value of iterator: `%d`.\n",
+            // RequestCode.CODE_SUFFIX.length + i);
+            toSend[startIdExtDataCopy + i] = extraBytes[i];
+        }
+
+        System.out.printf("Sent `%s` to IP: `%s`, port: `%d`.\n",
+                new String(toSend).replace('\n', '\0'), p_ip, p_port);
         super.send(toSend, p_ip, p_port);
     }
     // #endregion
