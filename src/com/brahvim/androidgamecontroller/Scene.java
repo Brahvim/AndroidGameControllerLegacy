@@ -4,75 +4,84 @@ import java.util.ArrayList;
 
 import processing.event.MouseEvent;
 
-class Scene {
-    public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
-    public static Scene currentScene;
+public class Scene {
+  public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
+  public static Scene currentScene;
 
-    public static void setScene(Scene p_scene) {
-        Scene.currentScene = p_scene;
-        p_scene.setup();
-    }
+  public static void setScene(Scene p_scene) {
+    Scene.currentScene = p_scene;
+    p_scene.setup();
+  }
 
-    public static void addScene(Scene p_scene) {
-        Scene.SCENES.add(p_scene);
-    }
+  public static void addScene(Scene p_scene) {
+    Scene.SCENES.add(p_scene);
+  }
 
-    public Scene() {
-        SCENES.add(this);
-    }
+  public Scene() {
+    Scene.SCENES.add(this);
+  }
 
-    // #region Application callback structure.
-    void setup() {
-    }
+  // #region Application callback structure.
+  public void setup() {
+  }
 
-    void draw() {
-    }
+  public void draw() {
+  }
 
-    void pre() {
-    }
+  public void pre() {
+  }
 
-    void post() {
-    }
+  public void post() {
+  }
 
-    void onReceive(byte[] p_data, String p_ip, int p_port) {
-    }
-    // #endregion
+  public void onReceive(byte[] p_data, String p_ip, int p_port) {
+  }
+  // #endregion
 
-    // #region Mouse events.
-    public void mousePressed() {
-    }
+  // #region Mouse events.
+  public void mousePressed() {
+  }
 
-    public void mouseMoved() {
-    }
+  public void mouseMoved() {
+  }
 
-    public void mouseWheel(MouseEvent p_event) {
-    }
+  public void mouseWheel(MouseEvent p_event) {
+  }
 
-    public void mouseClicked() {
-    }
+  public void mouseClicked() {
+  }
 
-    public void mouseDragged() {
-    }
+  public void mouseDragged() {
+  }
 
-    public void mouseReleased() {
-    }
+  public void mouseReleased() {
+  }
 
-    public void mouseExited() {
-    }
+  public void mouseExited() {
+  }
 
-    public void mouseEntered() {
-    }
-    // #endregion
+  public void mouseEntered() {
+  }
+  // #endregion
 
-    // #region Keyboard events.
-    public void keyPressed() {
-    }
+  // #region Keyboard events.
+  public void keyPressed() {
+  }
 
-    public void keyTyped() {
-    }
+  public void keyTyped() {
+  }
 
-    public void keyReleased() {
-    }
-    // #endregion
+  public void keyReleased() {
+  }
+
+  public void touchStarted() {
+  }
+
+  public void touchMoved() {
+  }
+
+  public void touchEnded() {
+  }
+  // #endregion
 
 }

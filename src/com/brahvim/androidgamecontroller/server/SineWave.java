@@ -1,4 +1,4 @@
-package com.brahvim.androidgamecontroller;
+package com.brahvim.androidgamecontroller.server;
 
 class SineWave {
     // #region Fields.
@@ -112,7 +112,7 @@ class SineWave {
 
     // #region Getters.
     public float getStartTime() {
-        return App.SKETCH.millis() - this.aliveTime;
+        return Sketch.SKETCH.millis() - this.aliveTime;
     }
 
     public float getTimeSinceStart() {
@@ -127,7 +127,7 @@ class SineWave {
         this.active = this.aliveTime <= this.endTime;
 
         if (this.active)
-            this.aliveTime += App.SKETCH.frameTime;
+            this.aliveTime += Sketch.SKETCH.frameTime;
         // ^^^ `frameTime` comes from "the Engine" by the way. (Hey - that's "Nerd"!)g
         else if (this.zeroWhenInactive)
             return 0;

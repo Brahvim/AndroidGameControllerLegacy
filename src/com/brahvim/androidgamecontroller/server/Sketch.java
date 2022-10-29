@@ -1,11 +1,10 @@
-package com.brahvim.androidgamecontroller;
+package com.brahvim.androidgamecontroller.server;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
-import java.awt.Robot;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -23,6 +22,9 @@ import javax.swing.JPanel;
 
 import org.jetbrains.annotations.TestOnly;
 
+import com.brahvim.androidgamecontroller.RequestCode;
+import com.brahvim.androidgamecontroller.Scene;
+
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -33,18 +35,16 @@ import uibooster.model.Form;
 import uibooster.model.FormBuilder;
 import uibooster.model.UiBoosterOptions;
 
-public class App extends PApplet {
+public class Sketch extends PApplet {
     // #region Fields.
-    final static AppWithScenes SKETCH = new AppWithScenes();
+    final static SketchWithScenes SKETCH = new SketchWithScenes();
     final static String VERSION = "v1.0";
     final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
-    final static int SERVER_PORT = 6443, CLIENT_PORT = 6443;
 
     // #region Stuff that makes AGC *go!*
     // final static String NEWLINE = System.lineSeparator();
-    UdpSocket socket;
-    Robot robot;
+    AgcServerSocket socket;
     UiBooster ui;
     // `possibleClients` can be removed by using a more functional pattern...
     ArrayList<String> possibleClients, connectedClients;
@@ -52,7 +52,7 @@ public class App extends PApplet {
     int numClients;
     PGraphics gr;
     boolean hasOneConnection;
-    float frameStartTime, deltaTime, pframeTime, frameTime;
+    float frameStartTime, pframeTime, frameTime;
     // #endregion
 
     // #region Exit fade animation variables.
@@ -95,8 +95,9 @@ public class App extends PApplet {
         if (socket != null) {
             if (numClients != 0) {
                 for (int i = 0; i < numClients; i++)
-                    socket.send(RequestCodes.toBytes("SERVER_CLOSE"),
-                            connectedClients.get(i), clientPorts.get(i));
+                    socket.sendCode(RequestCode.SERVER_CLOSE, socket.clients.get(i));
+                // socket.send(OldRequestCodesFromFile.toBytes("SERVER_CLOSE"),
+                // connectedClients.get(i), clientPorts.get(i));
             }
             socket.close();
         }
@@ -115,10 +116,10 @@ public class App extends PApplet {
     public void setup() {
         System.out.printf(
                 "Welcome to the AndroidGameController Server application `%s`!\n\n",
-                App.VERSION);
+                Sketch.VERSION);
 
         // Window setup:
-        surface.setTitle("AndroidGameController Server ".concat(App.VERSION));
+        surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
         surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
         minExtent = new PVector();
         maxExtent = new PVector(displayWidth - width, displayHeight - height);
@@ -142,10 +143,10 @@ public class App extends PApplet {
         // Forms.showFindingConnectionDialog();
 
         // Networking:
-        initSocket();
+        socket = new AgcServerSocket();
 
         // The very LAST thing to do:
-        App.SKETCH.initFirstScene();
+        Sketch.SKETCH.initFirstScene();
     }
 
     public void pre() {
@@ -156,7 +157,6 @@ public class App extends PApplet {
         frameStartTime = millis(); // Timestamp.
         frameTime = frameStartTime - pframeTime;
         pframeTime = frameStartTime;
-        deltaTime = frameTime * 0.01f;
 
         // #region Window dragging logic:
         pwinMouseX = winMouseX;
@@ -207,8 +207,7 @@ public class App extends PApplet {
     // #endregion
 
     // #region Processing and other libraries' input callbacks.
-
-    // #region Keyboard event callbacks.
+    // #region Processing's keyboard event callbacks.
     @Override
     public void keyPressed() {
         Scene.currentScene.keyPressed();
@@ -226,7 +225,7 @@ public class App extends PApplet {
 
     // #endregion
 
-    // #region Mouse event callbacks.
+    // #region Processing's mouse event callbacks.
     @Override
     public void mouseMoved() {
         Scene.currentScene.mouseMoved();
@@ -283,7 +282,7 @@ public class App extends PApplet {
     }
 
     public void agcExit() {
-        Scene.setScene(App.SKETCH.exitScene);
+        Scene.setScene(Sketch.SKETCH.exitScene);
 
         windowFadeWave = new SineWave(0.0008f);
         windowFadeWave.zeroWhenInactive = true;
@@ -482,29 +481,8 @@ public class App extends PApplet {
         return parsedMap;
     }
 
-    public void initSocket() {
-        socket = new UdpSocket(RequestCodes.get("SERVER_PORT")) {
-            @Override
-            public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                Scene.currentScene.onReceive(p_data, p_ip, p_port);
-            }
-
-            @Override
-            protected void onStart() {
-                // this.setPort(RequestCodes.get("SERVER_PORT"));
-                System.out.println("The socket has begun, boiiii!");
-                System.out.printf("Socket-Stats!:\n\t- IP: `%s`\n\t- Port: `%d`\n", super.getIp(), super.getPort());
-            }
-
-            @Override
-            protected void onClose() {
-                System.out.println("The socket's been disposed off, thanks for taking the service :)");
-            }
-        };
-    }
-
     @TestOnly
-    public static void sockTest() {
+    public void sockTest() {
         InetAddress localhost = null;
         try {
             localhost = InetAddress.getLocalHost();
@@ -512,9 +490,11 @@ public class App extends PApplet {
             e.printStackTrace();
         }
 
-        // System.out.println("Sending test message to " + localhost.getHostAddress());
-        SKETCH.socket.send(RequestCodes.toBytes("CLIENT_CLOSE"),
-                localhost.getHostAddress(), SKETCH.socket.getPort());
+        System.out.println("Sending a test \"SERVER_CLOSE\" message to myself LOL...");
+        socket.sendCode(RequestCode.SERVER_CLOSE, localhost.toString(), RequestCode.SERVER_PORT);
+
+        // socket.send(OldRequestCodesFromFile.toBytes("CLIENT_CLOSE"),
+        // localhost.getHostAddress(), SKETCH.socket.getPort());
     }
     // #endregion
 }

@@ -1,4 +1,4 @@
-package com.brahvim.androidgamecontroller;
+package com.brahvim.androidgamecontroller.server;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RequestCodes {
+public final class OldRequestCodesFromFile {
     static HashMap<String, Integer> values;
     static HashMap<Integer, String> keys; // ...not in the mood to uyse `BiDiMap`/`BiMap`!
     // ...apparently it's from a library, "Guava". No. Please no.
@@ -19,7 +19,7 @@ public final class RequestCodes {
 
     public static byte[] toBytes(String p_req) {
         byte[] ret = ByteBuffer.allocate(Integer.BYTES)
-                .putInt(RequestCodes.values.get(p_req)).array();
+                .putInt(OldRequestCodesFromFile.values.get(p_req)).array();
         System.out.printf("Converted request code to `byte[]` of length: `%d`.\n", ret.length);
         return ret;
     }

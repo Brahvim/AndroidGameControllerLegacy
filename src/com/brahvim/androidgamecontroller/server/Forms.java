@@ -1,4 +1,4 @@
-package com.brahvim.androidgamecontroller;
+package com.brahvim.androidgamecontroller.server;
 
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
@@ -89,7 +89,7 @@ public class Forms {
         ret.addButton(getString("SettingsForm.exitButton"), new Runnable() {
             @Override
             public void run() {
-                App.SKETCH.agcExit();
+                Sketch.SKETCH.agcExit();
             }
         });
 

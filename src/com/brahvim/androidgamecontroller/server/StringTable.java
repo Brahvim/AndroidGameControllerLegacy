@@ -1,4 +1,4 @@
-package com.brahvim.androidgamecontroller;
+package com.brahvim.androidgamecontroller.server;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class StringTable {
-    static HashMap<String, String> table = StringTable.parse("AGC_StringTable.ini");
+    public static HashMap<String, String> table = StringTable.parse("AGC_StringTable.ini");
 
-    static HashMap<String, String> parse /* parseStringTableFromFile */(String p_fileName) {
+    public static HashMap<String, String> parse /* parseStringTableFromFile */ (String p_fileName) {
         HashMap<String, String> parsedMap = new HashMap<>();
         File tableFile = new File("data", p_fileName);
 
@@ -32,6 +32,7 @@ public class StringTable {
                     // Skipping comments and registering sections,
                     // and skip this iteration if they exist:
                     switch (line.charAt(0)) {
+                        case ';': // Semicolons are also comments in INI files, apparently!
                         case '#':
                             continue;
                         case '[':
