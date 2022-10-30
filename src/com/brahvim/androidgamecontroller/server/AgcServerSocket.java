@@ -122,6 +122,7 @@ public class AgcServerSocket extends UdpSocket {
         this.clients = new ArrayList<>();
     }
 
+    // #region Client management methods.
     void addClientIfAbsent(AgcClient p_client) {
         boolean absent = true;
         for (AgcClient c : this.clients)
@@ -131,6 +132,18 @@ public class AgcServerSocket extends UdpSocket {
         if (absent)
             this.clients.add(p_client);
     }
+
+    void removeClient(String p_ip) {
+        // Section `3.1` on: [https://www.baeldung.com/java-list-iterate-backwards].
+
+        for (int i = this.clients.size(); i-- > 0;) {
+            AgcClient c = this.clients.get(i);
+            if (c.getIp().equals(p_ip))
+                this.clients.remove(c);
+        }
+    }
+
+    // #endregion
 
     // #region Custom methods.
     // Using `AgcServerSocket.AgcClient`s:

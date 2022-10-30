@@ -56,7 +56,6 @@ public class Sketch extends PApplet {
 
     // #region Exit fade animation variables.
     int bgColor = color(0, 150);
-    SineWave windowFadeWave;
     // #endregion
 
     // #region Window coordinates and states.
@@ -91,16 +90,18 @@ public class Sketch extends PApplet {
 
     // #region Processing's windowing callbacks.
     public void dispose() {
-        if (socket != null) {
-            int numClients = socket.clients.size();
-            if (numClients != 0) {
-                for (int i = 0; i < numClients; i++)
-                    socket.sendCode(RequestCode.SERVER_CLOSE, socket.clients.get(i));
-                // socket.send(OldRequestCodesFromFile.toBytes("SERVER_CLOSE"),
-                // connectedClients.get(i), clientPorts.get(i));
-            }
-            socket.close();
-        }
+        // if (socket != null) {
+        // int numClients = socket.clients.size();
+        // if (numClients != 0) {
+        // for (int i = 0; i < numClients; i++)
+        // socket.sendCode(RequestCode.SERVER_CLOSE, socket.clients.get(i));
+        // // socket.send(OldRequestCodesFromFile.toBytes("SERVER_CLOSE"),
+        // // connectedClients.get(i), clientPorts.get(i));
+        // }
+        // socket.close();
+        // }
+
+        agcExit();
 
         // Exit the sketch:
         super.dispose();
@@ -282,15 +283,10 @@ public class Sketch extends PApplet {
     }
 
     public void agcExit() {
-        Scene.setScene(Sketch.SKETCH.exitScene);
-
-        windowFadeWave = new SineWave(0.0008f);
-        windowFadeWave.zeroWhenInactive = true;
-        windowFadeWave.endWhenAngleIs(90);
-        windowFadeWave.start();
-
         if (isFormOpen(Forms.settingsForm))
             Forms.settingsForm.close();
+
+        Scene.setScene(Sketch.SKETCH.exitScene);
     }
 
     public void prepareJPanel() {
