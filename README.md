@@ -1,4 +1,4 @@
-# The *AndroidGameController* Desktop "Server" Program!
+# The *AndroidGameController!* Desktop "Server" Program!
 
 This is the Desktop program to be used with the [AndroidGameController-Client](https://github.com/Brahvim/AndroidGameControllerClient) Android application!
 
