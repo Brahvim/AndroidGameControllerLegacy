@@ -43,33 +43,25 @@ public class Sketch extends PApplet {
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
 
     // #region Stuff that makes AGC *go!*
-    // final static String NEWLINE = System.lineSeparator();
-    AgcServerSocket socket;
-    UiBooster ui;
-    // `possibleClients` can be removed by using a more functional pattern...
-    ArrayList<String> possibleClients, connectedClients;
-    ArrayList<Integer> clientPorts;
     PGraphics gr;
-    boolean hasOneConnection;
+    AgcServerSocket socket;
+    int bgColor = color(0, 150); // Exit fade animation, et cetera.
     float frameStartTime, pframeTime, frameTime;
-    // #endregion
-
-    // #region Exit fade animation variables.
-    int bgColor = color(0, 150);
     // #endregion
 
     // #region Window coordinates and states.
     PImage surfaceIcon;
     PVector minExtent, maxExtent;
 
+    // Ma' boilerplate :D
     float cx, cy, qx, qy, q3x, q3y;
     int pwidth, pheight;
 
+    boolean mouseInWin;
     int pwinMouseX, pwinMouseY;
     int winMouseX, winMouseY;
     int surfaceX, surfaceY; // Used to constrain the position of the overlay.
     int pMousePsdX, pMousePsdY; // Where was the mouse when it was last clicked?
-    boolean mouseInWin;
     // #endregion
     // #endregion Fields.
 
@@ -88,31 +80,11 @@ public class Sketch extends PApplet {
     }
     // #endregion
 
-    // #region Processing's windowing callbacks.
+    // #region Processing's `setup()`, `draw()` and other callbacks.
     public void dispose() {
-        // if (socket != null) {
-        // int numClients = socket.clients.size();
-        // if (numClients != 0) {
-        // for (int i = 0; i < numClients; i++)
-        // socket.sendCode(RequestCode.SERVER_CLOSE, socket.clients.get(i));
-        // // socket.send(OldRequestCodesFromFile.toBytes("SERVER_CLOSE"),
-        // // connectedClients.get(i), clientPorts.get(i));
-        // }
-        // socket.close();
-        // }
-
-        agcExit();
-
-        // Exit the sketch:
+        agcExit(); // This used to be a part of the comment, LOL.
         super.dispose();
     }
-
-    // `dipose()` calls `exit()`?!
-
-    // @Override
-    // public void exit() {
-    // agcExit();
-    // }
 
     public void setup() {
         System.out.printf(
@@ -126,13 +98,8 @@ public class Sketch extends PApplet {
         maxExtent = new PVector(displayWidth - width, displayHeight - height);
 
         // Forms:
-        ui = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
-        // strTable = parseIniFile("AGC_StringTable.ini");
-
-        Forms.init(ui);
+        Forms.init(new UiBooster(UiBoosterOptions.Theme.DARK_THEME));
         Forms.createSettingsForm();
-
-        // First scene! AFTER THE S-T-R TABLE GHSBSAJDHHSDVHJVASHj:
 
         // Stuff with processing!:
         updateRatios();
@@ -140,8 +107,9 @@ public class Sketch extends PApplet {
         frameRate(REFRESH_RATE);
 
         prepareJPanel();
-
-        // Forms.showFindingConnectionDialog();
+        // surface.setResizable(true);
+        // ^^^ The `surface` or its `JFrame`, ..or even the `JPanel`.
+        // NOBODY takes this request!
 
         // Networking:
         socket = new AgcServerSocket();
@@ -207,7 +175,6 @@ public class Sketch extends PApplet {
     }
     // #endregion
 
-    // #region Processing and other libraries' input callbacks.
     // #region Processing's keyboard event callbacks.
     @Override
     public void keyPressed() {
@@ -269,7 +236,6 @@ public class Sketch extends PApplet {
 
         Scene.currentScene.mousePressed();
     }
-    // #endregion
     // #endregion
 
     // #region Custom methods.
@@ -345,77 +311,7 @@ public class Sketch extends PApplet {
             }
         };
         panel.addMouseMotionListener(mA);
-
         gr = createGraphics(width, height);
-    }
-
-    // Using `netsh interface ip show address`:
-    @Deprecated
-    public HashMap<String, String> getNetworksOld() {
-        Process wlan = null;
-        try {
-            wlan = new ProcessBuilder("netsh", "interface", "ip", "show", "address").start();
-        } catch (IOException e) {
-            e.printStackTrace();
-            agcExit();
-        }
-
-        HashMap<String, String> ret = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(wlan.getInputStream()))) {
-            boolean findingIp = false;
-            // I do not cache `line.length()` because it is not needed in *every* case.
-
-            for (String line, currentInterface = ""; (line = reader.readLine()) != null;) {
-                // If you are looking at the configuration of an interface:
-                if (findingIp && line.contains("Default Gateway")) {
-                    int colonPos = line.indexOf(':'), ipStart = -1, lineLen = line.length();
-
-                    for (int i = colonPos + 1; i < lineLen; i++)
-                        if (line.charAt(i) != ' ') {
-                            ipStart = i; // The first number of the IP address is at this position!
-                            break;
-                        }
-                    String ip = line.substring(ipStart, lineLen);
-                    // System.out.printf("Putting `%s` for %s.\n", ip, currentInterface);
-                    ret.put(currentInterface, ip);
-                    findingIp = false;
-                } else if (line.contains("Configuration for interface")) {
-                    currentInterface = line.substring(line.indexOf('\"') + 1, line.length() - 1);
-                    // System.out.println(currentInterface);
-                    findingIp = true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return ret;
-    }
-
-    // Using `arp -a`:
-    public ArrayList<String> getNetworks() {
-        Process arp = null;
-
-        try {
-            arp = new ProcessBuilder("arp", "-a").start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<String> ret = new ArrayList<String>();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(arp.getInputStream()))) {
-            for (String line; (line = reader.readLine()) != null;) {
-                if (line.contains("dynamic")) {
-                    ret.add(line.substring(2, line.indexOf(' ', 2)));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return ret;
     }
 
     public boolean isFormOpen(Form p_form) {
@@ -444,53 +340,6 @@ public class Sketch extends PApplet {
 
         p_form = p_formBuild.show();
         return p_form;
-    }
-
-    @Deprecated
-    public static HashMap<String, String> parseRequestCodesFromFile(String p_fileName) {
-        HashMap<String, String> parsedMap = new HashMap<>();
-        File tableFile = new File("data", p_fileName);
-
-        if (tableFile.exists()) {
-            System.out.println("Found string table file!");
-            try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
-                int eqPos;
-                for (String line; (line = reader.readLine()) != null;) {
-
-                    if (line.isBlank() || line.charAt(0) == '#')
-                        continue;
-
-                    eqPos = line.indexOf('=');
-
-                    if (eqPos == -1)
-                        continue;
-
-                    parsedMap.put(
-                            line.substring(0, eqPos),
-                            line.substring(eqPos + 1, line.length()));
-                }
-            } catch (IOException e) {
-                System.out.println("Failed to read string table file!");
-                e.printStackTrace();
-            }
-        }
-        return parsedMap;
-    }
-
-    @TestOnly
-    public void sockTest() {
-        InetAddress localhost = null;
-        try {
-            localhost = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Sending a test \"SERVER_CLOSE\" message to myself LOL...");
-        socket.sendCode(RequestCode.SERVER_CLOSE, localhost.toString(), RequestCode.SERVER_PORT);
-
-        // socket.send(OldRequestCodesFromFile.toBytes("CLIENT_CLOSE"),
-        // localhost.getHostAddress(), SKETCH.socket.getPort());
     }
     // #endregion
 }

@@ -9,22 +9,18 @@ import processing.core.PApplet;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
-        Scene firstScene = awaitingConnectionScene;
-
         // #region "Are Wii gunna have a problem?""
+        Scene firstScene = awaitingConnectionScene;
         firstScene.setup();
         Scene.currentScene = firstScene;
         // #endregion
     }
 
     public void settingsMenuCheck() {
-        if (mouseButton == MouseEvent.BUTTON3) {
-            if (isFormOpen(Forms.settingsForm)) {
-            } else if ((Forms.settingsForm = showForm(
-                    Forms.settingsForm, Forms.settingsFormBuild)) != null) {
-                Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
-                Forms.settingsForm.getWindow().setResizable(false);
-            }
+        if (mouseButton == MouseEvent.BUTTON3 && !isFormOpen(Forms.settingsForm)) {
+            Forms.settingsForm = showForm(Forms.settingsForm, Forms.settingsFormBuild);
+            Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
+            Forms.settingsForm.getWindow().setResizable(false);
         }
     }
 
@@ -34,13 +30,12 @@ public class SketchWithScenes extends Sketch {
         }
     }
 
-    // "Please never make all `Scene` instances `static`."
-
+    // "Please never make any `Scene` instances `static`."
     Scene awaitingConnectionScene, workingScene, exitScene;
-    { // Scene definitions:
+
+    { // Scene definitions.
 
         awaitingConnectionScene = new Scene() {
-            // #region "Awaiting Connections" scene.
             String shownText;
 
             @Override
@@ -64,8 +59,8 @@ public class SketchWithScenes extends Sketch {
 
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n", p_data.length,
-                        new String(p_data), p_ip, p_port);
+                System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
+                        p_data.length, new String(p_data), p_ip, p_port);
 
                 if (RequestCode.packetHasCode(p_data)) {
                     switch (RequestCode.fromPacket(p_data)) {
@@ -101,9 +96,9 @@ public class SketchWithScenes extends Sketch {
                                 client = socket.new AgcClient(socket, p_ip, p_port, names[0], names[1]);
 
                                 printArray(names);
-                                System.out.printf("The client of IP `%s` reported the names: \"%s\" and \"%s\".\n",
-                                        p_ip,
-                                        names[0], names[1]);
+                                System.out.printf(
+                                        "The client of IP `%s` reported the names: \"%s\" and \"%s\".\n",
+                                        p_ip, names[0], names[1]);
                             } catch (ArrayIndexOutOfBoundsException e) {
                                 String name = new String(p_data, Integer.BYTES + (Character.BYTES * 2),
                                         p_data.length / Character.BYTES);
@@ -111,8 +106,8 @@ public class SketchWithScenes extends Sketch {
                                 // first one when editing the second string (the client's "bluetooth name").
                                 client = socket.new AgcClient(socket, p_ip, p_port, name, new String(name));
 
-                                System.out.printf("The client of IP `%s`, reported only one name, \"%s\".\n", p_ip,
-                                        name);
+                                System.out.printf("The client of IP `%s`, reported only one name, \"%s\".\n",
+                                        p_ip, name);
                             }
 
                             socket.addClientIfAbsent(client);
@@ -135,7 +130,6 @@ public class SketchWithScenes extends Sketch {
                     // The packet contains data! Get your `java.awt.Robot`s now!
                 }
             };
-            // #endregion
         };
 
         workingScene = new Scene() {
