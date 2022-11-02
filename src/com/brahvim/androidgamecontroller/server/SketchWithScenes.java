@@ -39,6 +39,41 @@ public class SketchWithScenes extends Sketch {
             @Override
             public void setup() {
                 shownText = Forms.getString("AwaitingConnectionsScene.text");
+
+                /*
+                 * // "Can you serialize enums?" YES!
+                 *
+                 * File test = new File("enum.ser");
+                 * 
+                 * if (test.exists()) {
+                 * try (FileInputStream fStr = new FileInputStream(test)) {
+                 * try (ObjectInputStream oStr = new ObjectInputStream(fStr)) {
+                 * DpadButtonConfig loaded = (DpadButtonConfig) oStr.readObject();
+                 * System.out.printf("""
+                 * Loaded up a configuration with
+                 * transform `%s` and
+                 * direction `%s`! Congrats?\n""",
+                 * loaded.transform.toString(),
+                 * loaded.dir.toString());
+                 * } catch (Exception e) {
+                 * e.printStackTrace();
+                 * }
+                 * } catch (Exception e) {
+                 * e.printStackTrace();
+                 * }
+                 * } else {
+                 * try (FileOutputStream fStr = new FileOutputStream(test)) {
+                 * try (ObjectOutputStream oStr = new ObjectOutputStream(fStr)) {
+                 * oStr.writeObject(new DpadButtonConfig(
+                 * new PVector(1, 2, 3), DpadButtonConfig.Direction.RIGHT));
+                 * } catch (Exception e) {
+                 * e.printStackTrace();
+                 * }
+                 * } catch (Exception e) {
+                 * e.printStackTrace();
+                 * }
+                 * }
+                 */
             }
 
             @Override
