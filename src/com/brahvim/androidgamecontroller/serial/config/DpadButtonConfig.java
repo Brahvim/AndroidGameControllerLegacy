@@ -2,6 +2,8 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import java.io.Serializable;
 
+import com.brahvim.androidgamecontroller.serial.DpadDirection;
+
 import processing.core.PVector;
 
 public class DpadButtonConfig implements Serializable {
@@ -10,14 +12,10 @@ public class DpadButtonConfig implements Serializable {
     // only hope, would fail!
 
     public PVector transform; // The `z` is NOT used here...
-    public Direction dir; // Enumerations are safer!
+    public DpadDirection dir; // Enumerations are safer!
 
-    public DpadButtonConfig(PVector p_transform, Direction p_dir) {
+    public DpadButtonConfig(PVector p_transform, DpadDirection p_dir) {
         this.transform = p_transform;
         this.dir = p_dir;
-    }
-
-    public enum Direction {
-        UP, LEFT, DOWN, RIGHT // `W`-`A`-`S`-D` order.
     }
 }
