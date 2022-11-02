@@ -42,7 +42,7 @@ public class AgcServerSocket extends UdpSocket {
          * @return The name of the client device given to it by its manufacturer. This
          *         is the most used way to identify devices.
          */
-        public String getDeviceName() {
+        public String getName() {
             return this.deviceName;
         }
 
@@ -105,10 +105,12 @@ public class AgcServerSocket extends UdpSocket {
         }
     }
 
-    ArrayList<AgcClient> clients;
+    public ArrayList<AgcClient> clients;
+    private ArrayList<String> bannedIpStrings;
 
     AgcServerSocket() {
         super(RequestCode.SERVER_PORT);
+        this.bannedIpStrings = new ArrayList<>();
         this.clients = new ArrayList<>();
     }
 
@@ -271,6 +273,22 @@ public class AgcServerSocket extends UdpSocket {
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
         if (Scene.currentScene != null)
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
+    }
+
+    public void banIp(String p_clientIp) {
+        this.bannedIpStrings.add(p_clientIp);
+    }
+
+    public boolean isClientBanned(@NotNull AgcClient p_client) {
+        if (this.bannedIpStrings.size() == 0)
+            return false;
+
+        String clientIp = p_client.getIp();
+
+        for (String s : this.bannedIpStrings)
+            if (s.equals(clientIp))
+                return false;
+        return true;
     }
 
     // #region Non-so-important Overrides.

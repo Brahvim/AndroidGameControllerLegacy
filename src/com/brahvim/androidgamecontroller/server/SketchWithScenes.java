@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -26,6 +27,56 @@ public class SketchWithScenes extends Sketch {
         if (socket.clients.size() == 0) {
             Scene.setScene(awaitingConnectionScene);
         }
+    }
+
+    public void confirmConnection(AgcClient p_client) {
+        Forms.ui.showConfirmDialog(
+                "Ping-pong!\nA device named \""
+                        .concat(p_client.getName())
+                        .concat("\" (IP: `")
+                        .concat(p_client.getIp())
+                        .concat(")`")
+                        .concat(" would like to connect!\n\nDo you allow this?"),
+
+                // Window title:
+                "New connection!",
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        socket.addClientIfAbsent(p_client);
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        confirmRejection(p_client);
+                    }
+                });
+    }
+
+    public void confirmRejection(AgcClient p_client) {
+        Forms.ui.showConfirmDialog(
+                """
+                        For the rest of this session
+                            (AKA till AndroidGameController restarts),
+                            the device \"
+                            """
+                        .concat(p_client.getName())
+                        .concat("\" (IP: `(")
+                        .concat("`). ")
+                        .concat("won't be allowed to connect.\n")
+                        .concat("Is this OK?"),
+                "Are you sure..?", new Runnable() {
+                    @Override
+                    public void run() {
+                        socket.banIp(p_client.getIp());
+                        System.out.println("Client from IP `%s` was rejected and banned.\n");
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        confirmConnection(p_client);
+                    }
+                });
     }
 
     // "Please never make any `Scene` instances `static`."
@@ -55,26 +106,31 @@ public class SketchWithScenes extends Sketch {
                  * direction `%s`! Congrats?\n""",
                  * loaded.transform.toString(),
                  * loaded.dir.toString());
-                 * } catch (Exception e) {
+                 * }catch(****
+                 * 
+                 * Exception e)**
+                 * {
                  * e.printStackTrace();
-                 * }
-                 * } catch (Exception e) {
+                 * }*}catch(**
+                 * Exception e)**
+                 * {
                  * e.printStackTrace();
-                 * }
-                 * } else {
-                 * try (FileOutputStream fStr = new FileOutputStream(test)) {
+                 * }*}else{*try(*
+                 * FileOutputStream fStr = new FileOutputStream(test))**
+                 * {
                  * try (ObjectOutputStream oStr = new ObjectOutputStream(fStr)) {
                  * oStr.writeObject(new DpadButtonConfig(
                  * new PVector(1, 2, 3), DpadButtonConfig.Direction.RIGHT));
                  * } catch (Exception e) {
                  * e.printStackTrace();
                  * }
-                 * } catch (Exception e) {
+                 * }catch(*
+                 * Exception e)**
+                 * {
                  * e.printStackTrace();
+                 * }***
                  * }
-                 * }
-                 */
-            }
+                 */}
 
             @Override
             public void draw() {
@@ -111,9 +167,11 @@ public class SketchWithScenes extends Sketch {
 
                             System.out.printf(
                                     "The client of IP `%s` reported the name: \"%s\".\n",
-                                    p_ip, client.getDeviceName());
+                                    p_ip, client.getName());
 
-                            socket.addClientIfAbsent(client);
+                            if (!socket.isClientBanned(client))
+                                confirmConnection(client);
+                            // socket.addClientIfAbsent(client);
                             // ^^^ Should be included in the `AgcClient` constructor now,
                             // ...just like the initial plan!
 

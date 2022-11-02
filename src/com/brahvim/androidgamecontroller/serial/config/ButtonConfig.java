@@ -5,7 +5,9 @@ import java.io.Serializable;
 import processing.core.PVector;
 
 public class ButtonConfig implements Serializable {
-    public PVector transform;
+    public PVector transform; // The `z` is rotation.
+    public ButtonShape shape;
+    public PVector scale;
     public String text;
 
     /*

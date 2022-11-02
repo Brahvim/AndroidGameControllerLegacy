@@ -77,6 +77,11 @@ public class UdpSocket {
     // #region Fields.
     private static int NUMBER_OF_THREADS = 0;
 
+    // Standard array sizes:
+    public final static int PACKET_LEAST_SIZE = 543;
+    public final static int PACKET_MAX_SIZE = 65535;
+    public final static int PACKET_RECOMMENDED_SIZE = 576;
+
     /**
      * The {@code Thread} that handles the network's receive calls.
      *
@@ -95,7 +100,8 @@ public class UdpSocket {
      *           {@link <a href=
      *           "https://stackoverflow.com/a/9235558/13951505">...</a>}.
      */
-    public Short byteArrayMaxSize = 576; // PS a more precise number is `543` bytes.
+    public Integer packetMaxSize = Receiver.PACKET_RECOMMENDED_SIZE;
+    // ^^^ PS a more precise number is `543` bytes.
 
     /**
      * An internal {@code private} variable that lets the thread know whether or not
@@ -137,7 +143,7 @@ public class UdpSocket {
           // `short`(`byteArrayMaxSize`) *should* be fine here?
           // Ehh, it's fine. Is it THAT important to use `AtomicShort` right-away anyway?
 
-          byte[] byteData = new byte[byteArrayMaxSize /* 65535 */];
+          byte[] byteData = new byte[packetMaxSize /* 65535 */];
           // ^^^ B I G ___ A L L O C A T I O N !
 
           // We got some work?
