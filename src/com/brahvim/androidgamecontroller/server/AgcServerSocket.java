@@ -20,8 +20,7 @@ public class AgcServerSocket extends UdpSocket {
 
         // The manufacturer-assigned name and the user-assigned bluetooth name for the
         // connected client Android device:
-        private String manName;
-        private String btName;
+        private String deviceName;
 
         // AgcClient(AgcServerSocket p_parent, String p_ip, int p_port) {
         // this.ip = p_ip;
@@ -29,31 +28,22 @@ public class AgcServerSocket extends UdpSocket {
         // this.parent = p_parent;
         // }
 
-        public AgcClient(AgcServerSocket p_parent, String p_ip, int p_port, String p_manName, String p_btName) {
+        public AgcClient(AgcServerSocket p_parent, String p_ip, int p_port, String p_deviceName) {
             this.ip = p_ip;
             this.port = p_port;
             this.parent = p_parent;
 
             // The new stuff:
-
-            this.btName = p_btName;
-            this.manName = p_manName;
+            this.deviceName = p_deviceName;
         }
 
         // #region Getters and Setters
         /**
-         * @return The user-assigned "bluetooth name" of the client device.
-         */
-        public String getBtName() {
-            return this.btName;
-        }
-
-        /**
          * @return The name of the client device given to it by its manufacturer. This
          *         is the most used way to identify devices.
          */
-        public String getManName() {
-            return this.manName;
+        public String getDeviceName() {
+            return this.deviceName;
         }
 
         public int getPort() {
@@ -279,7 +269,6 @@ public class AgcServerSocket extends UdpSocket {
 
     @Override
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
-        System.out.println("Received some data!");
         if (Scene.currentScene != null)
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
     }

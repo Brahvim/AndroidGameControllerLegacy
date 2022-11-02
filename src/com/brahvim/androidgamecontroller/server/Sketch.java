@@ -7,22 +7,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.jetbrains.annotations.TestOnly;
-
-import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 
 import processing.awt.PSurfaceAWT;
@@ -90,6 +78,15 @@ public class Sketch extends PApplet {
         System.out.printf(
                 "Welcome to the AndroidGameController Server application `%s`!\n\n",
                 Sketch.VERSION);
+
+        // JVM shutdown hook:
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                System.out.println("JVM EXITED.");
+                agcExit();
+            }
+        });
 
         // Window setup:
         surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));

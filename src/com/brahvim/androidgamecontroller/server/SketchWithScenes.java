@@ -5,8 +5,6 @@ import java.awt.event.MouseEvent;
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 
-import processing.core.PApplet;
-
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
         // #region "Are Wii gunna have a problem?""
@@ -69,46 +67,16 @@ public class SketchWithScenes extends Sketch {
                                        // namespaced here :D
                             System.out.printf("Client joined! IP: `%s`, port: `%d`.\n", p_ip, p_port);
 
-                            AgcServerSocket.AgcClient client;
-                            String[] names; // The Android client device's names.
-                            try {
-                                int strEnd = Integer.BYTES;
-                                // ^^^ Since array indices are whole numbers, this starts AFTER the code part.
+                            byte[] nameBytes = new byte[p_data.length - RequestCode.EXTRA_DATA_START];
+                            System.arraycopy(p_data, RequestCode.EXTRA_DATA_START, nameBytes, 0,
+                                    nameBytes.length);
 
-                                boolean second = false;
+                            AgcServerSocket.AgcClient client = socket.new AgcClient(socket, p_ip, p_port,
+                                    new String(nameBytes));
 
-                                for (; strEnd < p_data.length; strEnd++)
-                                    if (p_data[strEnd] == '\0') {
-                                        if (second)
-                                            break;
-                                        second = true;
-                                    }
-
-                                String namesStr = new String(p_data, Integer.BYTES, strEnd);
-                                System.out.println(namesStr);
-
-                                // Usually, this constructor would make a string on its own, but in this case,
-                                // it would also include the code's bytes, which isn't what we want, so we use
-                                // the value of the iterator of the loop from before:
-                                names = PApplet.split(namesStr,
-                                        // p_data.length * Character.BYTES),
-                                        "\n");
-                                client = socket.new AgcClient(socket, p_ip, p_port, names[0], names[1]);
-
-                                printArray(names);
-                                System.out.printf(
-                                        "The client of IP `%s` reported the names: \"%s\" and \"%s\".\n",
-                                        p_ip, names[0], names[1]);
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                                String name = new String(p_data, Integer.BYTES + (Character.BYTES * 2),
-                                        p_data.length / Character.BYTES);
-                                // The other string is re-allocated to make sure that no changes occur in the
-                                // first one when editing the second string (the client's "bluetooth name").
-                                client = socket.new AgcClient(socket, p_ip, p_port, name, new String(name));
-
-                                System.out.printf("The client of IP `%s`, reported only one name, \"%s\".\n",
-                                        p_ip, name);
-                            }
+                            System.out.printf(
+                                    "The client of IP `%s` reported the name: \"%s\".\n",
+                                    p_ip, client.getDeviceName());
 
                             socket.addClientIfAbsent(client);
                             // ^^^ Should be included in the `AgcClient` constructor now,
@@ -149,7 +117,9 @@ public class SketchWithScenes extends Sketch {
                 System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n", p_ip, p_port);
 
                 if (RequestCode.packetHasCode(p_data)) {
-                    switch (RequestCode.fromPacket(p_data)) {
+                    RequestCode code = RequestCode.fromPacket(p_data);
+                    System.out.printf("It was a code, `%s`!\n", code.toString());
+                    switch (code) {
                         case CLIENT_CLOSE:
                         case CLIENT_LOW_BATTERY:
                             socket.removeClient(p_ip);
@@ -160,6 +130,8 @@ public class SketchWithScenes extends Sketch {
                             break;
                     } // End of `packetHasCode()` check,
                 } // End of `onReceive()`.
+                else
+                    System.out.println("It was a packet of button data.");
             };
         };
 

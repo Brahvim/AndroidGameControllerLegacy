@@ -21,7 +21,7 @@ public enum RequestCode {
   //
 
   /**
-   * AGC pings all on your network with this request
+   * AGC pings all devices on your network with this request
    * so they respond and it can connect to them :D
    */
   FINDING_DEVICES(),
@@ -69,8 +69,21 @@ public enum RequestCode {
   CLIENT_WAS_REGISTERED();
   // #endregion
 
+  /**
+   * The port that AGC servers are always on.
+   */
   public static final int SERVER_PORT = 6443;
+
+  /**
+   * The bytes of this strings are suffixed when AGC sends a request code instead
+   * of a packet with serialized controller data.
+   */
   public final static byte[] CODE_SUFFIX = "CODE".getBytes(StandardCharsets.UTF_8);
+
+  /**
+   * This is how many bytes 'far' extra data starts in request packets.
+   */
+  public static final int EXTRA_DATA_START = Integer.BYTES + RequestCode.CODE_SUFFIX.length;
 
   // I want to send request codes in this manner:
   // `CODE` + <request code> + <extra data, separated by underscores..?>.
