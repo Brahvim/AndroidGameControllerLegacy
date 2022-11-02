@@ -35,17 +35,20 @@ public class SketchWithScenes extends Sketch {
                         .concat(p_client.getName())
                         .concat("\" (IP: `")
                         .concat(p_client.getIp())
-                        .concat(")`")
+                        .concat("`)")
                         .concat(" would like to connect!\n\nDo you allow this?"),
 
                 // Window title:
                 "New connection!",
+                // If yes,
                 new Runnable() {
                     @Override
                     public void run() {
                         socket.addClientIfAbsent(p_client);
                     }
-                }, new Runnable() {
+                },
+                // If no,
+                new Runnable() {
                     @Override
                     public void run() {
                         confirmRejection(p_client);
@@ -57,12 +60,12 @@ public class SketchWithScenes extends Sketch {
         Forms.ui.showConfirmDialog(
                 """
                         For the rest of this session
-                            (AKA till AndroidGameController restarts),
-                            the device \"
-                            """
+                        (AKA till AndroidGameController restarts),
+                        the device \""""
                         .concat(p_client.getName())
-                        .concat("\" (IP: `(")
-                        .concat("`). ")
+                        .concat("\" (IP: `")
+                        .concat(p_client.getIp())
+                        .concat("`) ")
                         .concat("won't be allowed to connect.\n")
                         .concat("Is this OK?"),
                 "Are you sure..?", new Runnable() {
