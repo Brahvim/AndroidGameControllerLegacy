@@ -75,7 +75,7 @@ public class UdpSocket {
    */
   public class Receiver {
     // #region Fields.
-    static int NUMBER_OF_THREADS = 0;
+    private static int NUMBER_OF_THREADS = 0;
 
     /**
      * The {@code Thread} that handles the network's receive calls.
@@ -85,7 +85,7 @@ public class UdpSocket {
      * @see UdpSocket.Receiver#start()
      * @see UdpSocket.Receiver#stop()
      */
-    Thread thread; // Ti's but a daemon thread.
+    private Thread thread; // Ti's but a daemon thread.
 
     /**
      * Sets the size of the buffer (in bytes) data is received into. The maximum
@@ -181,6 +181,15 @@ public class UdpSocket {
       }; // End of the `Runanble` constructor!... :D!~
 
       this.start();
+    }
+
+    public static int getNumberOfReceivers() {
+      // LOL:
+      return com.brahvim.androidgamecontroller.UdpSocket.Receiver.NUMBER_OF_THREADS;
+    }
+
+    public Thread getThread() {
+      return this.thread;
     }
 
     public void start() {
