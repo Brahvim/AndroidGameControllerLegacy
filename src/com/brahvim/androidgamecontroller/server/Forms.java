@@ -1,7 +1,5 @@
 package com.brahvim.androidgamecontroller.server;
 
-import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
-
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
 import uibooster.components.WindowSetting;
@@ -20,11 +18,39 @@ public class Forms {
     public static WaitingDialog findingDevicesDialog;
 
     public final static int SETTINGS_WIDTH = 360, SETTINGS_HEIGHT = 230;
-
     // #endregion
 
+    // #region General methods...
     public static void init(UiBooster p_ui) {
         Forms.ui = p_ui;
+    }
+
+    public static boolean isFormOpen(Form p_form) {
+        // if (p_form == null)
+        // return false;
+        // else if (p_form.isClosedByUser())
+        // return false;
+        // else
+        // return true;
+        return p_form == null ? false : p_form.isClosedByUser() ? false : true;
+    }
+
+    public static Form showForm(Form p_form, FormBuilder p_formBuild) {
+        if (p_form != null)
+            if (!p_form.isClosedByUser())
+                p_form.close();
+
+        p_form = p_formBuild.run();
+        return p_form;
+    }
+
+    public static Form showBlockingForm(Form p_form, FormBuilder p_formBuild) {
+        if (p_form != null)
+            if (!p_form.isClosedByUser())
+                p_form.close();
+
+        p_form = p_formBuild.show();
+        return p_form;
     }
 
     public static String getString(String p_key) {
@@ -33,6 +59,7 @@ public class Forms {
             System.err.printf("Key `%s` not found!\n", p_key);
         return ret;
     }
+    // #endregion
 
     public static WaitingDialog showFindingConnectionDialog() {
         WaitingDialog ret = ui.showWaitingDialog(
@@ -93,14 +120,14 @@ public class Forms {
         ret.addButton(Forms.getString("SettingsForm.exitButton"), new Runnable() {
             @Override
             public void run() {
-                Sketch.SKETCH.agcExit();
+                Sketch.agcExit();
             }
         });
 
         ret.addButton(Forms.getString("SettingsForm.bansMenuButton"), new Runnable() {
             @Override
             public void run() {
-                Forms.bansForm = Sketch.showForm(Forms.bansForm, Forms.createBansForm());
+                Forms.bansForm = Forms.showForm(Forms.bansForm, Forms.createBansForm());
             }
         });
 
@@ -111,16 +138,21 @@ public class Forms {
 
     public static FormBuilder createBansForm() {
         FormBuilder ret = Forms.ui.createForm(Forms.getString("BansForm.title"));
-        ret.addLabel(Sketch.SKETCH.socket.clients.size() == 0 ? Forms.getString("BansForm.noBans")
+        ret.addLabel(Sketch.socket.bannedIpStrings.size() == 0
+                ? Forms.getString("BansForm.noBans")
                 : Forms.getString("BansForm.label"));
 
-        for (AgcClient c : Sketch.SKETCH.socket.clients) {
-            String clientName = c.getName();
+        for (int i = 0, max = Sketch.socket.bannedIpStrings.size(); i < max; i++) {
+            String clientName = Sketch.socket.bannedClientNames.get(i),
+                    clientIp = Sketch.socket.bannedIpStrings.get(i);
+            // Can't use this variable inside an inner class
+            // without declaring it final. Impossible!
             ret.addButton(clientName, new Runnable() {
                 @Override
                 public void run() {
-                    Forms.unbanForm = Sketch.showForm(
-                            Forms.unbanForm, Forms.createUnbanForm(clientName, c.getIp()));
+                    Forms.unbanForm = Forms.showForm(
+                            Forms.unbanForm, Forms.createUnbanForm(
+                                    clientName, clientIp));
                 }
             });
         }
@@ -135,7 +167,7 @@ public class Forms {
         ret.addButton(Forms.getString("UnbansForm.unbanButton"), new Runnable() {
             @Override
             public void run() {
-                Sketch.SKETCH.socket.unbanIp(p_clientName);
+                Sketch.socket.unbanIp(p_clientName);
             }
         });
 

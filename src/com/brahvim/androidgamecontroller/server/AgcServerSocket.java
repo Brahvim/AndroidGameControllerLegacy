@@ -11,8 +11,6 @@ import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.UdpSocket;
 
-import processing.core.PApplet;
-
 public class AgcServerSocket extends UdpSocket {
     class AgcClient {
         private String ip;
@@ -108,12 +106,13 @@ public class AgcServerSocket extends UdpSocket {
     }
 
     public ArrayList<AgcClient> clients;
-    private ArrayList<String> bannedIpStrings;
+    public ArrayList<String> bannedIpStrings, bannedClientNames;
 
     AgcServerSocket() {
         super(RequestCode.SERVER_PORT);
-        this.bannedIpStrings = new ArrayList<>();
         this.clients = new ArrayList<>();
+        this.bannedIpStrings = new ArrayList<>();
+        this.bannedClientNames = new ArrayList<>();
     }
 
     // #region Client management methods.
@@ -277,16 +276,28 @@ public class AgcServerSocket extends UdpSocket {
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
     }
 
-    public void banIp(String p_clientIp) {
-        this.bannedIpStrings.add(p_clientIp);
+    public void unbanIp(String p_ip) {
+        this.bannedIpStrings.remove(p_ip);
     }
 
-    public void unbanIp(String p_clientIp) {
-        this.bannedIpStrings.remove(p_clientIp);
+    public void banIp(String p_ip) {
+        String name = null;
+
+        for (AgcClient c : this.clients) {
+            if (c.ip.equals(p_ip)) {
+                name = c.deviceName;
+            }
+        }
+
+        if (name == null) {
+            name = "`".concat(p_ip).concat("`");
+        }
+
+        this.bannedIpStrings.add(p_ip);
+        this.bannedClientNames.add(name);
     }
 
     public boolean isClientBanned(@NotNull AgcClient p_client) {
-        PApplet.printArray(this.bannedIpStrings);
         if (this.bannedIpStrings.size() == 0)
             return false;
 

@@ -5,11 +5,18 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import com.brahvim.androidgamecontroller.Scene;
 
@@ -19,8 +26,6 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import uibooster.UiBooster;
-import uibooster.model.Form;
-import uibooster.model.FormBuilder;
 import uibooster.model.UiBoosterOptions;
 
 public class Sketch extends PApplet {
@@ -32,7 +37,7 @@ public class Sketch extends PApplet {
 
     // #region Stuff that makes AGC *go!*
     PGraphics gr;
-    AgcServerSocket socket;
+    static AgcServerSocket socket;
     int bgColor = color(0, 150); // Exit fade animation, et cetera.
     float frameStartTime, pframeTime, frameTime;
     // #endregion
@@ -245,8 +250,8 @@ public class Sketch extends PApplet {
         q3y = cy + qy;
     }
 
-    public void agcExit() {
-        if (isFormOpen(Forms.settingsForm))
+    public static void agcExit() {
+        if (Forms.isFormOpen(Forms.settingsForm))
             Forms.settingsForm.close();
 
         Scene.setScene(Sketch.SKETCH.exitScene);
@@ -259,14 +264,51 @@ public class Sketch extends PApplet {
         frame.setLayout(null);
         frame.addNotify();
 
+        frame.addWindowListener(new WindowListener() {
+            @Override
+            public void windowClosing(WindowEvent p_event) {
+                System.out.println("Window closing...");
+                Sketch.agcExit();
+            }
+
+            // Never called!:
+            @Override
+            public void windowClosed(WindowEvent p_event) {
+                System.out.println("Window CLOSED.");
+                Sketch.agcExit();
+            }
+
+            // #region Unused...
+            @Override
+            public void windowOpened(WindowEvent p_event) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent p_event) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent p_event) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent p_event) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent p_event) {
+            }
+            // #endregion
+        });
+
         // The `JPanel`:
         JPanel panel = new JPanel() {
-
             @Override
             protected void paintComponent(Graphics p_graphics) {
                 if (p_graphics instanceof Graphics2D) {
-                    Graphics2D g2d = (Graphics2D) p_graphics;
-                    g2d.drawImage(gr.image, 0, 0, null);
+                    // Graphics2D g2d = (Graphics2D) p_graphics;
+                    // g2d.drawImage(gr.image, 0, 0, null);
+                    ((Graphics2D) p_graphics).drawImage(gr.image, 0, 0, null);
                 }
             }
         };
@@ -279,22 +321,21 @@ public class Sketch extends PApplet {
         panel.requestFocusInWindow();
 
         // Listeners for handling events :+1::
-        MouseAdapter mA = new MouseAdapter() {
-            public void mousePressed(MouseEvent me) {
+        panel.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent p_mouseEvent) {
                 mousePressed = true;
-                mouseButton = me.getButton();
+                mouseButton = p_mouseEvent.getButton();
                 SKETCH.mousePressed();
             }
 
-            public void mouseReleased(MouseEvent me) {
+            public void mouseReleased(MouseEvent p_mouseEvent) {
                 mousePressed = false;
                 SKETCH.mouseReleased();
             }
-        };
-        panel.addMouseListener(mA);
+        });
 
-        // We only utilize this variable again. Java makes copies before using it.
-        mA = new MouseAdapter() {
+        // Listeners for `mouseDragged()` and `mouseMoved()`:
+        panel.addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent me) {
                 mouseX = MouseInfo.getPointerInfo().getLocation().x - frame.getLocation().x;
                 mouseY = MouseInfo.getPointerInfo().getLocation().y - frame.getLocation().y;
@@ -306,37 +347,49 @@ public class Sketch extends PApplet {
                 mouseY = MouseInfo.getPointerInfo().getLocation().y - frame.getLocation().y;
                 SKETCH.mouseMoved();
             }
-        };
-        panel.addMouseMotionListener(mA);
+        });
+
+        // For `keyPressed()`, `keyReleased()` and `keyTyped()`:
+        panel.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent p_keyEvent) {
+                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
+                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
+
+                Sketch.SKETCH.keyTyped();
+            }
+
+            @Override
+            public void keyPressed(KeyEvent p_keyEvent) {
+                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
+                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
+
+                System.out.println("Heard a keypress!");
+
+                Sketch.SKETCH.keyPressed();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent p_keyEvent) {
+                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
+                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
+
+                Sketch.SKETCH.keyReleased();
+            }
+        });
+
+        // Handle `Alt + F4` closes ourselves!:
+        panel.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
+                        && e.getKeyCode() == KeyEvent.VK_F4) {
+                    Sketch.agcExit();
+                    e.consume();
+                }
+            }
+        });
+
         gr = createGraphics(width, height);
-    }
-
-    public boolean isFormOpen(Form p_form) {
-        // if (p_form == null)
-        // return false;
-        // else if (p_form.isClosedByUser())
-        // return false;
-        // else
-        // return true;
-        return p_form == null ? false : p_form.isClosedByUser() ? false : true;
-    }
-
-    public static Form showForm(Form p_form, FormBuilder p_formBuild) {
-        if (p_form != null)
-            if (!p_form.isClosedByUser())
-                p_form.close();
-
-        p_form = p_formBuild.run();
-        return p_form;
-    }
-
-    public Form showBlockingForm(Form p_form, FormBuilder p_formBuild) {
-        if (p_form != null)
-            if (!p_form.isClosedByUser())
-                p_form.close();
-
-        p_form = p_formBuild.show();
-        return p_form;
     }
     // #endregion
 }

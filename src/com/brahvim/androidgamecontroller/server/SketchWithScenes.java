@@ -16,8 +16,8 @@ public class SketchWithScenes extends Sketch {
     }
 
     public void settingsMenuCheck() {
-        if (mouseButton == MouseEvent.BUTTON3 && !isFormOpen(Forms.settingsForm)) {
-            Forms.settingsForm = showForm(Forms.settingsForm, Forms.settingsFormBuild);
+        if (mouseButton == MouseEvent.BUTTON3 && !Forms.isFormOpen(Forms.settingsForm)) {
+            Forms.settingsForm = Forms.showForm(Forms.settingsForm, Forms.settingsFormBuild);
             Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
             Forms.settingsForm.getWindow().setResizable(false);
         }
@@ -72,9 +72,10 @@ public class SketchWithScenes extends Sketch {
                 "Are you sure..?", new Runnable() {
                     @Override
                     public void run() {
-                        socket.banIp(p_client.getIp());
+                        String ip = p_client.getIp();
+                        socket.banIp(ip);
                         socket.sendCode(RequestCode.CLIENT_WAS_REJECTED, p_client);
-                        System.out.println("Client from IP `%s` was rejected and banned.\n");
+                        System.out.printf("Client from IP `%s` was rejected and banned.\n", ip);
                     }
                 }, new Runnable() {
                     @Override
