@@ -18,6 +18,9 @@ public class Forms {
     public static FormBuilder settingsFormBuild, newFindingConnectionsFormBuild, bansFormBuild, unbanFormBuild;
 
     public static WaitingDialog findingDevicesDialog;
+
+    public final static int SETTINGS_WIDTH = 360, SETTINGS_HEIGHT = 230;
+
     // #endregion
 
     public static void init(UiBooster p_ui) {
@@ -85,7 +88,7 @@ public class Forms {
     public static FormBuilder createSettingsForm() {
         FormBuilder ret = ui.createForm(Forms.getString("SettingsForm.title"));
         WindowSetting win = ret.andWindow();
-        win.setSize(360, 230);
+        win.setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
 
         ret.addButton(Forms.getString("SettingsForm.exitButton"), new Runnable() {
             @Override
