@@ -64,9 +64,16 @@ public enum RequestCode {
   MAX_DEVICES(),
 
   /**
-   * If the server accepts a client's `ADD_ME`, the server sends this.
+   * If the server operator accepts a client's `ADD_ME`, the server sends this.
    */
-  CLIENT_WAS_REGISTERED();
+  CLIENT_WAS_REGISTERED(),
+
+  /**
+   * The operator denied the entry of this client on the server.
+   * They may 'bail' them out of the ban list to be able to accpet any further
+   * requests from the client.
+   */
+  CLIENT_WAS_REJECTED();
   // #endregion
 
   /**

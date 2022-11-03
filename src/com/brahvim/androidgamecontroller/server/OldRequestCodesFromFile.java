@@ -34,7 +34,7 @@ public final class OldRequestCodesFromFile {
     static { // Parse `AGC_RequestCodes.properties`.
         values = new HashMap<String, Integer>();
 
-        File file = new File("data", "AGC_RequestCodes.properties");
+        File file = new File("data", "AgcRequestCodes.properties");
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
             int eqPos, numEnd;

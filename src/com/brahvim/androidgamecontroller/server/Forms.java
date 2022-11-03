@@ -1,5 +1,7 @@
 package com.brahvim.androidgamecontroller.server;
 
+import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
+
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
 import uibooster.components.WindowSetting;
@@ -9,21 +11,20 @@ import uibooster.model.FormElement;
 
 public class Forms {
     // #region Fields.
-    // From `App`:
-    static UiBooster ui; // = App.ui;
+    public static UiBooster ui;
 
-    static Form deviceSelectionForm, settingsForm, newFindingConnectionsForm;
+    public static Form deviceSelectionForm, settingsForm, newFindingConnectionsForm, bansForm, unbanForm;
 
-    static FormBuilder settingsFormBuild, newFindingConnectionsFormBuild;
+    public static FormBuilder settingsFormBuild, newFindingConnectionsFormBuild, bansFormBuild, unbanFormBuild;
 
-    static WaitingDialog findingDevicesDialog;
+    public static WaitingDialog findingDevicesDialog;
     // #endregion
 
-    static void init(UiBooster p_ui) {
+    public static void init(UiBooster p_ui) {
         Forms.ui = p_ui;
     }
 
-    static String getString(String p_key) {
+    public static String getString(String p_key) {
         String ret = StringTable.get(p_key);
         if (ret == null)
             System.err.printf("Key `%s` not found!\n", p_key);
@@ -32,8 +33,8 @@ public class Forms {
 
     public static WaitingDialog showFindingConnectionDialog() {
         WaitingDialog ret = ui.showWaitingDialog(
-                getString("FindConnectionWaitBox.text"),
-                getString("FindConnectionWaitBox.title"));
+                Forms.getString("FindConnectionWaitBox.text"),
+                Forms.getString("FindConnectionWaitBox.title"));
         findingDevicesDialog = ret;
         return ret;
     }
@@ -82,20 +83,67 @@ public class Forms {
     }
 
     public static FormBuilder createSettingsForm() {
-        FormBuilder ret = ui.createForm(getString("SettingsForm.title"));
+        FormBuilder ret = ui.createForm(Forms.getString("SettingsForm.title"));
         WindowSetting win = ret.andWindow();
-        win.setSize(360, 180);
+        win.setSize(360, 230);
 
-        ret.addButton(getString("SettingsForm.exitButton"), new Runnable() {
+        ret.addButton(Forms.getString("SettingsForm.exitButton"), new Runnable() {
             @Override
             public void run() {
                 Sketch.SKETCH.agcExit();
             }
         });
 
-        ret.addSlider(getString("SettingsForm.timeoutSlider"), 2, 20, 2, 2, 0);
+        ret.addButton(Forms.getString("SettingsForm.bansMenuButton"), new Runnable() {
+            @Override
+            public void run() {
+                Forms.bansForm = Sketch.showForm(Forms.bansForm, Forms.createBansForm());
+            }
+        });
+
+        ret.addSlider(Forms.getString("SettingsForm.timeoutSlider"), 2, 20, 2, 2, 0);
 
         return Forms.settingsFormBuild = ret;
+    }
+
+    public static FormBuilder createBansForm() {
+        FormBuilder ret = Forms.ui.createForm(Forms.getString("BansForm.title"));
+        ret.addLabel(Sketch.SKETCH.socket.clients.size() == 0 ? Forms.getString("BansForm.noBans")
+                : Forms.getString("BansForm.label"));
+
+        for (AgcClient c : Sketch.SKETCH.socket.clients) {
+            String clientName = c.getName();
+            ret.addButton(clientName, new Runnable() {
+                @Override
+                public void run() {
+                    Forms.unbanForm = Sketch.showForm(
+                            Forms.unbanForm, Forms.createUnbanForm(clientName, c.getIp()));
+                }
+            });
+        }
+
+        return ret;
+    }
+
+    public static FormBuilder createUnbanForm(String p_clientName, String p_clientIp) {
+        FormBuilder ret = Forms.ui.createForm("UnbansForm.title".concat(p_clientName).concat("?"));
+        ret.addLabel(p_clientName.concat(" (IP: `").concat(p_clientIp).concat("`)"));
+
+        ret.addButton(Forms.getString("UnbansForm.unbanButton"), new Runnable() {
+            @Override
+            public void run() {
+                Sketch.SKETCH.socket.unbanIp(p_clientName);
+            }
+        });
+
+        ret.addButton(Forms.getString("UnbansForm.permBanButton"), new Runnable() {
+            @Override
+            public void run() {
+                // IP should be written to `AgcBannedClients.csv`
+            }
+        });
+
+        return ret;
     }
 
 }

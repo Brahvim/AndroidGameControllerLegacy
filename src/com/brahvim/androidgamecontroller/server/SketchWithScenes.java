@@ -31,12 +31,12 @@ public class SketchWithScenes extends Sketch {
 
     public void confirmConnection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
-                "Ping-pong!\nA device named \""
+                "Ping-pong! \""
                         .concat(p_client.getName())
                         .concat("\" (IP: `")
                         .concat(p_client.getIp())
                         .concat("`)")
-                        .concat(" would like to connect!\n\nDo you allow this?"),
+                        .concat(" would like to connect!\nDo you allow this?"),
 
                 // Window title:
                 "New connection!",
@@ -45,6 +45,7 @@ public class SketchWithScenes extends Sketch {
                     @Override
                     public void run() {
                         socket.addClientIfAbsent(p_client);
+                        socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, p_client);
                     }
                 },
                 // If no,
@@ -59,8 +60,8 @@ public class SketchWithScenes extends Sketch {
     public void confirmRejection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
                 """
-                        For the rest of this session
-                        (AKA till AndroidGameController restarts),
+                        Till AndroidGameController restarts,
+                        or you choose so in the settings,
                         the device \""""
                         .concat(p_client.getName())
                         .concat("\" (IP: `")
@@ -72,6 +73,7 @@ public class SketchWithScenes extends Sketch {
                     @Override
                     public void run() {
                         socket.banIp(p_client.getIp());
+                        socket.sendCode(RequestCode.CLIENT_WAS_REJECTED, p_client);
                         System.out.println("Client from IP `%s` was rejected and banned.\n");
                     }
                 }, new Runnable() {
@@ -177,8 +179,6 @@ public class SketchWithScenes extends Sketch {
                             // socket.addClientIfAbsent(client);
                             // ^^^ Should be included in the `AgcClient` constructor now,
                             // ...just like the initial plan!
-
-                            socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, client);
 
                             // ...so we finally have a client!:
                             if (socket.clients.size() != 0)

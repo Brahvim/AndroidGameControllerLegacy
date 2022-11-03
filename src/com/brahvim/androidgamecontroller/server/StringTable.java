@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class StringTable {
-    public static HashMap<String, String> table = StringTable.parse("AGC_StringTable.ini");
+    public static HashMap<String, String> table = StringTable.parse("AgcStringTable.ini");
 
     public static HashMap<String, String> parse /* parseStringTableFromFile */ (String p_fileName) {
         HashMap<String, String> parsedMap = new HashMap<>();

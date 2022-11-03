@@ -321,7 +321,7 @@ public class Sketch extends PApplet {
         return p_form == null ? false : p_form.isClosedByUser() ? false : true;
     }
 
-    public Form showForm(Form p_form, FormBuilder p_formBuild) {
+    public static Form showForm(Form p_form, FormBuilder p_formBuild) {
         if (p_form != null)
             if (!p_form.isClosedByUser())
                 p_form.close();

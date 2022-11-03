@@ -11,6 +11,8 @@ import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.UdpSocket;
 
+import processing.core.PApplet;
+
 public class AgcServerSocket extends UdpSocket {
     class AgcClient {
         private String ip;
@@ -279,7 +281,12 @@ public class AgcServerSocket extends UdpSocket {
         this.bannedIpStrings.add(p_clientIp);
     }
 
+    public void unbanIp(String p_clientIp) {
+        this.bannedIpStrings.remove(p_clientIp);
+    }
+
     public boolean isClientBanned(@NotNull AgcClient p_client) {
+        PApplet.printArray(this.bannedIpStrings);
         if (this.bannedIpStrings.size() == 0)
             return false;
 
@@ -287,8 +294,8 @@ public class AgcServerSocket extends UdpSocket {
 
         for (String s : this.bannedIpStrings)
             if (s.equals(clientIp))
-                return false;
-        return true;
+                return true;
+        return false;
     }
 
     // #region Non-so-important Overrides.
