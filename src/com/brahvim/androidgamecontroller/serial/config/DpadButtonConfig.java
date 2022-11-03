@@ -11,6 +11,7 @@ public class DpadButtonConfig implements Serializable {
     // STRICTLY because - if I don't, `instanceof` checks, our
     // only hope, would fail!
 
+    public PVector scale;
     public PVector transform; // The `z` is NOT used here...
     public DpadDirection dir; // Enumerations are safer!
 

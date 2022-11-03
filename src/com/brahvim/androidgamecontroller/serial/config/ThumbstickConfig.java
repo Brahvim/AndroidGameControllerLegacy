@@ -5,6 +5,7 @@ import java.io.Serializable;
 import processing.core.PVector;
 
 public class ThumbstickConfig implements Serializable {
-    PVector transform; // Of course, thumbsticks don't have rotation.
+    public PVector scale;
+    public PVector transform; // Of course, thumbsticks don't have rotation.
     // ...unless I put a fancy texture with shadows on them.
 }
