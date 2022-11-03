@@ -100,7 +100,7 @@ public class UdpSocket {
      *           {@link <a href=
      *           "https://stackoverflow.com/a/9235558/13951505">...</a>}.
      */
-    public Integer packetMaxSize = Receiver.PACKET_RECOMMENDED_SIZE;
+    public Integer packetMaxSize = Receiver.PACKET_MAX_SIZE;
     // ^^^ PS a more precise number is `543` bytes.
 
     /**
