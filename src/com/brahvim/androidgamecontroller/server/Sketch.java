@@ -364,7 +364,7 @@ public class Sketch extends PApplet {
                 Sketch.SKETCH.key = p_keyEvent.getKeyChar();
                 Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
 
-                System.out.println("Heard a keypress!");
+                // System.out.println("Heard a keypress!");
 
                 Sketch.SKETCH.keyPressed();
             }
@@ -383,8 +383,11 @@ public class Sketch extends PApplet {
             public void keyPressed(KeyEvent e) {
                 if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
                         && e.getKeyCode() == KeyEvent.VK_F4) {
-                    Sketch.agcExit();
-                    e.consume();
+
+                    if (!Sketch.SKETCH.exitCalled()) {
+                        Sketch.agcExit();
+                        e.consume();
+                    }
                 }
             }
         });

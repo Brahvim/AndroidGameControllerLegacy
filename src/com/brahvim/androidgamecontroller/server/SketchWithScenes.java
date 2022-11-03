@@ -31,15 +31,18 @@ public class SketchWithScenes extends Sketch {
 
     public void confirmConnection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
-                "Ping-pong! \""
+                Forms.getString("ConfirmConnection.begin")
+
+                        .concat(" \"")
                         .concat(p_client.getName())
+
                         .concat("\" (IP: `")
                         .concat(p_client.getIp())
-                        .concat("`)")
-                        .concat(" would like to connect!\nDo you allow this?"),
 
+                        .concat("`) ")
+                        .concat(Forms.getString("ConfirmConnection.end")),
                 // Window title:
-                "New connection!",
+                Forms.getString("ConfirmConnection.windowTitle"),
                 // If yes,
                 new Runnable() {
                     @Override
@@ -154,6 +157,9 @@ public class SketchWithScenes extends Sketch {
 
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
+                if (socket.bannedIpStrings.contains(p_ip))
+                    return;
+
                 System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
                         p_data.length, new String(p_data), p_ip, p_port);
 
@@ -162,7 +168,7 @@ public class SketchWithScenes extends Sketch {
                         case ADD_ME: { // Limits the stack so
                                        // that `client` is
                                        // namespaced here :D
-                            System.out.printf("Client joined! IP: `%s`, port: `%d`.\n", p_ip, p_port);
+                            System.out.printf("Client wished to join! IP: `%s`, port: `%d`.\n", p_ip, p_port);
 
                             byte[] nameBytes = new byte[p_data.length - RequestCode.EXTRA_DATA_START];
                             System.arraycopy(p_data, RequestCode.EXTRA_DATA_START, nameBytes, 0,
@@ -261,7 +267,8 @@ public class SketchWithScenes extends Sketch {
                     float wave = windowFadeWave.get();
                     if (wave == 0) {
                         windowFadeWave.end();
-                        while (!Forms.settingsForm.isClosedByUser())
+
+                        while (!Forms.isFormClosed(Forms.settingsForm))
                             ;
                         delay(100);
                         exit();

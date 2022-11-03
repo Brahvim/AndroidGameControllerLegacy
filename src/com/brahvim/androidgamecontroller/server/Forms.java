@@ -6,6 +6,7 @@ import uibooster.components.WindowSetting;
 import uibooster.model.Form;
 import uibooster.model.FormBuilder;
 import uibooster.model.FormElement;
+import uibooster.model.FormElementChangeListener;
 
 public class Forms {
     // #region Fields.
@@ -33,6 +34,10 @@ public class Forms {
         // else
         // return true;
         return p_form == null ? false : p_form.isClosedByUser() ? false : true;
+    }
+
+    public static boolean isFormClosed(Form p_form) {
+        return p_form == null ? true : p_form.isClosedByUser();
     }
 
     public static Form showForm(Form p_form, FormBuilder p_formBuild) {
@@ -146,7 +151,7 @@ public class Forms {
             String clientName = Sketch.socket.bannedClientNames.get(i),
                     clientIp = Sketch.socket.bannedIpStrings.get(i);
             // Can't use this variable inside an inner class
-            // without declaring it final. Impossible!
+            // without declaring it `final`. Impossible!
             ret.addButton(clientName, new Runnable() {
                 @Override
                 public void run() {
@@ -157,6 +162,7 @@ public class Forms {
             });
         }
 
+        ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
         return ret;
     }
 
@@ -169,15 +175,33 @@ public class Forms {
             public void run() {
                 Sketch.socket.unbanIp(p_clientName);
             }
-        });
+        }).setID("btn_unban");
 
         ret.addButton(Forms.getString("UnbansForm.permBanButton"), new Runnable() {
             @Override
             public void run() {
                 // IP should be written to `AgcBannedClients.csv`
             }
+        }).setID("btn_perm_ban");
+
+        ret.setChangeListener(new FormElementChangeListener() {
+            @Override
+            public void onChange(FormElement p_elt, Object p_value, Form p_parentForm) {
+                switch (p_elt.getId()) {
+                    case "btn_unban" -> {
+                        p_parentForm.close();
+                    }
+                    case "btn_perm_ban" -> {
+                        p_parentForm.close();
+                    }
+                    default -> {
+                    }
+                }
+            }
+
         });
 
+        ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
         return ret;
     }
 
