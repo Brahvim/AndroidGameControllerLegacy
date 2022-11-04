@@ -3,8 +3,9 @@ package com.brahvim.androidgamecontroller.server;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JDialog;
+
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
-import com.jogamp.newt.event.KeyAdapter;
 
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
@@ -24,7 +25,9 @@ public class Forms {
 
     public static WaitingDialog findingDevicesDialog;
 
-    public final static int SETTINGS_WIDTH = 360, SETTINGS_HEIGHT = 230;
+    // In the case that these stop 'working' as expected, please see
+    // `Forms.showSettingsForm()`! It calls `window.pack()`...
+    public static int settingsWidth = 360, settingsHeight = 230;
     // #endregion
 
     // #region General methods...
@@ -35,7 +38,7 @@ public class Forms {
     public static String getString(String p_key) {
         String ret = StringTable.get(p_key);
         if (ret == null)
-            System.err.printf("Key `%s` not found!\n", p_key);
+            System.err.printf("String table key `%s` not found!\n", p_key);
         return ret;
     }
 
@@ -77,7 +80,6 @@ public class Forms {
 
         p_form = p_formBuild.run();
         Forms.addEscapeToCloseListener(p_form);
-        System.out.println("Added escape listener...");
         return p_form;
     }
 
@@ -104,14 +106,15 @@ public class Forms {
     // #endregion
 
     // #region Stuff that's common to all forms...
+    /**
+     * @deprecated Won't work for {@code JDialog}s with anything other than labels.
+     */
+    @Deprecated
     public static void addEscapeToCloseListener(Form p_form) {
         p_form.getWindow().addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent p_keyEvent) {
-                System.out.println("Key pressed!");
-
                 if (p_keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    System.out.println("Escape pressed...");
                     p_form.close();
                 }
             }
@@ -184,7 +187,7 @@ public class Forms {
     public static FormBuilder createSettingsForm() {
         FormBuilder ret = ui.createForm(Forms.getString("SettingsForm.title"));
         WindowSetting win = ret.andWindow();
-        win.setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
+        win.setSize(Forms.settingsWidth, Forms.settingsHeight);
 
         ret.addButton(Forms.getString("SettingsForm.exitButton"), new Runnable() {
             @Override
@@ -242,13 +245,18 @@ public class Forms {
             });
         }
 
-        ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
+        ret.andWindow().setSize(Forms.settingsWidth, Forms.settingsHeight);
         return ret;
 
     }
 
     public static FormBuilder createUnbanForm(String p_clientName, String p_clientIp) {
-        FormBuilder ret = Forms.ui.createForm("UnbansForm.title".concat(p_clientName).concat("?"));
+        FormBuilder ret = Forms.ui.createForm(
+                Forms.getString("UnbansForm.title")
+                        .concat(" ")
+                        .concat(p_clientName)
+                        .concat("?"));
+
         ret.addLabel(p_clientName.concat(" (IP: `").concat(p_clientIp).concat("`)"));
 
         ret.addButton(Forms.getString("UnbansForm.unbanButton"), new Runnable() {
@@ -283,7 +291,7 @@ public class Forms {
 
         });
 
-        ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
+        ret.andWindow().setSize(Forms.settingsWidth, Forms.settingsHeight);
         return ret;
     }
     // #endregion
@@ -291,27 +299,17 @@ public class Forms {
     // #region Functions that show forms:
     public static void showSettingsForm() {
         Forms.settingsForm = Forms.showRichForm(Forms.settingsForm, Forms.settingsFormBuild);
-        // Forms.addEscapeToCloseListener(Forms.settingsForm);
-        System.out.println(
-                Forms.settingsForm.getWindow().getKeyListeners().length);
+        JDialog window = Forms.settingsForm.getWindow();
 
-        Forms.settingsForm.getWindow().addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent p_keyEvent) {
-                System.out.println("Key pressed!");
+        // None of these listeners respond...
+        Forms.addEscapeToCloseListener(Forms.settingsForm);
 
-                if (p_keyEvent.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
-                    System.out.println("Escape pressed...");
-                    Forms.settingsForm.close();
-                }
-            }
-        });
+        window.setSize(Forms.settingsWidth, window.getHeight());
 
-        System.out.println(
-                Forms.settingsForm.getWindow().getKeyListeners().length);
-
-        Forms.settingsForm.getWindow().setLocation(
+        window.setLocation(
                 Sketch.SKETCH.sketchFrame.getX(), Sketch.SKETCH.sketchFrame.getY());
-        Forms.settingsForm.getWindow().setResizable(false);
+        window.setResizable(false);
     }
+    // #endregion
+
 }

@@ -36,16 +36,9 @@ public class SketchWithScenes extends Sketch {
 
     public void confirmConnection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
-                Forms.getString("ConfirmConnection.begin")
-
-                        .concat(" \"")
-                        .concat(p_client.getName())
-
-                        .concat("\" (IP: `")
-                        .concat(p_client.getIp())
-
-                        .concat("`) ")
-                        .concat(Forms.getString("ConfirmConnection.end")),
+                Forms.getString("ConfirmConnection.message")
+                        .replace("<name>", p_client.getName())
+                        .replace("<address>", p_client.getIp()),
                 // Window title:
                 Forms.getString("ConfirmConnection.windowTitle"),
                 // If yes,
@@ -67,21 +60,18 @@ public class SketchWithScenes extends Sketch {
 
     public void confirmRejection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
-                """
-                        Till AndroidGameController restarts,
-                        or you choose so in the settings,
-                        the device \""""
+                Forms.getString("RejectConnection.begin")
+                        .concat(" \"")
                         .concat(p_client.getName())
                         .concat("\" (IP: `")
                         .concat(p_client.getIp())
-                        .concat("`) ")
-                        .concat("won't be allowed to connect.\n")
-                        .concat("Is this OK?"),
-                "Are you sure..?", new Runnable() {
+                        .concat("`)? "),
+                Forms.getString("RejectConnection.windowTitle"),
+                new Runnable() {
                     @Override
                     public void run() {
                         socket.banClient(p_client);
-                        socket.sendCode(RequestCode.CLIENT_WAS_REJECTED, p_client);
+                        socket.sendCode(RequestCode.CLIENT_WAS_BANNED, p_client);
                         System.out.printf(
                                 "Client from IP `%s` was rejected and banned.\n",
                                 p_client.getIp());
@@ -297,6 +287,6 @@ public class SketchWithScenes extends Sketch {
             }
         };
 
-    }
+    } // End of scene definitions.
 
 }

@@ -73,7 +73,12 @@ public enum RequestCode {
    * They may 'bail' them out of the ban list to be able to accpet any further
    * requests from the client.
    */
-  CLIENT_WAS_REJECTED();
+  CLIENT_WAS_REJECTED(),
+
+  /**
+   * "BRO you just got banned from the current AGC session! Bruh momentum..."
+   */
+  CLIENT_WAS_BANNED();
   // #endregion
 
   /**

@@ -32,6 +32,11 @@ public class UdpSocket {
   public final static int DEFAULT_TIMEOUT = 32;
 
   /**
+   * The "broadcast address" of the current network.
+   */
+  private static String BROADCAST_ADDRESS = null;
+
+  /**
    * The internal {@linkplain DatagramSocket} that takes care of
    * networking.<br>
    * <br>
@@ -457,6 +462,9 @@ public class UdpSocket {
     // System.out.println("Socket closed...");
   }
 
+  // #endregion
+
+  // #region `static` stuff!:
   /**
    * Tries to 'force' the OS into constructing a socket with the port specified
    * using {@code DatagramSocket.setReuseAddress(boolean)}.
@@ -478,6 +486,10 @@ public class UdpSocket {
     }
 
     return ret;
+  }
+
+  public static String refreshBroadcastAddress() {
+    return null;
   }
   // #endregion
 
