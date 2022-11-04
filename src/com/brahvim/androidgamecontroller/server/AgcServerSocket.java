@@ -106,13 +106,15 @@ public class AgcServerSocket extends UdpSocket {
     }
 
     public ArrayList<AgcClient> clients;
-    public ArrayList<String> bannedIpStrings, bannedClientNames;
+    // public ArrayList<AgcClient> peers;
+    // The ones that are currently being used! ........................ :D
+
+    public ArrayList<AgcClient> bannedClients;
 
     AgcServerSocket() {
         super(RequestCode.SERVER_PORT);
         this.clients = new ArrayList<>();
-        this.bannedIpStrings = new ArrayList<>();
-        this.bannedClientNames = new ArrayList<>();
+        this.bannedClients = new ArrayList<>();
     }
 
     // #region Client management methods.
@@ -276,38 +278,92 @@ public class AgcServerSocket extends UdpSocket {
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
     }
 
-    public void unbanIp(String p_ip) {
-        this.bannedIpStrings.remove(p_ip);
+    public void unbanClient(String p_ip) {
+        for (AgcClient c : this.bannedClients)
+            if (c.ip.equals(p_ip)) {
+                this.bannedClients.remove(c);
+                break;
+            }
     }
 
-    public void banIp(String p_ip) {
-        String name = null;
+    public void banClient(String p_ip, int p_port) {
+        String clientName = null;
 
         for (AgcClient c : this.clients) {
-            if (c.ip.equals(p_ip)) {
-                name = c.deviceName;
-            }
+            if (c.ip.equals(p_ip))
+                clientName = c.deviceName;
         }
 
-        if (name == null) {
-            name = "`".concat(p_ip).concat("`");
-        }
+        if (clientName == null)
+            clientName = new String(p_ip);
 
-        this.bannedIpStrings.add(p_ip);
-        this.bannedClientNames.add(name);
+        this.bannedClients.add(new AgcClient(this, p_ip, -1, clientName));
     }
 
-    public boolean isClientBanned(@NotNull AgcClient p_client) {
-        if (this.bannedIpStrings.size() == 0)
-            return false;
+    public void banClient(AgcClient p_client) {
+        this.bannedClients.add(p_client);
+    }
 
-        String clientIp = p_client.getIp();
+    public boolean isClientBanned(AgcClient p_client) {
+        return this.bannedClients.size() == 0 ? false
+                : this.bannedClients.contains(p_client);
+    }
 
-        for (String s : this.bannedIpStrings)
-            if (s.equals(clientIp))
+    public boolean isIpBanned(String p_ip) {
+        for (AgcClient c : this.bannedClients)
+            if (c.ip.equals(p_ip))
                 return true;
         return false;
     }
+
+    // From back when the `bannedIpStrings` and `bannedClientNames`
+    // `ArrayList<String>`s were-a-thing!:
+
+    /*
+     * public void unbanIp(String p_ip) {
+     * this.bannedIpStrings.remove(p_ip);
+     * }
+     * 
+     * public void banClient(AgcClient p_client) {
+     * this.bannedIpStrings.add(p_client.ip);
+     * this.bannedClientNames.add(p_client.deviceName);
+     * }
+     * 
+     * public void banClient(String p_ip, String p_name) {
+     * this.bannedIpStrings.add(p_ip);
+     * this.bannedClientNames.add(p_name);
+     * }
+     * 
+     * public void banClient(String p_ip) {
+     * String name = null;
+     * 
+     * for (AgcClient c : this.clients) {
+     * if (c.ip.equals(p_ip)) {
+     * name = c.deviceName;
+     * }
+     * }
+     * 
+     * if (name == null) {
+     * name = "`".concat(p_ip).concat("`");
+     * }
+     * 
+     * this.bannedIpStrings.add(p_ip);
+     * this.bannedClientNames.add(name);
+     * }
+     * 
+     * public boolean isClientBanned(@NotNull AgcClient p_client) {
+     * if (this.bannedIpStrings.size() == 0)
+     * return false;
+     * 
+     * String clientIp = p_client.getIp();
+     * 
+     * for (String s : this.bannedIpStrings)
+     * if (s.equals(clientIp))
+     * return true;
+     * return false;
+     * }
+     * 
+     */
 
     // #region Non-so-important Overrides.
     @Override

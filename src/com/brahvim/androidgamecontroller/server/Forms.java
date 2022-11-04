@@ -1,5 +1,11 @@
 package com.brahvim.androidgamecontroller.server;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
+import com.jogamp.newt.event.KeyAdapter;
+
 import uibooster.UiBooster;
 import uibooster.components.WaitingDialog;
 import uibooster.components.WindowSetting;
@@ -26,6 +32,14 @@ public class Forms {
         Forms.ui = p_ui;
     }
 
+    public static String getString(String p_key) {
+        String ret = StringTable.get(p_key);
+        if (ret == null)
+            System.err.printf("Key `%s` not found!\n", p_key);
+        return ret;
+    }
+
+    // #region Form null-check methods:
     public static boolean isFormOpen(Form p_form) {
         // if (p_form == null)
         // return false;
@@ -40,6 +54,11 @@ public class Forms {
         return p_form == null ? true : p_form.isClosedByUser();
     }
 
+    public static void closeForm(Form p_form) {
+        if (p_form != null)
+            p_form.close();
+    }
+
     public static Form showForm(Form p_form, FormBuilder p_formBuild) {
         if (p_form != null)
             if (!p_form.isClosedByUser())
@@ -49,6 +68,20 @@ public class Forms {
         return p_form;
     }
 
+    // Shows a form 'rich' with listeners etcetera.
+    public static Form showRichForm(Form p_form, FormBuilder p_formBuild) {
+        // Should encapsulate this - just the `showForm()` function, but I didn't!:
+        if (p_form != null)
+            if (!p_form.isClosedByUser())
+                p_form.close();
+
+        p_form = p_formBuild.run();
+        Forms.addEscapeToCloseListener(p_form);
+        System.out.println("Added escape listener...");
+        return p_form;
+    }
+
+    // Shows a form 'rich' with listeners etcetera.
     public static Form showBlockingForm(Form p_form, FormBuilder p_formBuild) {
         if (p_form != null)
             if (!p_form.isClosedByUser())
@@ -58,14 +91,45 @@ public class Forms {
         return p_form;
     }
 
-    public static String getString(String p_key) {
-        String ret = StringTable.get(p_key);
-        if (ret == null)
-            System.err.printf("Key `%s` not found!\n", p_key);
-        return ret;
+    public static Form showRichBlockingForm(Form p_form, FormBuilder p_formBuild) {
+        if (p_form != null)
+            if (!p_form.isClosedByUser())
+                p_form.close();
+
+        p_form = p_formBuild.show();
+        Forms.addEscapeToCloseListener(p_form);
+        return p_form;
+    }
+    // #endregion
+    // #endregion
+
+    // #region Stuff that's common to all forms...
+    public static void addEscapeToCloseListener(Form p_form) {
+        p_form.getWindow().addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent p_keyEvent) {
+                System.out.println("Key pressed!");
+
+                if (p_keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    System.out.println("Escape pressed...");
+                    p_form.close();
+                }
+            }
+
+            // #region Unused callbacks.
+            @Override
+            public void keyReleased(KeyEvent p_keyEvent) {
+            }
+
+            @Override
+            public void keyTyped(KeyEvent p_keyEvent) {
+            }
+            // #endregion
+        });
     }
     // #endregion
 
+    // #region Form creation...
     public static WaitingDialog showFindingConnectionDialog() {
         WaitingDialog ret = ui.showWaitingDialog(
                 Forms.getString("FindConnectionWaitBox.text"),
@@ -132,7 +196,7 @@ public class Forms {
         ret.addButton(Forms.getString("SettingsForm.bansMenuButton"), new Runnable() {
             @Override
             public void run() {
-                Forms.bansForm = Forms.showForm(Forms.bansForm, Forms.createBansForm());
+                Forms.bansForm = Forms.showRichForm(Forms.bansForm, Forms.createBansForm());
             }
         });
 
@@ -143,27 +207,44 @@ public class Forms {
 
     public static FormBuilder createBansForm() {
         FormBuilder ret = Forms.ui.createForm(Forms.getString("BansForm.title"));
-        ret.addLabel(Sketch.socket.bannedIpStrings.size() == 0
+        ret.addLabel(Sketch.socket.bannedClients.size() == 0
                 ? Forms.getString("BansForm.noBans")
                 : Forms.getString("BansForm.label"));
 
-        for (int i = 0, max = Sketch.socket.bannedIpStrings.size(); i < max; i++) {
-            String clientName = Sketch.socket.bannedClientNames.get(i),
-                    clientIp = Sketch.socket.bannedIpStrings.get(i);
-            // Can't use this variable inside an inner class
-            // without declaring it `final`. Impossible!
+        /*
+         * for (int i = 0, max = Sketch.socket.bannedIpStrings.size(); i < max; i++) {
+         * String clientName = Sketch.socket.bannedClientNames.get(i),
+         * clientIp = Sketch.socket.bannedIpStrings.get(i);
+         * // Can't use this variable inside an inner class
+         * // without declaring it `final`. Impossible!
+         * ret.addButton(clientName, new Runnable() {
+         * 
+         * @Override
+         * public void run() {
+         * Forms.unbanForm = Forms.showForm(
+         * Forms.unbanForm, Forms.createUnbanForm(
+         * clientName, clientIp));
+         * }
+         * });
+         * }
+         */
+
+        for (AgcClient c : Sketch.socket.bannedClients) {
+            String clientName = c.getName(), clientIp = c.getIp();
+
             ret.addButton(clientName, new Runnable() {
                 @Override
                 public void run() {
-                    Forms.unbanForm = Forms.showForm(
-                            Forms.unbanForm, Forms.createUnbanForm(
-                                    clientName, clientIp));
+                    Forms.unbanForm = Forms.showRichForm(
+                            Forms.unbanForm,
+                            Forms.createUnbanForm(clientName, clientIp));
                 }
             });
         }
 
         ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
         return ret;
+
     }
 
     public static FormBuilder createUnbanForm(String p_clientName, String p_clientIp) {
@@ -173,7 +254,7 @@ public class Forms {
         ret.addButton(Forms.getString("UnbansForm.unbanButton"), new Runnable() {
             @Override
             public void run() {
-                Sketch.socket.unbanIp(p_clientName);
+                Sketch.socket.unbanClient(p_clientName);
             }
         }).setID("btn_unban");
 
@@ -190,6 +271,7 @@ public class Forms {
                 switch (p_elt.getId()) {
                     case "btn_unban" -> {
                         p_parentForm.close();
+                        Forms.closeForm(Forms.unbanForm);
                     }
                     case "btn_perm_ban" -> {
                         p_parentForm.close();
@@ -204,5 +286,32 @@ public class Forms {
         ret.andWindow().setSize(Forms.SETTINGS_WIDTH, Forms.SETTINGS_HEIGHT);
         return ret;
     }
+    // #endregion
 
+    // #region Functions that show forms:
+    public static void showSettingsForm() {
+        Forms.settingsForm = Forms.showRichForm(Forms.settingsForm, Forms.settingsFormBuild);
+        // Forms.addEscapeToCloseListener(Forms.settingsForm);
+        System.out.println(
+                Forms.settingsForm.getWindow().getKeyListeners().length);
+
+        Forms.settingsForm.getWindow().addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent p_keyEvent) {
+                System.out.println("Key pressed!");
+
+                if (p_keyEvent.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
+                    System.out.println("Escape pressed...");
+                    Forms.settingsForm.close();
+                }
+            }
+        });
+
+        System.out.println(
+                Forms.settingsForm.getWindow().getKeyListeners().length);
+
+        Forms.settingsForm.getWindow().setLocation(
+                Sketch.SKETCH.sketchFrame.getX(), Sketch.SKETCH.sketchFrame.getY());
+        Forms.settingsForm.getWindow().setResizable(false);
+    }
 }

@@ -30,31 +30,33 @@ import uibooster.model.UiBoosterOptions;
 
 public class Sketch extends PApplet {
     // #region Fields.
-    final static SketchWithScenes SKETCH = new SketchWithScenes();
-    final static String VERSION = "v1.0";
-    final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
+    public final static SketchWithScenes SKETCH = new SketchWithScenes();
+    public final static String VERSION = "v1.0";
+    public final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
 
     // #region Stuff that makes AGC *go!*
-    PGraphics gr;
-    static AgcServerSocket socket;
-    int bgColor = color(0, 150); // Exit fade animation, et cetera.
-    float frameStartTime, pframeTime, frameTime;
+    public PGraphics gr;
+    public static AgcServerSocket socket;
+    public int bgColor = color(0, 150); // Exit fade animation, et cetera.
+    public float frameStartTime, pframeTime, frameTime;
     // #endregion
 
     // #region Window coordinates and states.
-    PImage surfaceIcon;
-    PVector minExtent, maxExtent;
+    public PImage surfaceIcon;
+    public PVector minExtent, maxExtent;
 
     // Ma' boilerplate :D
-    float cx, cy, qx, qy, q3x, q3y;
-    int pwidth, pheight;
+    public float cx, cy, qx, qy, q3x, q3y;
+    public int pwidth, pheight;
 
-    boolean mouseInWin;
-    int pwinMouseX, pwinMouseY;
-    int winMouseX, winMouseY;
-    int surfaceX, surfaceY; // Used to constrain the position of the overlay.
-    int pMousePsdX, pMousePsdY; // Where was the mouse when it was last clicked?
+    public JFrame sketchFrame; // We do not rely on the Processing 3 'dummy' variable!
+
+    public boolean mouseInWin;
+    public int pwinMouseX, pwinMouseY;
+    public int winMouseX, winMouseY;
+    public int surfaceX, surfaceY; // Used to constrain the position of the overlay.
+    public int pmousePressX, pmousePressY; // Where was the mouse when it was last clicked?
     // #endregion
     // #endregion Fields.
 
@@ -84,15 +86,6 @@ public class Sketch extends PApplet {
                 "Welcome to the AndroidGameController Server application `%s`!\n\n",
                 Sketch.VERSION);
 
-        // JVM shutdown hook:
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.out.println("JVM EXITED.");
-                agcExit();
-            }
-        });
-
         // Window setup:
         surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
         surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
@@ -108,7 +101,10 @@ public class Sketch extends PApplet {
         System.out.printf("Running on a `%d`Hz display.\n", REFRESH_RATE);
         frameRate(REFRESH_RATE);
 
-        prepareJPanel();
+        // Make the window undecorated and all!:
+        gr = createGraphics(width, height);
+        sketchFrame = createSketchPanel(gr);
+
         // surface.setResizable(true);
         // ^^^ The `surface` or its `JFrame`, ..or even the `JPanel`.
         // NOBODY takes this request!
@@ -137,8 +133,8 @@ public class Sketch extends PApplet {
         winMouseY = MouseInfo.getPointerInfo().getLocation().y;
 
         if (mousePressed) {
-            surfaceX = winMouseX - pMousePsdX;
-            surfaceY = winMouseY - pMousePsdY;
+            surfaceX = winMouseX - pmousePressX;
+            surfaceY = winMouseY - pmousePressY;
 
             if (surfaceX < minExtent.x)
                 surfaceX = (int) minExtent.x;
@@ -155,13 +151,13 @@ public class Sketch extends PApplet {
             surface.setLocation(surfaceX, surfaceY);
         }
 
-        mouseInWin = winMouseX > frame.getX() &&
-                winMouseX < frame.getX() + width &&
-                winMouseY > frame.getY() &&
-                winMouseY < frame.getY() + height;
+        mouseInWin = winMouseX > sketchFrame.getX() &&
+                winMouseX < sketchFrame.getX() + width &&
+                winMouseY > sketchFrame.getY() &&
+                winMouseY < sketchFrame.getY() + height;
         // #endregion
 
-        frame.setBackground(new Color(0, 0, 0, 0));
+        sketchFrame.setBackground(new Color(0, 0, 0, 0));
 
         gr.beginDraw();
         gr.background(bgColor);
@@ -174,69 +170,6 @@ public class Sketch extends PApplet {
 
     public void post() {
         Scene.currentScene.post();
-    }
-    // #endregion
-
-    // #region Processing's keyboard event callbacks.
-    @Override
-    public void keyPressed() {
-        Scene.currentScene.keyPressed();
-    }
-
-    @Override
-    public void keyReleased() {
-        Scene.currentScene.keyReleased();
-    }
-
-    @Override
-    public void keyTyped() {
-        Scene.currentScene.keyTyped();
-    }
-
-    // #endregion
-
-    // #region Processing's mouse event callbacks.
-    @Override
-    public void mouseMoved() {
-        Scene.currentScene.mouseMoved();
-    }
-
-    @Override
-    public void mouseWheel(processing.event.MouseEvent p_event) {
-        Scene.currentScene.mouseWheel(p_event);
-    }
-
-    @Override
-    public void mouseClicked() {
-        Scene.currentScene.mouseClicked();
-    }
-
-    @Override
-    public void mouseDragged() {
-        Scene.currentScene.mouseDragged();
-    }
-
-    @Override
-    public void mouseExited() {
-        Scene.currentScene.mouseExited();
-    }
-
-    @Override
-    public void mouseEntered() {
-        Scene.currentScene.mouseEntered();
-    }
-
-    @Override
-    public void mouseReleased() {
-        Scene.currentScene.mouseReleased();
-    }
-
-    @Override
-    public void mousePressed() {
-        pMousePsdX = mouseX;
-        pMousePsdY = mouseY;
-
-        Scene.currentScene.mousePressed();
     }
     // #endregion
 
@@ -257,28 +190,29 @@ public class Sketch extends PApplet {
         Scene.setScene(Sketch.SKETCH.exitScene);
     }
 
-    public void prepareJPanel() {
-        frame = (JFrame) ((PSurfaceAWT.SmoothCanvas) getSurface().getNative()).getFrame();
-        frame.removeNotify();
-        frame.setUndecorated(true);
-        frame.setLayout(null);
-        frame.addNotify();
+    public JFrame createSketchPanel(PGraphics p_sketchGraphics) {
+        // This is the dummy variable from Processing.
+        JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) getSurface().getNative()).getFrame();
+        ret.removeNotify();
+        ret.setUndecorated(true);
+        ret.setLayout(null);
+        ret.addNotify();
 
-        frame.addWindowListener(new WindowListener() {
+        ret.addWindowListener(new WindowListener() {
             @Override
             public void windowClosing(WindowEvent p_event) {
                 System.out.println("Window closing...");
                 Sketch.agcExit();
             }
 
+            // #region Unused...
             // Never called!:
             @Override
             public void windowClosed(WindowEvent p_event) {
-                System.out.println("Window CLOSED.");
-                Sketch.agcExit();
+                // System.out.println("Window CLOSED.");
+                // Sketch.agcExit();
             }
 
-            // #region Unused...
             @Override
             public void windowOpened(WindowEvent p_event) {
             }
@@ -301,20 +235,19 @@ public class Sketch extends PApplet {
             // #endregion
         });
 
-        // The `JPanel`:
+        // #region The `JPanel`:
+
         JPanel panel = new JPanel() {
             @Override
-            protected void paintComponent(Graphics p_graphics) {
-                if (p_graphics instanceof Graphics2D) {
-                    // Graphics2D g2d = (Graphics2D) p_graphics;
-                    // g2d.drawImage(gr.image, 0, 0, null);
-                    ((Graphics2D) p_graphics).drawImage(gr.image, 0, 0, null);
+            protected void paintComponent(Graphics p_javaGaphics) {
+                if (p_javaGaphics instanceof Graphics2D) {
+                    ((Graphics2D) p_javaGaphics).drawImage(p_sketchGraphics.image, 0, 0, null);
                 }
             }
         };
 
         // Let the `JFrame` be visible and request for `OS` permissions:
-        ((JFrame) frame).setContentPane(panel);
+        ((JFrame) ret).setContentPane(panel); // This is the dummy variable from Processing.
         panel.setFocusable(true);
         panel.setFocusTraversalKeysEnabled(false);
         panel.requestFocus();
@@ -336,15 +269,16 @@ public class Sketch extends PApplet {
 
         // Listeners for `mouseDragged()` and `mouseMoved()`:
         panel.addMouseMotionListener(new MouseAdapter() {
-            public void mouseDragged(MouseEvent me) {
-                mouseX = MouseInfo.getPointerInfo().getLocation().x - frame.getLocation().x;
-                mouseY = MouseInfo.getPointerInfo().getLocation().y - frame.getLocation().y;
+            public void mouseDragged(MouseEvent p_mouseEvent) {
+                mouseX = MouseInfo.getPointerInfo().getLocation().x - ret.getLocation().x;
+                mouseY = MouseInfo.getPointerInfo().getLocation().y - ret.getLocation().y;
+
                 SKETCH.mouseDragged();
             }
 
             public void mouseMoved(MouseEvent me) {
-                mouseX = MouseInfo.getPointerInfo().getLocation().x - frame.getLocation().x;
-                mouseY = MouseInfo.getPointerInfo().getLocation().y - frame.getLocation().y;
+                mouseX = MouseInfo.getPointerInfo().getLocation().x - ret.getLocation().x;
+                mouseY = MouseInfo.getPointerInfo().getLocation().y - ret.getLocation().y;
                 SKETCH.mouseMoved();
             }
         });
@@ -379,11 +313,18 @@ public class Sketch extends PApplet {
         });
 
         // Handle `Alt + F4` closes ourselves!:
+        // It is kinda 'stupid' to use another listener for optimization, but the reason
+        // why multiple listeners are allowed anyway is to let outer code access events
+        // and also give you convenience :P
+
+        // PS Notice how this uses `KeyAdapter` instead for
         panel.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
                         && e.getKeyCode() == KeyEvent.VK_F4) {
 
+                    // Apparently this wasn't the cause of an error I was trying to rectify.
+                    // However, it *still is a good practice!*
                     if (!Sketch.SKETCH.exitCalled()) {
                         Sketch.agcExit();
                         e.consume();
@@ -391,8 +332,70 @@ public class Sketch extends PApplet {
                 }
             }
         });
+        // #endregion
+        return ret;
+    }
+    // #endregion
 
-        gr = createGraphics(width, height);
+    // #region Processing's keyboard event callbacks.
+    @Override
+    public void keyPressed() {
+        Scene.currentScene.keyPressed();
+    }
+
+    @Override
+    public void keyReleased() {
+        Scene.currentScene.keyReleased();
+    }
+
+    @Override
+    public void keyTyped() {
+        Scene.currentScene.keyTyped();
+    }
+    // #endregion
+
+    // #region Processing's mouse event callbacks.
+    @Override
+    public void mouseMoved() {
+        Scene.currentScene.mouseMoved();
+    }
+
+    @Override
+    public void mouseWheel(processing.event.MouseEvent p_mouseEvent) {
+        Scene.currentScene.mouseWheel(p_mouseEvent);
+    }
+
+    @Override
+    public void mouseClicked() {
+        Scene.currentScene.mouseClicked();
+    }
+
+    @Override
+    public void mouseDragged() {
+        Scene.currentScene.mouseDragged();
+    }
+
+    @Override
+    public void mouseExited() {
+        Scene.currentScene.mouseExited();
+    }
+
+    @Override
+    public void mouseEntered() {
+        Scene.currentScene.mouseEntered();
+    }
+
+    @Override
+    public void mouseReleased() {
+        Scene.currentScene.mouseReleased();
+    }
+
+    @Override
+    public void mousePressed() {
+        pmousePressX = mouseX;
+        pmousePressY = mouseY;
+
+        Scene.currentScene.mousePressed();
     }
     // #endregion
 }

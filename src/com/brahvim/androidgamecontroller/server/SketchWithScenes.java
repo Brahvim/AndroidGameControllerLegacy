@@ -1,6 +1,7 @@
 package com.brahvim.androidgamecontroller.server;
 
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
@@ -17,10 +18,14 @@ public class SketchWithScenes extends Sketch {
 
     public void settingsMenuCheck() {
         if (mouseButton == MouseEvent.BUTTON3 && !Forms.isFormOpen(Forms.settingsForm)) {
-            Forms.settingsForm = Forms.showForm(Forms.settingsForm, Forms.settingsFormBuild);
-            Forms.settingsForm.getWindow().setLocation(frame.getX(), frame.getY());
-            Forms.settingsForm.getWindow().setResizable(false);
+            Forms.showSettingsForm();
         }
+    }
+
+    public void settingsMenuKbCheck() {
+        // `525` is the context menu key / "right-click key" *at least* on my keyboard.
+        if (keyCode == KeyEvent.VK_SPACE || keyCode == 525)
+            Forms.showSettingsForm();
     }
 
     public void noClientsCheck() {
@@ -75,10 +80,11 @@ public class SketchWithScenes extends Sketch {
                 "Are you sure..?", new Runnable() {
                     @Override
                     public void run() {
-                        String ip = p_client.getIp();
-                        socket.banIp(ip);
+                        socket.banClient(p_client);
                         socket.sendCode(RequestCode.CLIENT_WAS_REJECTED, p_client);
-                        System.out.printf("Client from IP `%s` was rejected and banned.\n", ip);
+                        System.out.printf(
+                                "Client from IP `%s` was rejected and banned.\n",
+                                p_client.getIp());
                     }
                 }, new Runnable() {
                     @Override
@@ -156,8 +162,13 @@ public class SketchWithScenes extends Sketch {
             }
 
             @Override
+            public void keyPressed() {
+                settingsMenuKbCheck();
+            }
+
+            @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                if (socket.bannedIpStrings.contains(p_ip))
+                if (socket.isIpBanned(p_ip))
                     return;
 
                 System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
@@ -168,11 +179,12 @@ public class SketchWithScenes extends Sketch {
                         case ADD_ME: { // Limits the stack so
                                        // that `client` is
                                        // namespaced here :D
-                            System.out.printf("Client wished to join! IP: `%s`, port: `%d`.\n", p_ip, p_port);
+                            System.out.printf("Client wished to join! IP: `%s`, port: `%d`.\n",
+                                    p_ip, p_port);
 
                             byte[] nameBytes = new byte[p_data.length - RequestCode.EXTRA_DATA_START];
-                            System.arraycopy(p_data, RequestCode.EXTRA_DATA_START, nameBytes, 0,
-                                    nameBytes.length);
+                            System.arraycopy(p_data, RequestCode.EXTRA_DATA_START,
+                                    nameBytes, 0, nameBytes.length);
 
                             AgcServerSocket.AgcClient client = socket.new AgcClient(socket, p_ip, p_port,
                                     new String(nameBytes));
@@ -216,8 +228,14 @@ public class SketchWithScenes extends Sketch {
                 settingsMenuCheck();
             }
 
+            @Override
+            public void keyPressed() {
+                settingsMenuKbCheck();
+            }
+
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n", p_ip, p_port);
+                System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n",
+                        p_ip, p_port);
 
                 if (RequestCode.packetHasCode(p_data)) {
                     RequestCode code = RequestCode.fromPacket(p_data);

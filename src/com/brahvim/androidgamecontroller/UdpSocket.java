@@ -451,7 +451,8 @@ public class UdpSocket {
       this.sock.setReuseAddress(false);
       this.sock.close();
     } catch (SocketException e) {
-      e.printStackTrace();
+      // That's basically re-printing the exception! NO!
+      // e.printStackTrace();
     }
     // System.out.println("Socket closed...");
   }

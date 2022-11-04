@@ -2,8 +2,6 @@ package com.brahvim.androidgamecontroller;
 
 import java.util.ArrayList;
 
-import processing.event.MouseEvent;
-
 public class Scene {
   public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
   public static Scene currentScene;
@@ -46,8 +44,7 @@ public class Scene {
   public void mouseMoved() {
   }
 
-  // @SuppressWarnings("unused")
-  public void mouseWheel(MouseEvent p_event) {
+  public void mouseWheel(processing.event.MouseEvent p_mouseEvent) {
   }
 
   public void mouseClicked() {
