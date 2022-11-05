@@ -5,4 +5,5 @@ package com.brahvim.androidgamecontroller.serial.state;
  */
 public class StateBase {
     public long millis;
+    public boolean pressed, ppressed;
 }

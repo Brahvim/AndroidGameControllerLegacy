@@ -1,7 +1,5 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import com.brahvim.androidgamecontroller.client.MainActivity;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -19,8 +17,9 @@ public class ConfigurationPacket implements Serializable {
     public ArrayList<TouchpadConfig> touchpads;
 
     ConfigurationPacket() {
-        this.appStartMilliSinceEpoch =
-          System.currentTimeMillis() - MainActivity.sketch.millis();
+        // Please set `this.appStartMilliSinceEpoch` in this manner!:
+        // this.appStartMilliSinceEpoch = System.currentTimeMillis() -
+        // MainActivity.sketch.millis();
     }
 
 }
