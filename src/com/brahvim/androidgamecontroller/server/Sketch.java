@@ -31,7 +31,7 @@ import uibooster.model.UiBoosterOptions;
 public class Sketch extends PApplet {
     // #region Fields.
     public final static SketchWithScenes SKETCH = new SketchWithScenes();
-    public final static String VERSION = "v1.0";
+    public final static String VERSION = "v1.0.0";
     public final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
 

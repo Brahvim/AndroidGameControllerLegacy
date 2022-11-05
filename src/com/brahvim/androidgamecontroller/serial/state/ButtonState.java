@@ -1,8 +1,6 @@
 package com.brahvim.androidgamecontroller.serial.state;
 
-import java.io.Serializable;
-
-public class ButtonState extends StateBase implements Serializable {
+public class ButtonState extends StateBase {
     // Nope! No OOP here :)
 
     /*

@@ -2,11 +2,9 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import com.brahvim.androidgamecontroller.serial.ButtonShape;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class ButtonConfig extends ControlConfigBase implements Serializable {
+public class ButtonConfig extends ControlConfigBase {
     public String text;
     public ButtonShape shape;
 

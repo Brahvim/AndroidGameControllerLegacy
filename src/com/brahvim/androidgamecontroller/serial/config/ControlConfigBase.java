@@ -1,15 +1,13 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import com.brahvim.androidgamecontroller.serial.ControlType;
+import java.io.Serializable;
 
 import processing.core.PVector;
 
 /**
  * Base class for all controller elements' configuration objects.
  */
-public class ControlConfigBase {
-    public ControlType type;
-
+public class ControlConfigBase implements Serializable {
     public PVector scale;
     public PVector transform;
 
@@ -19,12 +17,6 @@ public class ControlConfigBase {
     }
 
     ControlConfigBase(PVector p_scale, PVector p_transform) {
-        this.scale = p_scale;
-        this.transform = p_transform;
-    }
-
-    ControlConfigBase(ControlType p_type, PVector p_scale, PVector p_transform) {
-        this.type = p_type;
         this.scale = p_scale;
         this.transform = p_transform;
     }

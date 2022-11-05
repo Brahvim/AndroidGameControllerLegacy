@@ -1,8 +1,6 @@
 package com.brahvim.androidgamecontroller.serial.state;
 
-import java.io.Serializable;
-
-public class ThumbstickState extends StateBase implements Serializable {
+public class ThumbstickState extends StateBase {
     public boolean pressed, ppressed;
     public float mag, dir;
 

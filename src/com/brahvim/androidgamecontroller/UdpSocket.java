@@ -34,7 +34,7 @@ public class UdpSocket {
   /**
    * The "broadcast address" of the current network.
    */
-  private static String BROADCAST_ADDRESS = null;
+  // private static String BROADCAST_ADDRESS = null;
 
   /**
    * The internal {@linkplain DatagramSocket} that takes care of

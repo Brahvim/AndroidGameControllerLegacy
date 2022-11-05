@@ -1,9 +1,9 @@
 package com.brahvim.androidgamecontroller.serial;
 
 public enum ControlType {
-    A(), B(), X(), Y(),
-    UP(), LEFT(), DOWN(), RIGHT(),
-    TOUCHPAD(), THUMBSTICK();
+    //A(), B(), X(), Y(),
+    //UP(), LEFT(), DOWN(), RIGHT(),
+    //TOUCHPAD(), THUMBSTICK();
 
     // ...Use of the system keyboard should be allowed whenever wished by the user.
     // Let's make buttons for it!

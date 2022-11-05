@@ -1,10 +1,8 @@
 package com.brahvim.androidgamecontroller.serial.state;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class TouchpadState implements Serializable {
+public class TouchpadState {
     // NO idea why I would need to use abstraction like this here...
     // Better do it anyway! This is software development!
 

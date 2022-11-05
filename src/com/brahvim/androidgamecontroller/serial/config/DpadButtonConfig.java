@@ -2,11 +2,9 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import com.brahvim.androidgamecontroller.serial.DpadDirection;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class DpadButtonConfig extends ControlConfigBase implements Serializable {
+public class DpadButtonConfig extends ControlConfigBase {
     // PS I WILL have to use composition over inheritance here
     // STRICTLY because - if I don't, `instanceof` checks, our
     // only hope, would fail!

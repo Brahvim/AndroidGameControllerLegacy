@@ -78,8 +78,18 @@ public enum RequestCode {
   /**
    * "BRO you just got banned from the current AGC session! Bruh momentum..."
    */
-  CLIENT_WAS_BANNED();
+  CLIENT_WAS_BANNED(),
+
+  /**
+   * The client will send extra data along with this request.
+   * The *extra data* contains ONLY the bytes of a serialized
+   * `com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket` object.
+   */
+  CLIENT_SENDS_CONFIG();
   // #endregion
+
+  public static final String CLIENT_CURRENT_VERSION = "v1.0.0";
+  public static final String SERVER_CURRENT_VERSION = "v1.0.0";
 
   /**
    * The port that AGC servers are always on.
