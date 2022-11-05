@@ -1,5 +1,8 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
+import com.brahvim.androidgamecontroller.serial.ButtonShape;
+import com.brahvim.androidgamecontroller.serial.DpadDirection;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,7 +54,7 @@ public class ConfigurationPacket implements Serializable {
         ConfigurationPacket ret = new ConfigurationPacket();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(p_file))) {
-            String section = "", content = "";
+            String section = "", property = "", value = "";
             int eqPos, lineLen;
 
             for (String line; (line = reader.readLine()) != null; /*lineNumber++*/) {
@@ -68,15 +71,61 @@ public class ConfigurationPacket implements Serializable {
 
                 lineLen = line.length();
 
+                // For parsing "`property= value`":
                 eqPos = line.indexOf('=');
-                content = line.substring(eqPos + 1, lineLen);
+                property = line.substring(0, eqPos);
+                value = line.substring(eqPos + 1, lineLen);
 
                 switch (section) {
                     case "Button" -> {
+                        ButtonConfig record = new ButtonConfig();
+
+                        switch (property) {
+                            case "x":
+                                record.transform.x = Integer.parseInt(value);
+                                break;
+                            case "y":
+                                record.transform.y = Integer.parseInt(value);
+                                break;
+                            case "w":
+                                record.scale.x = Integer.parseInt(value);
+                                break;
+                            case "h":
+                                record.scale.y = Integer.parseInt(value);
+                                break;
+                            case "text":
+                                record.text = value;
+                                break;
+                            case "shape":
+                                record.shape = ButtonShape.valueOf(value);
+                                break;
+                        }
+
+                        ret.buttons.add(record);
                     }
 
                     case "DpadButton" -> {
+                        DpadButtonConfig record = new DpadButtonConfig();
 
+                        switch (property) {
+                            case "x":
+                                record.transform.x = Integer.parseInt(value);
+                                break;
+                            case "y":
+                                record.transform.y = Integer.parseInt(value);
+                                break;
+                            case "w":
+                                record.scale.x = Integer.parseInt(value);
+                                break;
+                            case "h":
+                                record.scale.y = Integer.parseInt(value);
+                                break;
+                            case "shape":
+                                record.dir = DpadDirection.valueOf(value);
+                                break;
+                        }
+
+                        ret.dpadButtons.add(record);
                     }
 
                     case "Thumbstick" -> {

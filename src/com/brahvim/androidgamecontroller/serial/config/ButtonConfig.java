@@ -8,6 +8,8 @@ public class ButtonConfig extends ControlConfigBase {
     public String text;
     public ButtonShape shape;
 
+    public ButtonConfig() {
+    }
 
     public ButtonConfig(float p_x, float p_y, String p_text) {
         super(
