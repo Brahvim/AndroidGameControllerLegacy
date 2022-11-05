@@ -1,22 +1,21 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import java.io.Serializable;
-
 import com.brahvim.androidgamecontroller.serial.DpadDirection;
+
+import java.io.Serializable;
 
 import processing.core.PVector;
 
-public class DpadButtonConfig implements Serializable {
+public class DpadButtonConfig extends ControlConfigBase implements Serializable {
     // PS I WILL have to use composition over inheritance here
     // STRICTLY because - if I don't, `instanceof` checks, our
     // only hope, would fail!
 
-    public PVector scale;
-    public PVector transform; // The `z` is NOT used here...
-    public DpadDirection dir; // Enumerations are safer!
+    public DpadDirection dir; // Enumerations are safer! Don't use `transform`'s `z`!
 
     public DpadButtonConfig(PVector p_transform, DpadDirection p_dir) {
-        this.transform = p_transform;
+        super.transform = p_transform; // The `z` is NOT used at all here...
+        // (Unless I do some stupid `java.lang.Enum.ordinal()` thing, which would be unnecessary!)
         this.dir = p_dir;
     }
 }

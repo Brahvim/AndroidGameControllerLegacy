@@ -60,13 +60,19 @@ public class SketchWithScenes extends Sketch {
 
     public void confirmRejection(AgcClient p_client) {
         Forms.ui.showConfirmDialog(
-                Forms.getString("RejectConnection.begin")
-                        .concat(" \"")
-                        .concat(p_client.getName())
-                        .concat("\" (IP: `")
-                        .concat(p_client.getIp())
-                        .concat("`)? "),
+                // Forms.getString("RejectConnection.begin")
+                // .concat(" \"")
+                // .concat(p_client.getName())
+                // .concat("\" (IP: `")
+                // .concat(p_client.getIp())
+                // .concat("`)? "),
+                // Forms.getString("RejectConnection.windowTitle"),
+
+                Forms.getString("RejectConnection.message")
+                        .replace("<name>", p_client.getName()),
+
                 Forms.getString("RejectConnection.windowTitle"),
+
                 new Runnable() {
                     @Override
                     public void run() {

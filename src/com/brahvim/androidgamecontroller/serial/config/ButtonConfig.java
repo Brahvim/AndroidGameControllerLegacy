@@ -1,16 +1,24 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import java.io.Serializable;
-
 import com.brahvim.androidgamecontroller.serial.ButtonShape;
+
+import java.io.Serializable;
 
 import processing.core.PVector;
 
-public class ButtonConfig implements Serializable {
+public class ButtonConfig extends ControlConfigBase implements Serializable {
     public String text;
-    public PVector scale;
-    public PVector transform; // The `z` is rotation.
     public ButtonShape shape;
+
+
+    public ButtonConfig(float p_x, float p_y, String p_text) {
+        super(
+          new PVector(400, 400),
+          new PVector(p_x, p_y, 0)); // The `z` is rotation.
+
+        this.text = p_text;
+        this.shape = ButtonShape.RECTANGLE;
+    }
 
     /*
      * // Hopefully, we can also have STYLE information in the future! :D
