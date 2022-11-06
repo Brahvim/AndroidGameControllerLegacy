@@ -17,6 +17,9 @@ public class ByteSerial {
         try {
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                bos.flush();
+                oos.flush();
+
                 oos.writeObject(p_object);
 
                 oos.flush();

@@ -8,4 +8,7 @@ import java.io.Serializable;
 public class StateBase implements Serializable {
     public long millis, configHash;
     public boolean pressed, ppressed;
+
+    public StateBase() {
+    }
 }

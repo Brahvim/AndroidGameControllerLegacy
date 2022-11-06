@@ -15,7 +15,7 @@ public class ControlConfigBase implements Serializable {
 
     // This constructor helps NOT force extending classes from always giving the
     // data this class needs. *"Might"* not be a good idea.
-    ControlConfigBase() {
+    public ControlConfigBase() {
     }
 
     ControlConfigBase(PVector p_scale, PVector p_transform) {

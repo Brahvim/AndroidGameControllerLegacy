@@ -14,6 +14,7 @@ public class DpadButtonConfig extends ControlConfigBase {
     public DpadDirection dir; // Enumerations are safer! Don't use `transform`'s `z`!
 
     public DpadButtonConfig() {
+        super();
     }
 
     public DpadButtonConfig(PVector p_transform, DpadDirection p_dir) {

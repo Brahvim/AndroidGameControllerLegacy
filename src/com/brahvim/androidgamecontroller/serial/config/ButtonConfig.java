@@ -14,6 +14,7 @@ public class ButtonConfig extends ControlConfigBase {
 
 
     public ButtonConfig() {
+        super();
     }
 
     public ButtonConfig(float p_x, float p_y, String p_text) {

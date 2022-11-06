@@ -7,6 +7,10 @@ public class TouchpadState extends StateBase {
     // Better do it anyway! This is software development!
     public PVector[] touches;
 
+    public TouchpadState() {
+        super();
+    }
+
     /*
      * public int count() {
      * return this.touches.length;
