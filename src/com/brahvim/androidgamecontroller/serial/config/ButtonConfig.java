@@ -15,8 +15,8 @@ public class ButtonConfig extends ControlConfigBase {
 
     public ButtonConfig(float p_x, float p_y, String p_text) {
         super(
-                new PVector(400, 400),
-                new PVector(p_x, p_y, 0)); // The `z` is rotation.
+          new PVector(400, 400),
+          new PVector(p_x, p_y, 0)); // The `z` is rotation.
 
         this.text = p_text;
         this.shape = ButtonShape.RECTANGLE;
@@ -32,8 +32,18 @@ public class ButtonConfig extends ControlConfigBase {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((text == null) ? 0 : text.hashCode());
-        result = prime * result + ((shape == null) ? 0 : shape.hashCode());
+
+        // result = prime * result + ((text == null) ? 0 : text.hashCode());
+        int textHash = 1;
+        {
+            for (int i = 0; i < text.length(); i++)
+                textHash = prime * textHash + text.charAt(i);
+        }
+
+        // result = prime * result + ((shape == null) ? 0 : shape.hashCode());
+        result = prime * result + textHash;
+        result = prime * result + (shape == null? 0 : shape.ordinal() + 1);
+
         return result;
     }
 

@@ -8,8 +8,10 @@ import java.io.Serializable;
 public class StateBase implements Serializable {
     public final static long serialVersionUID = -8801139154962962076L;
 
-    public long millis, configHash;
-    public boolean pressed, ppressed;
+    public long millis;
+    public int configHash;
+    public boolean pressed, ppressed; // May have different meanings. May be refreshed
+    // either in the loop, or during events. Depends on the implementation.
 
     public StateBase() {
     }

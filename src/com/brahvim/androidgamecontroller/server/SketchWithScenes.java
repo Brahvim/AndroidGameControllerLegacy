@@ -2,7 +2,6 @@ package com.brahvim.androidgamecontroller.server;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
@@ -10,10 +9,6 @@ import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
-import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
-import com.brahvim.androidgamecontroller.serial.state.KeyboardState;
-import com.brahvim.androidgamecontroller.serial.state.ThumbstickState;
-import com.brahvim.androidgamecontroller.serial.state.TouchpadState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 import processing.core.PApplet;
@@ -50,9 +45,14 @@ public class SketchWithScenes extends Sketch {
 
         byte[] extraData = RequestCode.getPacketExtras(p_data);
 
-        System.out.printf("Config bytes: `%s`.\n", new String(extraData));
-
         Sketch.primaryClientConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
+
+        System.out.println("Config hashes:");
+        for (ButtonConfig c : Sketch.primaryClientConfig.buttons) {
+            System.out.println(c.hashCode());
+        }
+
+        System.out.println();
     }
 
     public void confirmConnection(AgcClient p_client) {

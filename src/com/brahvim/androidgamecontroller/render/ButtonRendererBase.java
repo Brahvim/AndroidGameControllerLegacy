@@ -15,11 +15,10 @@ public class ButtonRendererBase {
     public ButtonRendererBase(@NotNull ButtonConfig p_config) {
         this.config = p_config;
         this.state = new ButtonState();
-        this.state.configHash = p_config.hashCode();
     }
 
     public void draw(@NotNull PGraphics p_graphics) {
-        this.state.ppressed = this.state.pressed;
+        //this.state.ppressed = this.state.pressed; // Nope! The impl. handles this!
 
         p_graphics.pushMatrix();
         p_graphics.pushStyle();
