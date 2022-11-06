@@ -13,12 +13,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
@@ -38,6 +40,7 @@ public class Sketch extends PApplet {
     // #region Stuff that makes AGC *go!*
     public PGraphics gr;
     public static AgcServerSocket socket;
+
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public float frameStartTime, pframeTime, frameTime;
     // #endregion
@@ -102,8 +105,9 @@ public class Sketch extends PApplet {
         frameRate(REFRESH_RATE);
 
         // Make the window undecorated and all!:
+        surface.setAlwaysOnTop(true);
         gr = createGraphics(width, height);
-        sketchFrame = createSketchPanel(gr);
+        sketchFrame = createSketchPanel(this, gr);
 
         // surface.setResizable(true);
         // ^^^ The `surface` or its `JFrame`, ..or even the `JPanel`.
@@ -190,9 +194,9 @@ public class Sketch extends PApplet {
         Scene.setScene(Sketch.SKETCH.exitScene);
     }
 
-    public JFrame createSketchPanel(PGraphics p_sketchGraphics) {
+    public JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
         // This is the dummy variable from Processing.
-        JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) getSurface().getNative()).getFrame();
+        JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) p_sketch.getSurface().getNative()).getFrame();
         ret.removeNotify();
         ret.setUndecorated(true);
         ret.setLayout(null);
@@ -320,6 +324,9 @@ public class Sketch extends PApplet {
         // PS Notice how this uses `KeyAdapter` instead for
         panel.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
+                if (Scene.currentScene == Sketch.SKETCH.exitScene)
+                    return;
+
                 if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
                         && e.getKeyCode() == KeyEvent.VK_F4) {
 

@@ -10,9 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.UdpSocket;
+import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 
 public class AgcServerSocket extends UdpSocket {
     class AgcClient {
+        public AgcClientWindow window;
+        public ConfigurationPacket config;
+
         private String ip;
         private int port;
         private AgcServerSocket parent;
@@ -77,6 +81,7 @@ public class AgcServerSocket extends UdpSocket {
             this.parent.send(p_code.toBytes(), this.ip, this.port);
         }
 
+        // #region Overloads for `equals()`.
         @Override
         public boolean equals(Object p_obj) {
             if (!(p_obj instanceof AgcClient))
@@ -103,6 +108,7 @@ public class AgcServerSocket extends UdpSocket {
             // Check passed! Object is indeed equal :)
             return true;
         }
+        // #endregion
     }
 
     public ArrayList<AgcClient> clients;
@@ -276,6 +282,13 @@ public class AgcServerSocket extends UdpSocket {
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
         if (Scene.currentScene != null)
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
+    }
+
+    public AgcClient getClientFromIp(String p_ip) {
+        for (AgcClient c : this.clients)
+            if (c.getIp().equals(p_ip))
+                return c;
+        return null;
     }
 
     public void unbanClient(String p_ip) {

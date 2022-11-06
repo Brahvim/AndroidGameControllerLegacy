@@ -7,8 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+// Bite Cereal! ":D!
+// *Just add milk!*
 public class ByteSerial {
-    public static byte[] toBytes(Serializable p_object) {
+    public static byte[] encode(Serializable p_object) {
         try {
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
                  ObjectOutputStream oos = new ObjectOutputStream(bos)) {
@@ -28,7 +30,7 @@ public class ByteSerial {
         return null;
     }
 
-    public static Object fromBytes(byte[] p_data) {
+    public static Object decode(byte[] p_data) {
         try {
 
             try (ByteArrayInputStream bis = new ByteArrayInputStream(p_data);

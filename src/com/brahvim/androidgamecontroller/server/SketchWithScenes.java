@@ -1,10 +1,17 @@
 package com.brahvim.androidgamecontroller.server;
 
-import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.serial.ByteSerial;
+import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.state.ButtonState;
+import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
+import com.brahvim.androidgamecontroller.serial.state.KeyboardState;
+import com.brahvim.androidgamecontroller.serial.state.ThumbstickState;
+import com.brahvim.androidgamecontroller.serial.state.TouchpadState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 public class SketchWithScenes extends Sketch {
@@ -212,6 +219,8 @@ public class SketchWithScenes extends Sketch {
         };
 
         workingScene = new Scene() {
+            ConfigurationPacket myConfig;
+
             @Override
             public void draw() {
                 gr.textAlign(CENTER);
@@ -247,8 +256,28 @@ public class SketchWithScenes extends Sketch {
                             break;
                     } // End of `packetHasCode()` check,
                 } // End of `onReceive()`.
-                else
+                else {
                     System.out.println("It was a packet of button data.");
+                    Object receivedObject = ByteSerial.decode(p_data);
+
+                    if (receivedObject == null || myConfig == null)
+                        return;
+
+                    AgcClient client = Sketch.socket.getClientFromIp(p_ip);
+
+                    if (client == null)
+                        return;
+
+                    if (client.window.config.anyConfigArrayisNull())
+                        return;
+
+                    if (receivedObject instanceof ButtonState) {
+                    } else if (receivedObject instanceof DpadButtonState) {
+                    } else if (receivedObject instanceof KeyboardState) {
+                    } else if (receivedObject instanceof ThumbstickState) {
+                    } else if (receivedObject instanceof TouchpadState) {
+                    }
+                }
             };
         };
 
