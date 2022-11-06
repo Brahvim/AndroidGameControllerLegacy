@@ -7,8 +7,11 @@ import java.util.Objects;
 import processing.core.PVector;
 
 public class ButtonConfig extends ControlConfigBase {
+    public final static long serialVersionUID = 3448431857528425173L;
+
     public String text;
     public ButtonShape shape;
+
 
     public ButtonConfig() {
     }

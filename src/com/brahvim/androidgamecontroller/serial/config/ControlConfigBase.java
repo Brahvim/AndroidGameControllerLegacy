@@ -8,6 +8,8 @@ import processing.core.PVector;
  * Base class for all controller elements' configuration objects.
  */
 public class ControlConfigBase implements Serializable {
+    public final static long serialVersionUID = 8587363312969447326L;
+
     public PVector scale;
     public PVector transform;
 

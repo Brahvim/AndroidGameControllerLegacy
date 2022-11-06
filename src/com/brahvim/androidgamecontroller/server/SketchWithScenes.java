@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
+import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
@@ -42,6 +43,16 @@ public class SketchWithScenes extends Sketch {
         if (socket.clients.size() == 0) {
             Scene.setScene(awaitingConnectionScene);
         }
+    }
+
+    public void registerClientConfig(byte[] p_data) {
+        System.out.println("Received the configuration form the client.");
+
+        byte[] extraData = RequestCode.getPacketExtras(p_data);
+
+        System.out.printf("Config bytes: `%s`.\n", new String(extraData));
+
+        Sketch.primaryClientConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
     }
 
     public void confirmConnection(AgcClient p_client) {
@@ -214,6 +225,10 @@ public class SketchWithScenes extends Sketch {
                         }
                             break;
 
+                        case CLIENT_SENDS_CONFIG:
+                            registerClientConfig(p_data);
+                            break;
+
                         default:
                             noClientsCheck();
                             break;
@@ -225,8 +240,6 @@ public class SketchWithScenes extends Sketch {
         };
 
         workingScene = new Scene() {
-            ConfigurationPacket myConfig;
-
             @Override
             public void draw() {
                 gr.textAlign(CENTER);
@@ -258,6 +271,10 @@ public class SketchWithScenes extends Sketch {
                             noClientsCheck();
                             break;
 
+                        case CLIENT_SENDS_CONFIG:
+                            registerClientConfig(p_data);
+                            break;
+
                         default:
                             break;
                     } // End of `packetHasCode()` check,
@@ -267,13 +284,26 @@ public class SketchWithScenes extends Sketch {
                     PApplet.printArray(new String(p_data));
                     Object receivedObject = ByteSerial.decode(p_data);
 
-                    if (receivedObject == null || myConfig == null)
+                    if (receivedObject == null || Sketch.primaryClientConfig == null)
                         return;
 
                     AgcClient client = Sketch.socket.getClientFromIp(p_ip);
 
                     if (client == null)
                         return;
+
+                    System.out.println("Config hash info:");
+
+                    ButtonState state = (ButtonState) receivedObject;
+
+                    System.out.println(state.configHash);
+
+                    for (ButtonConfig c : Sketch.primaryClientConfig.buttons) {
+                        if (c.hashCode() == state.configHash) {
+                            System.out.printf("Button with text `%s` had a change.\n",
+                                    c.text);
+                        }
+                    }
 
                     // if (client.config.anyConfigArrayisNull())
                     // return;

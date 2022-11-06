@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
@@ -39,6 +40,7 @@ public class Sketch extends PApplet {
     public PGraphics gr;
     public static AgcServerSocket socket;
     public static AgcClientWindow primaryClientWindow;
+    public static ConfigurationPacket primaryClientConfig;
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public float frameStartTime, pframeTime, frameTime;

@@ -106,6 +106,7 @@ public enum RequestCode {
 
     /**
      * This is how many bytes 'far' extra data starts in request packets.
+     * Equals to {@code Integer.BYTES + RequestCode.CODE_SUFFIX.length}.
      */
     public static final int EXTRA_DATA_START = Integer.BYTES + RequestCode.CODE_SUFFIX.length;
 
@@ -143,6 +144,23 @@ public enum RequestCode {
 
         // Return da code!11:
         return RequestCode.values()[ByteBuffer.wrap(bytes).getInt()];
+    }
+
+    public static byte[] getPacketExtras(byte[] p_data) {
+        int numBytesToCopy = p_data.length - RequestCode.EXTRA_DATA_START;
+        byte[] ret = new byte[numBytesToCopy];
+
+        // System.out.printf("Packet length: `%d`, will copy: `%d`, starting point:
+        // `%d`, plus " +
+        // "depth: `%d` .\n",
+        // p_data.length, numBytesToCopy, RequestCode.EXTRA_DATA_START,
+        // RequestCode.EXTRA_DATA_START + numBytesToCopy);
+
+        if (ret.length - RequestCode.EXTRA_DATA_START >= 0)
+            System.arraycopy(p_data, RequestCode.EXTRA_DATA_START, ret,
+              RequestCode.EXTRA_DATA_START, ret.length - RequestCode.EXTRA_DATA_START);
+
+        return ret;
     }
 
     public static RequestCode fromBytes(byte[] p_bytes) {

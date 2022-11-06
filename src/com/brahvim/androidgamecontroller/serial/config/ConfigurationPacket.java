@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import processing.core.PVector;
 
 public class ConfigurationPacket implements Serializable {
+    public final static long serialVersionUID = 8505272624450677291L;
+
     public String AGC_VERSION;
     public PVector screenDimensions;
     public long appStartMilliSinceEpoch;

@@ -5,6 +5,8 @@ import com.brahvim.androidgamecontroller.serial.DpadDirection;
 import processing.core.PVector;
 
 public class DpadButtonConfig extends ControlConfigBase {
+    public final static long serialVersionUID = -4244298640535047093L;
+
     // PS I WILL have to use composition over inheritance here
     // STRICTLY because - if I don't, `instanceof` checks, our
     // only hope, would fail!
