@@ -300,7 +300,8 @@ public class SketchWithScenes extends Sketch {
 
                     for (ButtonConfig c : Sketch.primaryClientConfig.buttons) {
                         if (c.hashCode() == state.configHash) {
-                            System.out.printf("Button with text `%s` had a change.\n",
+                            System.out.printf(
+                                    "Button with text `%s` had a change.\n",
                                     c.text);
                         }
                     }
@@ -345,6 +346,7 @@ public class SketchWithScenes extends Sketch {
                      * states.set(i, touchpadState);
                      * }
                      */
+
                 }
             };
         };
