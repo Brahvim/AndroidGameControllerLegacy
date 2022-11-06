@@ -49,7 +49,7 @@ public class UdpSocket {
      * The internal, {@code private} {@linkplain UdpSocket.Receiver} instance.
      * In abstract words, it handles threading for receiving messages.
      */
-    private Receiver receiver;
+    protected Receiver receiver;
 
     /**
      * Holds the previous {@code DatagramPacket} that was received.
@@ -213,7 +213,7 @@ public class UdpSocket {
             // Yes. If `task` is `null`, throw an error.
             this.thread = new Thread(this.task);
 
-            this.thread.setName("`UdpSocket.Receiver` Thread " + Receiver.NUMBER_OF_THREADS);
+            this.thread.setName("UDP Socket Receiver Thread " + Receiver.NUMBER_OF_THREADS);
             this.thread.setDaemon(true);
             this.thread.start();
         }

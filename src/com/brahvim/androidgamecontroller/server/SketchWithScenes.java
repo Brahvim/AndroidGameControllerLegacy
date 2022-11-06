@@ -37,80 +37,8 @@ public class SketchWithScenes extends Sketch {
     }
 
     public void noClientsCheck() {
-        if (socket.clients.size() == 0) {
+        if (socket.clients.size() == 0)
             Scene.setScene(awaitingConnectionScene);
-        }
-    }
-
-    public void registerClientConfig(byte[] p_data) {
-        System.out.println("Received the configuration form the client.");
-
-        byte[] extraData = RequestCode.getPacketExtras(p_data);
-
-        Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
-
-        System.out.println("Config hashes:");
-        for (ButtonConfig c : Sketch.myConfig.buttons) {
-            System.out.println(c.hashCode());
-        }
-
-        System.out.println();
-    }
-
-    public void confirmConnection(AgcClient p_client) {
-        Forms.ui.showConfirmDialog(
-                Forms.getString("ConfirmConnection.message")
-                        .replace("<name>", p_client.getName())
-                        .replace("<address>", p_client.getIp()),
-                // Window title:
-                Forms.getString("ConfirmConnection.windowTitle"),
-                // If yes,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        socket.addClientIfAbsent(p_client);
-                        socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, p_client);
-                    }
-                },
-                // If no,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        confirmRejection(p_client);
-                    }
-                });
-    }
-
-    public void confirmRejection(AgcClient p_client) {
-        Forms.ui.showConfirmDialog(
-                // Forms.getString("RejectConnection.begin")
-                // .concat(" \"")
-                // .concat(p_client.getName())
-                // .concat("\" (IP: `")
-                // .concat(p_client.getIp())
-                // .concat("`)? "),
-                // Forms.getString("RejectConnection.windowTitle"),
-
-                Forms.getString("RejectConnection.message")
-                        .replace("<name>", p_client.getName()),
-
-                Forms.getString("RejectConnection.windowTitle"),
-
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        socket.banClient(p_client);
-                        socket.sendCode(RequestCode.CLIENT_WAS_BANNED, p_client);
-                        System.out.printf(
-                                "Client from IP `%s` was rejected and banned.\n",
-                                p_client.getIp());
-                    }
-                }, new Runnable() {
-                    @Override
-                    public void run() {
-                        confirmConnection(p_client);
-                    }
-                });
     }
 
     // "Please never make any `Scene` instances `static`."
@@ -119,7 +47,7 @@ public class SketchWithScenes extends Sketch {
     { // Scene definitions.
 
         awaitingConnectionScene = new Scene() {
-            boolean alreadyBusyConnecting;
+            boolean noMorePings = false;
             String shownText;
 
             @Override
@@ -187,10 +115,89 @@ public class SketchWithScenes extends Sketch {
                 settingsMenuKbCheck();
             }
 
+            public void registerClientConfig(byte[] p_data) {
+                System.out.println("Received the configuration form the client.");
+
+                byte[] extraData = RequestCode.getPacketExtras(p_data);
+
+                Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
+
+                System.out.println("Config hashes:");
+                for (ButtonConfig c : Sketch.myConfig.buttons) {
+                    System.out.println(c.hashCode());
+                }
+
+                System.out.println();
+            }
+
+            public void confirmConnection(AgcClient p_client) {
+                new BlockingConfirmDialog(
+                        // Forms.ui.showConfirmDialog(
+                        Forms.getString("ConfirmConnection.message")
+                                .replace("<name>", p_client.getName())
+                                .replace("<address>", p_client.getIp()),
+                        // Window title:
+                        Forms.getString("ConfirmConnection.windowTitle"),
+                        // If yes,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                socket.addClientIfAbsent(p_client);
+                                socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, p_client);
+                            }
+                        },
+                        // If no,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                confirmRejection(p_client);
+                            }
+                        });
+            }
+
+            public void confirmRejection(AgcClient p_client) {
+                new BlockingConfirmDialog(
+                        // Forms.ui.showConfirmDialog(
+                        // Older stuff that used `.concat()`:
+                        /*
+                         * // Forms.ui.showConfirmDialog(
+                         * // Forms.getString("RejectConnection.begin")
+                         * // .concat(" \"")
+                         * // .concat(p_client.getName())
+                         * // .concat("\" (IP: `")
+                         * // .concat(p_client.getIp())
+                         * // .concat("`)? "),
+                         * // Forms.getString("RejectConnection.windowTitle"),
+                         */
+
+                        Forms.getString("RejectConnection.message")
+                                .replace("<name>", p_client.getName()),
+
+                        Forms.getString("RejectConnection.windowTitle"),
+
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                socket.banClient(p_client);
+                                socket.sendCode(RequestCode.CLIENT_WAS_BANNED, p_client);
+                                System.out.printf(
+                                        "Client from IP `%s` was rejected and banned.\n",
+                                        p_client.getIp());
+                            }
+                        }, new Runnable() {
+                            @Override
+                            public void run() {
+                                confirmConnection(p_client);
+                            }
+                        });
+            }
+
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                if (socket.isIpBanned(p_ip))
+                if (socket.isIpBanned(p_ip) || noMorePings)
                     return;
+
+                noMorePings = true;
 
                 System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
                         p_data.length, new String(p_data), p_ip, p_port);
@@ -200,7 +207,7 @@ public class SketchWithScenes extends Sketch {
                         case ADD_ME: { // Limits the stack so
                                        // that `client` is
                                        // namespaced here :D
-                            alreadyBusyConnecting = true;
+
                             System.out.printf("Client wished to join! IP: `%s`, port: `%d`.\n",
                                     p_ip, p_port);
 
@@ -215,15 +222,8 @@ public class SketchWithScenes extends Sketch {
                                     "The client of IP `%s` reported the name: \"%s\".\n",
                                     p_ip, client.getName());
 
-                            if (!(socket.isClientBanned(client) && alreadyBusyConnecting))
+                            if (!(socket.isClientBanned(client) && socket.clients.contains(client)))
                                 confirmConnection(client);
-                            // socket.addClientIfAbsent(client);
-                            // ^^^ Should be included in the `AgcClient` constructor now,
-                            // ...just like the initial plan!
-
-                            // ...so we finally have a client!
-                            // Time to play the waiting game! (For da config.!)
-                            alreadyBusyConnecting = false;
                         }
                             break;
 
@@ -239,9 +239,10 @@ public class SketchWithScenes extends Sketch {
                             noClientsCheck();
                             break;
                     }
-                } else {
-                    // The packet contains data! Get your `java.awt.Robot`s now!
                 }
+                // else {
+                // The packet contains data! Get your `java.awt.Robot`s now!
+                // }
             };
         };
 

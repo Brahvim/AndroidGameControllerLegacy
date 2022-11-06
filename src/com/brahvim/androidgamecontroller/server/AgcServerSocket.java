@@ -329,6 +329,12 @@ public class AgcServerSocket extends UdpSocket {
         return false;
     }
 
+    public void restartReceiver() {
+        super.receiver.stop();
+        super.receiver.start();
+        System.out.println("Restarted some receiver...");
+    }
+
     // From back when the `bannedIpStrings` and `bannedClientNames`
     // `ArrayList<String>`s were-a-thing!:
 

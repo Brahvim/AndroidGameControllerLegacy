@@ -27,5 +27,9 @@
         "AndroidGameController_ButtonUpdate/lib/UiBooster/swing-worker-1.1.jar",
         "AndroidGameController_ButtonUpdate/lib/UiBooster/swingx-1.6.1.jar",
         "AndroidGameController_ButtonUpdate/lib/UiBooster/UiBooster.jar"
-    ]
+    ],
+    "files.associations": {
+        "stdlib.h": "c",
+        "string.h": "c"
+    }
 }
