@@ -86,7 +86,7 @@ public class UdpSocket {
          * The {@code Thread} that handles the network's receive calls.
          *
          * @implSpec {@linkplain UdpSocket.Receiver#start()}
-         * should set this to be a daemon thread.
+         *           should set this to be a daemon thread.
          * @see UdpSocket.Receiver#start()
          * @see UdpSocket.Receiver#stop()
          */
@@ -97,8 +97,8 @@ public class UdpSocket {
          * possible size is {@code 65535} bytes.
          *
          * @implNote Should be {@code 576} by default. To know why, please see
-         * {@link <a href=
-         * "https://stackoverflow.com/a/9235558/13951505">...</a>}.
+         *           {@link <a href=
+         *           "https://stackoverflow.com/a/9235558/13951505">...</a>}.
          */
         public Integer packetMaxSize = Receiver.PACKET_MAX_SIZE;
         // ^^^ PS a more precise number is `543` bytes.
@@ -131,7 +131,7 @@ public class UdpSocket {
          *
          * @param p_parent The {@code UdpSocket} instance.
          * @implNote {@code p_parent} may not be used since {@code Receiver} is a class
-         * nested inside {@linkplain UdpSocket}
+         *           nested inside {@linkplain UdpSocket}
          */
         Receiver(UdpSocket p_parent) {
             Receiver.NUMBER_OF_THREADS++;
@@ -174,9 +174,19 @@ public class UdpSocket {
 
                             // The user's code can throw exception that pause our thread :)
                             try {
-                                onReceive(in.getData(),
-                                  addr.toString().substring(1),
-                                  in.getPort());
+                                byte[] copy = new byte[byteData.length];
+
+                                System.arraycopy(byteData, 0, copy, 0, byteData.length);
+
+                                // Super slow `memset()`...
+                                for (int i = 0; i < byteData.length; i++)
+                                    byteData[i] = 0;
+                                // ...but I just didn't want to use `System.arraycopy()`
+                                // with a freshly allocated array. What a WASTE!
+
+                                onReceive(copy,
+                                        addr.toString().substring(1),
+                                        in.getPort());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -256,9 +266,9 @@ public class UdpSocket {
      * timeout (in milliseconds).
      *
      * @apiNote This constructor used to try to force the OS into giving the port of
-     * the user's choice. This functionality has now been split. Please see
-     * {@linkplain UdpSocket#createSocketForcingPort(int, int)} and
-     * {@linkplain UdpSocket#UdpSocket(DatagramSocket)}.
+     *          the user's choice. This functionality has now been split. Please see
+     *          {@linkplain UdpSocket#createSocketForcingPort(int, int)} and
+     *          {@linkplain UdpSocket#UdpSocket(DatagramSocket)}.
      */
     public UdpSocket(int p_port, int p_timeout) {
         try {
@@ -408,7 +418,7 @@ public class UdpSocket {
         // System.out.println("The socket sent some data!");
         try {
             this.sock.send(out = new DatagramPacket(
-              p_data, p_data.length, InetAddress.getByName(p_ip), p_port));
+                    p_data, p_data.length, InetAddress.getByName(p_ip), p_port));
         } catch (IOException e) {
             if (e instanceof UnknownHostException) {
                 e.printStackTrace();
@@ -424,7 +434,7 @@ public class UdpSocket {
      */
     public void send(String p_message, String p_ip, int p_port) {
         this.send(p_message.getBytes(StandardCharsets.UTF_8),
-          p_ip, p_port);
+                p_ip, p_port);
 
         // VSCode, please allow comments without an
         // extra space, I beg you. I need it for my style! I DON'T insert spaces for

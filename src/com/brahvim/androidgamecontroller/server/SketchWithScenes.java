@@ -15,6 +15,8 @@ import com.brahvim.androidgamecontroller.serial.state.ThumbstickState;
 import com.brahvim.androidgamecontroller.serial.state.TouchpadState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
+import processing.core.PApplet;
+
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
         // #region "Are Wii gunna have a problem?""
@@ -149,7 +151,8 @@ public class SketchWithScenes extends Sketch {
                  * e.printStackTrace();
                  * }***
                  * }
-                 */}
+                 */
+            }
 
             @Override
             public void draw() {
@@ -204,8 +207,10 @@ public class SketchWithScenes extends Sketch {
                             // ...just like the initial plan!
 
                             // ...so we finally have a client!:
-                            if (socket.clients.size() != 0)
+                            if (socket.clients.size() != 0) {
+                                socket.clients.get(0).window = Sketch.primaryClientWindow;
                                 Scene.setScene(workingScene);
+                            }
                         }
                             break;
 
@@ -259,6 +264,7 @@ public class SketchWithScenes extends Sketch {
                 } // End of `onReceive()`.
                 else {
                     System.out.println("It was a packet of button data.");
+                    PApplet.printArray(new String(p_data));
                     Object receivedObject = ByteSerial.decode(p_data);
 
                     if (receivedObject == null || myConfig == null)
@@ -271,6 +277,15 @@ public class SketchWithScenes extends Sketch {
 
                     // if (client.config.anyConfigArrayisNull())
                     // return;
+
+                    if (Sketch.socket.clients.get(0).equals(client)) {
+                        if (receivedObject instanceof ButtonState buttonState) {
+                        } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
+                        } else if (receivedObject instanceof KeyboardState keyboardState) {
+                        } else if (receivedObject instanceof ThumbstickState thumbstickState) {
+                        } else if (receivedObject instanceof TouchpadState touchpadState) {
+                        }
+                    }
 
                     if (receivedObject instanceof ButtonState buttonState) {
                         ArrayList<ButtonState> states = client.window.buttonStates;

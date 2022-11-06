@@ -38,6 +38,7 @@ public class Sketch extends PApplet {
     // #region Stuff that makes AGC *go!*
     public PGraphics gr;
     public static AgcServerSocket socket;
+    public static AgcClientWindow primaryClientWindow;
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public float frameStartTime, pframeTime, frameTime;
@@ -87,9 +88,12 @@ public class Sketch extends PApplet {
                 "Welcome to the AndroidGameController Server application `%s`!\n\n",
                 Sketch.VERSION);
 
+        updateRatios();
+
         // Window setup:
         surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
         surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
+        surface.setLocation(displayWidth / 2 - (int) cx, displayHeight / 2 + (int) cy);
         minExtent = new PVector();
         maxExtent = new PVector(displayWidth - width, displayHeight - height);
 
@@ -98,7 +102,6 @@ public class Sketch extends PApplet {
         Forms.createSettingsForm();
 
         // Stuff with processing!:
-        updateRatios();
         System.out.printf("Running on a `%d`Hz display.\n", REFRESH_RATE);
         frameRate(REFRESH_RATE);
 

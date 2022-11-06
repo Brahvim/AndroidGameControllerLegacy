@@ -1,5 +1,7 @@
 package com.brahvim.androidgamecontroller.serial;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,10 +12,11 @@ import java.io.Serializable;
 // Bite Cereal! ":D!
 // *Just add milk!*
 public class ByteSerial {
+    @Nullable
     public static byte[] encode(Serializable p_object) {
         try {
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                 ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                    ObjectOutputStream oos = new ObjectOutputStream(bos)) {
                 oos.writeObject(p_object);
 
                 oos.flush();
@@ -30,11 +33,11 @@ public class ByteSerial {
         return null;
     }
 
+    @Nullable
     public static Object decode(byte[] p_data) {
         try {
-
             try (ByteArrayInputStream bis = new ByteArrayInputStream(p_data);
-                 ObjectInputStream ois = new ObjectInputStream(bis)) {
+                    ObjectInputStream ois = new ObjectInputStream(bis)) {
                 return ois.readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
