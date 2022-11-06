@@ -2,6 +2,8 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import com.brahvim.androidgamecontroller.serial.ButtonShape;
 
+import java.util.Objects;
+
 import processing.core.PVector;
 
 public class ButtonConfig extends ControlConfigBase {
@@ -18,6 +20,11 @@ public class ButtonConfig extends ControlConfigBase {
 
         this.text = p_text;
         this.shape = ButtonShape.RECTANGLE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text, shape);
     }
 
     /*

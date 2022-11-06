@@ -3,6 +3,8 @@ package com.brahvim.androidgamecontroller.render;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 
+import org.jetbrains.annotations.NotNull;
+
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
@@ -10,12 +12,13 @@ public class ButtonRendererBase {
     private ButtonConfig config;
     private ButtonState state;
 
-    public ButtonRendererBase(ButtonConfig p_config) {
+    public ButtonRendererBase(@NotNull ButtonConfig p_config) {
         this.config = p_config;
         this.state = new ButtonState();
+        this.state.configHash = p_config.hashCode();
     }
 
-    public void draw(PGraphics p_graphics) {
+    public void draw(@NotNull PGraphics p_graphics) {
         this.state.ppressed = this.state.pressed;
 
         p_graphics.pushMatrix();

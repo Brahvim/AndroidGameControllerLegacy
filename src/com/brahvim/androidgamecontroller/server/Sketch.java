@@ -13,14 +13,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import com.brahvim.androidgamecontroller.Scene;
-import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;

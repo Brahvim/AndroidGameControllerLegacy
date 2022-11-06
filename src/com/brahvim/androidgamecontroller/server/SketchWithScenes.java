@@ -2,6 +2,7 @@ package com.brahvim.androidgamecontroller.server;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
@@ -268,14 +269,35 @@ public class SketchWithScenes extends Sketch {
                     if (client == null)
                         return;
 
-                    if (client.window.config.anyConfigArrayisNull())
-                        return;
+                    // if (client.config.anyConfigArrayisNull())
+                    // return;
 
-                    if (receivedObject instanceof ButtonState) {
-                    } else if (receivedObject instanceof DpadButtonState) {
-                    } else if (receivedObject instanceof KeyboardState) {
-                    } else if (receivedObject instanceof ThumbstickState) {
-                    } else if (receivedObject instanceof TouchpadState) {
+                    if (receivedObject instanceof ButtonState buttonState) {
+                        ArrayList<ButtonState> states = client.window.buttonStates;
+                        for (int i = 0; i < states.size(); i++)
+                            if (states.get(i).configHash == buttonState.configHash)
+                                states.set(i, buttonState);
+
+                    } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
+                        ArrayList<DpadButtonState> states = client.window.dpadButtonStates;
+                        for (int i = 0; i < states.size(); i++)
+                            if (states.get(i).configHash == dpadButtonState.configHash)
+                                states.set(i, dpadButtonState);
+
+                    } else if (receivedObject instanceof KeyboardState keyboardState) {
+                        client.window.keyboardState = keyboardState;
+
+                    } else if (receivedObject instanceof ThumbstickState thumbstickState) {
+                        ArrayList<ThumbstickState> states = client.window.thumbstickStates;
+                        for (int i = 0; i < states.size(); i++)
+                            if (states.get(i).configHash == thumbstickState.configHash)
+                                states.set(i, thumbstickState);
+
+                    } else if (receivedObject instanceof TouchpadState touchpadState) {
+                        ArrayList<TouchpadState> states = client.window.touchpadStates;
+                        for (int i = 0; i < states.size(); i++)
+                            if (states.get(i).configHash == touchpadState.configHash)
+                                states.set(i, touchpadState);
                     }
                 }
             };

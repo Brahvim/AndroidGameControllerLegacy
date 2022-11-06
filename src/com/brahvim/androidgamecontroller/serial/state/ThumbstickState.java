@@ -1,7 +1,6 @@
 package com.brahvim.androidgamecontroller.serial.state;
 
 public class ThumbstickState extends StateBase {
-    public boolean pressed, ppressed;
     public float mag, dir;
 
     /*
