@@ -14,7 +14,6 @@ import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 import processing.core.PApplet;
-import processing.core.PVector;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -120,6 +119,7 @@ public class SketchWithScenes extends Sketch {
     { // Scene definitions.
 
         awaitingConnectionScene = new Scene() {
+            boolean alreadyBusyConnecting;
             String shownText;
 
             @Override
@@ -200,6 +200,7 @@ public class SketchWithScenes extends Sketch {
                         case ADD_ME: { // Limits the stack so
                                        // that `client` is
                                        // namespaced here :D
+                            alreadyBusyConnecting = true;
                             System.out.printf("Client wished to join! IP: `%s`, port: `%d`.\n",
                                     p_ip, p_port);
 
@@ -214,7 +215,7 @@ public class SketchWithScenes extends Sketch {
                                     "The client of IP `%s` reported the name: \"%s\".\n",
                                     p_ip, client.getName());
 
-                            if (!socket.isClientBanned(client))
+                            if (!(socket.isClientBanned(client) && alreadyBusyConnecting))
                                 confirmConnection(client);
                             // socket.addClientIfAbsent(client);
                             // ^^^ Should be included in the `AgcClient` constructor now,
@@ -222,6 +223,7 @@ public class SketchWithScenes extends Sketch {
 
                             // ...so we finally have a client!
                             // Time to play the waiting game! (For da config.!)
+                            alreadyBusyConnecting = false;
                         }
                             break;
 
