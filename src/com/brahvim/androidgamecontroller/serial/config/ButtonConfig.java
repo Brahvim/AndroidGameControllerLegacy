@@ -2,8 +2,6 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import com.brahvim.androidgamecontroller.serial.ButtonShape;
 
-import java.util.Objects;
-
 import processing.core.PVector;
 
 public class ButtonConfig extends ControlConfigBase {
@@ -24,9 +22,19 @@ public class ButtonConfig extends ControlConfigBase {
         this.shape = ButtonShape.RECTANGLE;
     }
 
-    @Override
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#hashCode()
+     */
+
+    @Override // `Objects.hash()` provides inconsistent results across compilers...
     public int hashCode() {
-        return Objects.hash(text, shape);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        result = prime * result + ((shape == null) ? 0 : shape.hashCode());
+        return result;
     }
 
     /*
