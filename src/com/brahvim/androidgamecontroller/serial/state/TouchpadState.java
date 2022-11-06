@@ -8,7 +8,6 @@ public class TouchpadState extends StateBase {
     public PVector[] touches;
 
     public TouchpadState() {
-        super();
     }
 
     /*

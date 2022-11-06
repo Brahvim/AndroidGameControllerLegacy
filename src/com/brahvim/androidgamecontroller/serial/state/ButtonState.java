@@ -4,7 +4,6 @@ public class ButtonState extends StateBase {
     public final static long serialVersionUID = -8131929056944084215L;
 
     public ButtonState() {
-        super();
     }
 
     // Nope! No OOP here :)

@@ -14,12 +14,12 @@ public class DpadButtonConfig extends ControlConfigBase {
     public DpadDirection dir; // Enumerations are safer! Don't use `transform`'s `z`!
 
     public DpadButtonConfig() {
-        super();
     }
 
     public DpadButtonConfig(PVector p_transform, DpadDirection p_dir) {
         super.transform = p_transform; // The `z` is NOT used at all here...
-        // (Unless I do some stupid `java.lang.Enum.ordinal()` thing, which would be unnecessary!)
+        // (Unless I do some stupid `java.lang.Enum.ordinal()` thing, which would be
+        // unnecessary!)
         this.dir = p_dir;
     }
 }

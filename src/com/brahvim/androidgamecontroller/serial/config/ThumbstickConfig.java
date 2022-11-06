@@ -6,7 +6,6 @@ public class ThumbstickConfig extends ControlConfigBase {
     public final static long serialVersionUID = -6618151523553691071L;
 
     public ThumbstickConfig() {
-        super();
     }
 
     // Of course, thumbsticks don't have rotation.
