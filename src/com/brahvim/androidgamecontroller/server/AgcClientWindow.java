@@ -33,7 +33,7 @@ public class AgcClientWindow extends PApplet {
 
     @Override
     public void settings() {
-        size(400, 400, JAVA2D);
+        size(Sketch.AGC_WIDTH, Sketch.AGC_HEIGHT, JAVA2D);
     }
 
     @Override

@@ -35,12 +35,13 @@ public class Sketch extends PApplet {
     public final static String VERSION = "v1.0.0";
     public final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
+    public final static int AGC_WIDTH = 400, AGC_HEIGHT = 200;
 
     // #region Stuff that makes AGC *go!*
     public PGraphics gr;
     public static AgcServerSocket socket;
-    public static AgcClientWindow primaryClientWindow;
-    public static ConfigurationPacket primaryClientConfig;
+    public static AgcClientWindow myWindow; // The primary client's window AKA the main window! :D
+    public static ConfigurationPacket myConfig; // The primary client's configuration.
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public float frameStartTime, pframeTime, frameTime;
@@ -75,7 +76,7 @@ public class Sketch extends PApplet {
     }
 
     public void settings() {
-        size(400, 200, JAVA2D);
+        size(Sketch.AGC_WIDTH, Sketch.AGC_HEIGHT, JAVA2D);
     }
     // #endregion
 

@@ -2,9 +2,11 @@ package com.brahvim.androidgamecontroller.server;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
@@ -12,6 +14,7 @@ import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 
 import processing.core.PApplet;
+import processing.core.PVector;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -45,10 +48,10 @@ public class SketchWithScenes extends Sketch {
 
         byte[] extraData = RequestCode.getPacketExtras(p_data);
 
-        Sketch.primaryClientConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
+        Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
 
         System.out.println("Config hashes:");
-        for (ButtonConfig c : Sketch.primaryClientConfig.buttons) {
+        for (ButtonConfig c : Sketch.myConfig.buttons) {
             System.out.println(c.hashCode());
         }
 
@@ -217,16 +220,17 @@ public class SketchWithScenes extends Sketch {
                             // ^^^ Should be included in the `AgcClient` constructor now,
                             // ...just like the initial plan!
 
-                            // ...so we finally have a client!:
-                            if (socket.clients.size() != 0) {
-                                socket.clients.get(0).window = Sketch.primaryClientWindow;
-                                Scene.setScene(workingScene);
-                            }
+                            // ...so we finally have a client!
+                            // Time to play the waiting game! (For da config.!)
                         }
                             break;
 
                         case CLIENT_SENDS_CONFIG:
+                            if (socket.clients.size() != 0)
+                                socket.clients.get(0).window = Sketch.myWindow;
+
                             registerClientConfig(p_data);
+                            Scene.setScene(workingScene);
                             break;
 
                         default:
@@ -240,6 +244,32 @@ public class SketchWithScenes extends Sketch {
         };
 
         workingScene = new Scene() {
+            ArrayList<ButtonRendererBase> buttonRenderers = new ArrayList<>();
+
+            @Override
+            public void setup() {
+
+                // Coordinate mapping and addition to the 'iterator-thingy'! :joy:...
+                for (ButtonConfig c : Sketch.myConfig.buttons) {
+                    System.out.println("Old scale and transform:");
+                    System.out.println(c.scale);
+                    System.out.println(c.transform);
+
+                    c.scale.set(
+                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+
+                    c.transform.set(
+                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+                    buttonRenderers.add(new ButtonRendererBase(c));
+
+                    System.out.println("New, mapped scale and transform:");
+                    System.out.println(c.scale);
+                    System.out.println(c.transform);
+                }
+            }
+
             @Override
             public void draw() {
                 gr.textAlign(CENTER);
@@ -271,9 +301,9 @@ public class SketchWithScenes extends Sketch {
                             noClientsCheck();
                             break;
 
-                        case CLIENT_SENDS_CONFIG:
-                            registerClientConfig(p_data);
-                            break;
+                        // case CLIENT_SENDS_CONFIG:
+                        // registerClientConfig(p_data);
+                        // break;
 
                         default:
                             break;
@@ -284,7 +314,7 @@ public class SketchWithScenes extends Sketch {
                     PApplet.printArray(new String(p_data));
                     Object receivedObject = ByteSerial.decode(p_data);
 
-                    if (receivedObject == null || Sketch.primaryClientConfig == null)
+                    if (receivedObject == null || Sketch.myConfig == null)
                         return;
 
                     AgcClient client = Sketch.socket.getClientFromIp(p_ip);
@@ -298,7 +328,7 @@ public class SketchWithScenes extends Sketch {
 
                     System.out.println(state.configHash);
 
-                    for (ButtonConfig c : Sketch.primaryClientConfig.buttons) {
+                    for (ButtonConfig c : Sketch.myConfig.buttons) {
                         if (c.hashCode() == state.configHash) {
                             System.out.printf(
                                     "Button with text `%s` had a change.\n",
