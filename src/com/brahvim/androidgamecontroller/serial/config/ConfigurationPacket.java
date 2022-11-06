@@ -4,10 +4,10 @@ import com.brahvim.androidgamecontroller.serial.ButtonShape;
 import com.brahvim.androidgamecontroller.serial.DpadDirection;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -48,12 +48,12 @@ public class ConfigurationPacket implements Serializable {
     }
 
     // We return a new object instead so you can *revert if needed or something I dunno:*
-    public static ConfigurationPacket parse(File p_file) {
+    public static ConfigurationPacket parse(InputStream p_fileStream) {
         //int lineNumber = 0;
 
         ConfigurationPacket ret = new ConfigurationPacket();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(p_file))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(p_fileStream))) {
             String section = "", property = "", value = "";
             int eqPos, lineLen;
 
