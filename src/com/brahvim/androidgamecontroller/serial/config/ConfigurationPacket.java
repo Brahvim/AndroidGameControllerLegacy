@@ -32,32 +32,37 @@ public class ConfigurationPacket implements Serializable {
 
     public <T> T addObject(Object p_object) {
         if (p_object instanceof ButtonConfig)
-            this.buttons.add((ButtonConfig)p_object);
+            this.buttons.add((ButtonConfig) p_object);
 
         else if (p_object instanceof DpadButtonConfig)
-            this.dpadButtons.add((DpadButtonConfig)p_object);
+            this.dpadButtons.add((DpadButtonConfig) p_object);
 
         else if (p_object instanceof ThumbstickConfig)
-            this.thumbsticks.add((ThumbstickConfig)p_object);
+            this.thumbsticks.add((ThumbstickConfig) p_object);
 
         else if (p_object instanceof TouchpadConfig)
-            this.touchpads.add((TouchpadConfig)p_object);
+            this.touchpads.add((TouchpadConfig) p_object);
 
-        else throw new IllegalArgumentException();
-        return (T)p_object;
+        else
+            throw new IllegalArgumentException();
+
+        @SuppressWarnings("unchecked")
+        T ret = (T) p_object;
+        return ret;
     }
 
-    // We return a new object instead so you can *revert if needed or something I dunno:*
+    // We return a new object instead so you can *revert if needed or something I
+    // dunno:*
     public static ConfigurationPacket parse(InputStream p_fileStream) {
-        //int lineNumber = 0;
+        // int lineNumber = 0;
 
         ConfigurationPacket ret = new ConfigurationPacket();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(p_fileStream))) {
-            String section = "", property = "", value = "";
+            String section = "", property, value;
             int eqPos, lineLen;
 
-            for (String line; (line = reader.readLine()) != null; /*lineNumber++*/) {
+            for (String line; (line = reader.readLine()) != null; /* lineNumber++ */) {
                 switch (line.charAt(0)) {
                     case '#':
                     case ';':
@@ -152,11 +157,9 @@ public class ConfigurationPacket implements Serializable {
                     }
                 }
             }
-        } catch (
-          FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (
-          IOException p_e) {
+        } catch (IOException p_e) {
             p_e.printStackTrace();
             return null;
         }
