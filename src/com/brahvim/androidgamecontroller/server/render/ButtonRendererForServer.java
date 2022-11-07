@@ -46,7 +46,7 @@ public class ButtonRendererForServer extends ButtonRendererBase {
         p_graphics.textSize(0.35f);
         p_graphics.translate(-0.5f * p_graphics.textWidth(super.config.text), 0.1f);
         p_graphics.textAlign(PConstants.CENTER, PConstants.BASELINE);
-        p_graphics.text(super.config.text, 0, -1f);
+        p_graphics.text(super.config.text, 0, -1);
 
         // Pop back!:
         p_graphics.popMatrix();

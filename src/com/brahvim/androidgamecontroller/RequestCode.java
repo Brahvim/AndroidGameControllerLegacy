@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
  */
 
 public enum RequestCode {
-    // #region Finally, here are da ENUMERATION values!
+    // region Finally, here are da ENUMERATION values!
     //
     // SUPER IMPORTANT *Convention Note:*
     // I put brackets around enum fields so I can put values in there
@@ -88,8 +88,9 @@ public enum RequestCode {
     CLIENT_SENDS_CONFIG(),
 
     SERVER_GOT_CONFIG();
-    // #endregion
+    // endregion
 
+    // region Non-Enum Fields.
     public static final String CLIENT_CURRENT_VERSION = "v1.0.0";
     public static final String SERVER_CURRENT_VERSION = "v1.0.0";
 
@@ -112,8 +113,9 @@ public enum RequestCode {
 
     // I want to send request codes in this manner:
     // `CODE` + <request code> + <extra data, separated by underscores..?>.
+    // endregion
 
-    // #region Static stuff comes first, here...
+    // region Static stuff comes first, here...
     public static boolean packetHasCode(byte[] p_pack) {
         // If the first bytes don't say "CODE", it's not a packet of code, it's data!
         // Lazy method: `return new String(p_pack).startsWith("CODE");` 🤣
@@ -167,11 +169,13 @@ public enum RequestCode {
         return RequestCode.values()[ByteBuffer.wrap(p_bytes).getInt()];
     }
 
+    // region`static toBytes()`:
     // public static byte[] toBytes(RequestCodes p_code) {
     // // return p_code.toBytes();
     // return ByteBuffer.allocate(Integer.BYTES).putInt(p_code.ordinal()).array();
     // }
-    // #endregion
+    // endregion
+    // endregion
 
     // region INSTANCE methods!:
     public byte[] toBytes() {
