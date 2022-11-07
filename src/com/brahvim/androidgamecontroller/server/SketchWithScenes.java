@@ -12,6 +12,7 @@ import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
+import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
 
 import processing.core.PApplet;
 
@@ -39,6 +40,31 @@ public class SketchWithScenes extends Sketch {
     public void noClientsCheck() {
         if (socket.clients.size() == 0)
             Scene.setScene(awaitingConnectionScene);
+    }
+
+    public void registerClientConfig(byte[] p_data, AgcClient p_client) {
+        System.out.println("Received the configuration form the client.");
+
+        byte[] extraData = RequestCode.getPacketExtras(p_data);
+
+        // If it is the primary client, the main window's controller should be changed!:
+        if (p_client.equals(socket.clients.get(0)))
+            Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
+        else
+            // Okay, okay, which client?
+            for (AgcClient c : socket.clients) {
+                if (c.equals(p_client))
+                    c.config = (ConfigurationPacket) ByteSerial.decode(extraData);
+            }
+
+        System.out.println("Config hashes:");
+        for (ButtonConfig c : Sketch.myConfig.buttons) {
+            System.out.println(c.hashCode());
+        }
+
+        socket.sendCode(RequestCode.SERVER_GOT_CONFIG, p_client);
+
+        System.out.println("Told client that we got the config.!");
     }
 
     // "Please never make any `Scene` instances `static`."
@@ -113,23 +139,6 @@ public class SketchWithScenes extends Sketch {
             @Override
             public void keyPressed() {
                 settingsMenuKbCheck();
-            }
-
-            public void registerClientConfig(byte[] p_data, AgcClient p_client) {
-                System.out.println("Received the configuration form the client.");
-
-                byte[] extraData = RequestCode.getPacketExtras(p_data);
-
-                Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
-
-                System.out.println("Config hashes:");
-                for (ButtonConfig c : Sketch.myConfig.buttons) {
-                    System.out.println(c.hashCode());
-                }
-
-                socket.sendCode(RequestCode.SERVER_GOT_CONFIG, p_client);
-
-                System.out.println("Told client that we got the config.!");
             }
 
             public void confirmConnection(AgcClient p_client) {
@@ -255,7 +264,7 @@ public class SketchWithScenes extends Sketch {
         };
 
         workingScene = new Scene() {
-            ArrayList<ButtonRendererBase> buttonRenderers = new ArrayList<>();
+            ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
 
             @Override
             public void setup() {
@@ -273,7 +282,7 @@ public class SketchWithScenes extends Sketch {
                     c.transform.set(
                             map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
                             map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-                    buttonRenderers.add(new ButtonRendererBase(c));
+                    buttonRenderers.add(new ButtonRendererForServer(c));
 
                     System.out.println("New, mapped scale and transform:");
                     System.out.println(c.scale);
@@ -285,7 +294,14 @@ public class SketchWithScenes extends Sketch {
             public void draw() {
                 gr.textAlign(CENTER);
                 gr.textSize(28);
-                gr.text("AndroidGameController!", cx, cy);
+                // gr.text("AndroidGameController!", cx, cy);
+
+                if (buttonRenderers != null)
+                    // Iterating in this manner helps avoid concurrent modification:
+                    for (int i = 0; i < buttonRenderers.size(); i++) {
+                        buttonRenderers.get(i).draw(gr);
+                    }
+
             }
 
             @Override
@@ -312,9 +328,8 @@ public class SketchWithScenes extends Sketch {
                             noClientsCheck();
                             break;
 
-                        // case CLIENT_SENDS_CONFIG:
-                        // registerClientConfig(p_data);
-                        // break;
+                        case CLIENT_SENDS_CONFIG:
+                            registerClientConfig(p_data, socket.getClientFromIp(p_ip));
 
                         default:
                             break;
@@ -337,13 +352,19 @@ public class SketchWithScenes extends Sketch {
 
                     ButtonState state = (ButtonState) receivedObject;
 
-                    System.out.println(state.configHash);
-
+                    // Print the name of the button:
                     for (ButtonConfig c : Sketch.myConfig.buttons) {
                         if (c.hashCode() == state.configHash) {
                             System.out.printf(
                                     "Button with text `%s` had a change.\n",
                                     c.text);
+                        }
+                    }
+
+                    for (int i = 0; i < buttonRenderers.size(); i++) {
+                        ButtonRendererBase r = buttonRenderers.get(i);
+                        if (r.configHash() == state.configHash) {
+                            r.state = state;
                         }
                     }
 
