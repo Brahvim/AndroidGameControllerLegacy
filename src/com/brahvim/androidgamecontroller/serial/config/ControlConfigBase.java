@@ -9,17 +9,24 @@ import processing.core.PVector;
  */
 public class ControlConfigBase implements Serializable {
     public final static long serialVersionUID = 8587363312969447326L;
+    public static int totalConfigs = 0;
 
+    public int controlNumber;
     public PVector scale;
     public PVector transform;
 
     // This constructor helps NOT force extending classes from always giving the
     // data this class needs. *"Might"* not be a good idea.
     public ControlConfigBase() {
+        ControlConfigBase.totalConfigs++;
+        this.controlNumber = ControlConfigBase.totalConfigs;
     }
 
     ControlConfigBase(PVector p_scale, PVector p_transform) {
         this.scale = p_scale;
         this.transform = p_transform;
+
+        ControlConfigBase.totalConfigs++;
+        this.controlNumber = ControlConfigBase.totalConfigs;
     }
 }

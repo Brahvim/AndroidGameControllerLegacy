@@ -8,7 +8,7 @@ import com.brahvim.androidgamecontroller.serial.state.ThumbstickState;
 import processing.core.PGraphics;
 
 public class ThumbstickRendererBase {
-    protected ThumbstickConfig config;
+    public ThumbstickConfig config;
     public ThumbstickState state;
 
     public ThumbstickRendererBase(@NotNull ThumbstickConfig p_config) {

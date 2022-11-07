@@ -127,7 +127,7 @@ class SineWave {
         this.active = this.aliveTime <= this.endTime;
 
         if (this.active)
-            this.aliveTime += Sketch.SKETCH.frameTime;
+            this.aliveTime += Sketch.frameTime;
         // ^^^ `frameTime` comes from "the Engine" by the way. (Hey - that's "Nerd"!)
         else if (this.zeroWhenInactive)
             return 0;

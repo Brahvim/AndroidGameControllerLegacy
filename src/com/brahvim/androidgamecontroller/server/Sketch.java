@@ -44,7 +44,7 @@ public class Sketch extends PApplet {
     public static ConfigurationPacket myConfig; // The primary client's configuration.
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
-    public float frameStartTime, pframeTime, frameTime;
+    public static float frameStartTime, pframeTime, frameTime;
     // #endregion
 
     // #region Window coordinates and states.
@@ -52,8 +52,8 @@ public class Sketch extends PApplet {
     public PVector minExtent, maxExtent;
 
     // Ma' boilerplate :D
-    public float cx, cy, qx, qy, q3x, q3y;
-    public int pwidth, pheight;
+    public static float cx, cy, qx, qy, q3x, q3y;
+    public static int pwidth, pheight;
 
     public JFrame sketchFrame; // We do not rely on the Processing 3 'dummy' variable!
 
@@ -409,4 +409,5 @@ public class Sketch extends PApplet {
         Scene.currentScene.mousePressed();
     }
     // #endregion
+
 }

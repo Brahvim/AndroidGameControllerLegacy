@@ -11,6 +11,7 @@ public class ButtonConfig extends ControlConfigBase {
     public ButtonShape shape;
 
     public ButtonConfig() {
+        super();
     }
 
     /**

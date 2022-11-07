@@ -9,7 +9,7 @@ public class StateBase implements Serializable {
     public final static long serialVersionUID = -8801139154962962076L;
 
     public long millis;
-    public int configHash;
+    public int controlNumber;
     public boolean pressed, ppressed; // May have different meanings. May be refreshed
     // either in the loop, or during events. Depends on the implementation.
 

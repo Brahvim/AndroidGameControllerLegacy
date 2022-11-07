@@ -9,7 +9,7 @@ import processing.core.PConstants;
 import processing.core.PGraphics;
 
 public class DpadButtonRendererBase {
-    protected DpadButtonConfig config;
+    public DpadButtonConfig config;
     public DpadButtonState state;
 
     public DpadButtonRendererBase(@NotNull DpadButtonConfig p_config) {

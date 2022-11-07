@@ -15,13 +15,24 @@ public class DpadButtonConfig extends ControlConfigBase {
     // Wish I called it "`orientation`" instead :joy:
 
     public DpadButtonConfig() {
+        super();
     }
 
     public DpadButtonConfig(PVector p_transform, PVector p_scale, DpadDirection p_dir) {
+        super();
         super.transform = p_transform; // The `z` is NOT used at all here...
         // (Unless I do some stupid `java.lang.Enum.ordinal()` thing, which would be
         // unnecessary!)
         super.scale = p_scale;
         this.dir = p_dir;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + dir.ordinal();
+        return result;
+    }
+
 }

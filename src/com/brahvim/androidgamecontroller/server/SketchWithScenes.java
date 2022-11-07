@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
+import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
+import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
 import com.brahvim.androidgamecontroller.server.render.DpadButtonRendererForServer;
@@ -71,7 +73,7 @@ public class SketchWithScenes extends Sketch {
     }
 
     // "Please never make any `Scene` instances `static`."
-    Scene awaitingConnectionScene, workingScene, exitScene;
+    Scene awaitingConnectionScene, workScene, exitScene;
 
     { // Scene definitions.
 
@@ -252,7 +254,7 @@ public class SketchWithScenes extends Sketch {
                                 socket.clients.get(0).window = Sketch.myWindow;
 
                             registerClientConfig(p_data, socket.getClientFromIp(p_ip));
-                            Scene.setScene(workingScene);
+                            Scene.setScene(workScene);
                             break;
 
                         default:
@@ -263,7 +265,7 @@ public class SketchWithScenes extends Sketch {
             };
         };
 
-        workingScene = new Scene() {
+        workScene = new Scene() {
             ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of `Robot` for each type of control.
             ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
             ArrayList<DpadButtonRendererForServer> dpadButtonRenderers = new ArrayList<>();
@@ -336,9 +338,8 @@ public class SketchWithScenes extends Sketch {
 
                 if (ServerRenderer.all != null)
                     // Iterating in this manner helps avoid concurrent modification:
-                    for (int i = 0; i < ServerRenderer.all.size(); i++) {
+                    for (int i = 0; i < ServerRenderer.all.size(); i++)
                         ServerRenderer.all.get(i).draw(gr);
-                    }
 
             }
 
@@ -353,12 +354,12 @@ public class SketchWithScenes extends Sketch {
             }
 
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n",
-                        p_ip, p_port);
+                // System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n",
+                // p_ip, p_port);
 
                 if (RequestCode.packetHasCode(p_data)) {
                     RequestCode code = RequestCode.fromPacket(p_data);
-                    System.out.printf("It was a code, `%s`!\n", code.toString());
+                    System.out.printf("Received a code, `%s`!\n", code.toString());
                     switch (code) {
                         case CLIENT_CLOSE:
                         case CLIENT_LOW_BATTERY:
@@ -374,7 +375,7 @@ public class SketchWithScenes extends Sketch {
                     } // End of `packetHasCode()` check,
                 } // End of `onReceive()`.
                 else {
-                    System.out.println("It was a packet of button data.");
+                    System.out.println("Received a packet of button data.");
                     Object receivedObject = ByteSerial.decode(p_data);
 
                     if (receivedObject == null || Sketch.myConfig == null)
@@ -387,70 +388,31 @@ public class SketchWithScenes extends Sketch {
 
                     // System.out.println("Config hash info:");
 
-                    ButtonState state = (ButtonState) receivedObject;
-
-                    // Print the name of the button:
-                    /*
-                     * for (ButtonConfig c : Sketch.myConfig.buttons) {
-                     * if (c.hashCode() == state.configHash) {
-                     * System.out.printf(
-                     * "Button with text `%s` had a change.\n",
-                     * c.text);
-                     * }
-                     * }
-                     */
-
-                    for (int i = 0; i < buttonRenderers.size(); i++) {
-                        ButtonRendererBase r = buttonRenderers.get(i);
-                        if (r.configHash() == state.configHash) {
-                            r.state = state;
+                    if (receivedObject instanceof ButtonState buttonState) {
+                        System.out.println("The packet contained data for a button!");
+                        for (int i = 0; i < buttonRenderers.size(); i++) {
+                            ButtonRendererBase r = buttonRenderers.get(i);
+                            if (r.config.controlNumber == buttonState.controlNumber) {
+                                r.state = buttonState;
+                            }
                         }
+                    } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
+                        System.out.println("The packet contained data for a DPAD button!");
+                        for (int i = 0; i < dpadButtonRenderers.size(); i++) {
+                            DpadButtonRendererBase r = dpadButtonRenderers.get(i);
+                            if (r.config.controlNumber == dpadButtonState.controlNumber) {
+                                r.state = dpadButtonState;
+                            }
+                        }
+                    } else {
+                        System.out.println("RECEIVED A PACKET FOR AN UNKNOWN CONTROL.");
                     }
 
-                    // if (client.config.anyConfigArrayisNull())
-                    // return;
-                    /*
-                     * if (Sketch.socket.clients.get(0).equals(client)) {
-                     * if (receivedObject instanceof ButtonState buttonState) {
-                     * } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
-                     * } else if (receivedObject instanceof KeyboardState keyboardState) {
-                     * } else if (receivedObject instanceof ThumbstickState thumbstickState) {
-                     * } else if (receivedObject instanceof TouchpadState touchpadState) {
-                     * }
-                     * }
-                     * 
-                     * if (receivedObject instanceof ButtonState buttonState) {
-                     * ArrayList<ButtonState> states = client.window.buttonStates;
-                     * for (int i = 0; i < states.size(); i++)
-                     * if (states.get(i).configHash == buttonState.configHash)
-                     * states.set(i, buttonState);
-                     * 
-                     * } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
-                     * ArrayList<DpadButtonState> states = client.window.dpadButtonStates;
-                     * for (int i = 0; i < states.size(); i++)
-                     * if (states.get(i).configHash == dpadButtonState.configHash)
-                     * states.set(i, dpadButtonState);
-                     * 
-                     * } else if (receivedObject instanceof KeyboardState keyboardState) {
-                     * client.window.keyboardState = keyboardState;
-                     * 
-                     * } else if (receivedObject instanceof ThumbstickState thumbstickState) {
-                     * ArrayList<ThumbstickState> states = client.window.thumbstickStates;
-                     * for (int i = 0; i < states.size(); i++)
-                     * if (states.get(i).configHash == thumbstickState.configHash)
-                     * states.set(i, thumbstickState);
-                     * 
-                     * } else if (receivedObject instanceof TouchpadState touchpadState) {
-                     * ArrayList<TouchpadState> states = client.window.touchpadStates;
-                     * for (int i = 0; i < states.size(); i++)
-                     * if (states.get(i).configHash == touchpadState.configHash)
-                     * states.set(i, touchpadState);
-                     * }
-                     */
-
                 }
-            };
-        };
+
+                // End of packet data check,
+            } // End of `onReceive()`,
+        }; // End of `workScene`'s definition'.
 
         exitScene = new Scene() {
             String thankYouText;
