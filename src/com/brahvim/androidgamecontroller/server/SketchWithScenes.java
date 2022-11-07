@@ -1,5 +1,7 @@
 package com.brahvim.androidgamecontroller.server;
 
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -13,8 +15,6 @@ import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
-
-import processing.core.PApplet;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -257,23 +257,22 @@ public class SketchWithScenes extends Sketch {
                             break;
                     }
                 }
-                // else {
-                // The packet contains data! Get your `java.awt.Robot`s now!
-                // }
             };
         };
 
         workingScene = new Scene() {
+            ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of `Robot` for each type of control.
             ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
 
             @Override
             public void setup() {
+                Robot robot = null; // Used for iteration, I guess.
 
-                // Coordinate mapping and addition to the 'iterator-thingy'! :joy:...
+                // Coordinate mapping and addition to the 'buttonRenderers'! :joy:...
                 for (ButtonConfig c : Sketch.myConfig.buttons) {
-                    System.out.println("Old scale and transform:");
-                    System.out.println(c.scale);
-                    System.out.println(c.transform);
+                    // System.out.println("Old scale and transform:");
+                    // System.out.println(c.scale);
+                    // System.out.println(c.transform);
 
                     c.scale.set(
                             map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
@@ -282,12 +281,25 @@ public class SketchWithScenes extends Sketch {
                     c.transform.set(
                             map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
                             map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-                    buttonRenderers.add(new ButtonRendererForServer(c));
 
-                    System.out.println("New, mapped scale and transform:");
-                    System.out.println(c.scale);
-                    System.out.println(c.transform);
+                    // Construct a robot:
+                    try {
+                        robot = new Robot();
+                        robots.add(robot);
+                    } catch (AWTException e) {
+                        // It just... won't happen!
+                    }
+
+                    // Add the button:
+                    ButtonRendererForServer button = new ButtonRendererForServer(c, robot);
+                    buttonRenderers.add(button);
+
+                    // System.out.println("New, mapped scale and transform:");
+                    // System.out.println(c.scale);
+                    // System.out.println(c.transform);
                 }
+
+                // More button types are initialized here...
             }
 
             @Override
@@ -337,7 +349,6 @@ public class SketchWithScenes extends Sketch {
                 } // End of `onReceive()`.
                 else {
                     System.out.println("It was a packet of button data.");
-                    PApplet.printArray(new String(p_data));
                     Object receivedObject = ByteSerial.decode(p_data);
 
                     if (receivedObject == null || Sketch.myConfig == null)
@@ -348,18 +359,20 @@ public class SketchWithScenes extends Sketch {
                     if (client == null)
                         return;
 
-                    System.out.println("Config hash info:");
+                    // System.out.println("Config hash info:");
 
                     ButtonState state = (ButtonState) receivedObject;
 
                     // Print the name of the button:
-                    for (ButtonConfig c : Sketch.myConfig.buttons) {
-                        if (c.hashCode() == state.configHash) {
-                            System.out.printf(
-                                    "Button with text `%s` had a change.\n",
-                                    c.text);
-                        }
-                    }
+                    /*
+                     * for (ButtonConfig c : Sketch.myConfig.buttons) {
+                     * if (c.hashCode() == state.configHash) {
+                     * System.out.printf(
+                     * "Button with text `%s` had a change.\n",
+                     * c.text);
+                     * }
+                     * }
+                     */
 
                     for (int i = 0; i < buttonRenderers.size(); i++) {
                         ButtonRendererBase r = buttonRenderers.get(i);

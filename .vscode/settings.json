@@ -31,5 +31,12 @@
     "files.associations": {
         "stdlib.h": "c",
         "string.h": "c"
-    }
+    },
+    "java.completion.filteredTypes": [
+        "com.sun.*",
+        "sun.*",
+        "jdk.*",
+        "org.graalvm.*",
+        "io.micrometer.shaded.*"
+    ]
 }

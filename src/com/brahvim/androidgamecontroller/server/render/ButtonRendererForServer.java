@@ -1,5 +1,7 @@
 package com.brahvim.androidgamecontroller.server.render;
 
+import java.awt.Robot;
+
 import org.jetbrains.annotations.NotNull;
 
 import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
@@ -9,13 +11,24 @@ import processing.core.PConstants;
 import processing.core.PGraphics;
 
 public class ButtonRendererForServer extends ButtonRendererBase {
-    public ButtonRendererForServer(@NotNull ButtonConfig p_config) {
+    @SuppressWarnings("unused")
+    private Robot robot;
+
+    // public ButtonRendererForServer(@NotNull ButtonConfig p_config) {
+    // super(p_config);
+    // }
+
+    public ButtonRendererForServer(@NotNull ButtonConfig p_config, Robot p_robot) {
         super(p_config);
+        this.robot = p_robot;
     }
 
     @Override
     public void draw(@NotNull PGraphics p_graphics) {
         // super.state.ppressed = super.state.pressed; // Nope! The impl. handles super!
+
+        // this.robot.keyPress(0);
+        // this.robot.keyRelease(0);
 
         p_graphics.pushMatrix();
         p_graphics.pushStyle();
