@@ -12,12 +12,14 @@ public class BlockingConfirmDialog {
                 .addLabel(p_label)
                 .addButton("Yes", new Runnable() {
                     public void run() {
+                        System.out.println("Yes was pressed.");
                         p_yes.run();
                         dialogEnded = true;
                     };
                 })
                 .addButton("No", new Runnable() {
                     public void run() {
+                        System.out.println("No was pressed.");
                         p_yes.run();
                         dialogEnded = true;
                     };

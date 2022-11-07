@@ -115,7 +115,7 @@ public class SketchWithScenes extends Sketch {
                 settingsMenuKbCheck();
             }
 
-            public void registerClientConfig(byte[] p_data) {
+            public void registerClientConfig(byte[] p_data, AgcClient p_client) {
                 System.out.println("Received the configuration form the client.");
 
                 byte[] extraData = RequestCode.getPacketExtras(p_data);
@@ -127,12 +127,14 @@ public class SketchWithScenes extends Sketch {
                     System.out.println(c.hashCode());
                 }
 
-                System.out.println();
+                socket.sendCode(RequestCode.SERVER_GOT_CONFIG, p_client);
+
+                System.out.println("Told client that we got the config.!");
             }
 
             public void confirmConnection(AgcClient p_client) {
-                new BlockingConfirmDialog(
-                        // Forms.ui.showConfirmDialog(
+                // BlockingConfirmDialog.create(
+                Forms.ui.showConfirmDialog(
                         Forms.getString("ConfirmConnection.message")
                                 .replace("<name>", p_client.getName())
                                 .replace("<address>", p_client.getIp()),
@@ -156,8 +158,8 @@ public class SketchWithScenes extends Sketch {
             }
 
             public void confirmRejection(AgcClient p_client) {
-                new BlockingConfirmDialog(
-                        // Forms.ui.showConfirmDialog(
+                // BlockingConfirmDialog.create(
+                Forms.ui.showConfirmDialog(
                         // Older stuff that used `.concat()`:
                         /*
                          * // Forms.ui.showConfirmDialog(
@@ -194,10 +196,8 @@ public class SketchWithScenes extends Sketch {
 
             @Override
             public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                if (socket.isIpBanned(p_ip) || noMorePings)
+                if (socket.isIpBanned(p_ip))
                     return;
-
-                noMorePings = true;
 
                 System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
                         p_data.length, new String(p_data), p_ip, p_port);
@@ -223,7 +223,15 @@ public class SketchWithScenes extends Sketch {
                                     p_ip, client.getName());
 
                             if (!(socket.isClientBanned(client) && socket.clients.contains(client)))
-                                confirmConnection(client);
+                                if (!noMorePings) {
+                                    noMorePings = true;
+                                    new Thread() {
+                                        public void run() {
+                                            confirmConnection(client);
+                                            noMorePings = false;
+                                        };
+                                    }.start();
+                                }
                         }
                             break;
 
@@ -231,7 +239,7 @@ public class SketchWithScenes extends Sketch {
                             if (socket.clients.size() != 0)
                                 socket.clients.get(0).window = Sketch.myWindow;
 
-                            registerClientConfig(p_data);
+                            registerClientConfig(p_data, socket.getClientFromIp(p_ip));
                             Scene.setScene(workingScene);
                             break;
 
