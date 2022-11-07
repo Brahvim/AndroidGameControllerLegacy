@@ -13,20 +13,47 @@ public class ButtonConfig extends ControlConfigBase {
     public ButtonConfig() {
     }
 
+    /**
+     * Create a button at the desired position with text.
+     */
     public ButtonConfig(float p_x, float p_y, String p_text) {
         super(
-                new PVector(400, 400),
-                new PVector(p_x, p_y, 0)); // The `z` is rotation.
+          new PVector(400, 400),
+          new PVector(p_x, p_y, 0)); // The `z` is rotation.
 
         this.text = p_text;
         this.shape = ButtonShape.RECTANGLE;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
+    /**
+     * Create a button with the desired position and size with text.
      */
+    public ButtonConfig(PVector p_transform, PVector p_scale, String p_text) {
+        super(p_scale, p_transform); // The `z` is rotation.
+
+        this.text = p_text;
+        this.shape = ButtonShape.RECTANGLE;
+    }
+
+    /**
+     * Create a button at the desired position, with the desired shape and size, with text.
+     */
+    public ButtonConfig(PVector p_transform, PVector p_scale, String p_text, ButtonShape p_shape) {
+        super(p_scale, p_transform); // The `z` is rotation.
+
+        this.text = p_text;
+        this.shape = p_shape;
+    }
+
+
+    /**
+     * Create a circular button at the desired position with the desired radius and text.
+     */
+    public ButtonConfig(PVector p_transform, float p_radius, String p_text) {
+        super(new PVector(p_radius, p_radius), p_transform);
+        this.shape = ButtonShape.ROUND;
+        this.text = p_text;
+    }
 
     @Override // `Objects.hash()` provides inconsistent results across compilers...
     public int hashCode() {
@@ -42,7 +69,7 @@ public class ButtonConfig extends ControlConfigBase {
 
         // result = prime * result + ((shape == null) ? 0 : shape.hashCode());
         result = prime * result + textHash;
-        result = prime * result + (shape == null ? 0 : shape.ordinal() + 1);
+        result = prime * result + (shape == null? 0 : shape.ordinal() + 1);
 
         return result;
     }

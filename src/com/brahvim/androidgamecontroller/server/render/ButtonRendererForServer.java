@@ -10,8 +10,7 @@ import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
-public class ButtonRendererForServer extends ButtonRendererBase {
-    @SuppressWarnings("unused")
+public class ButtonRendererForServer extends ButtonRendererBase implements ServerRenderer {
     private Robot robot;
 
     // public ButtonRendererForServer(@NotNull ButtonConfig p_config) {
@@ -21,6 +20,7 @@ public class ButtonRendererForServer extends ButtonRendererBase {
     public ButtonRendererForServer(@NotNull ButtonConfig p_config, Robot p_robot) {
         super(p_config);
         this.robot = p_robot;
+        ServerRenderer.all.add(this);
     }
 
     @Override

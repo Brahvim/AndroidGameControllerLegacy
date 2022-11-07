@@ -1,8 +1,6 @@
 package com.brahvim.androidgamecontroller.render;
 
-import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
-import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
 
 import org.jetbrains.annotations.NotNull;

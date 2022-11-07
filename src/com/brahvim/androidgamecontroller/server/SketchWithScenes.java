@@ -12,9 +12,12 @@ import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
+import com.brahvim.androidgamecontroller.server.render.DpadButtonRendererForServer;
+import com.brahvim.androidgamecontroller.server.render.ServerRenderer;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -263,6 +266,7 @@ public class SketchWithScenes extends Sketch {
         workingScene = new Scene() {
             ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of `Robot` for each type of control.
             ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
+            ArrayList<DpadButtonRendererForServer> dpadButtonRenderers = new ArrayList<>();
 
             @Override
             public void setup() {
@@ -299,6 +303,28 @@ public class SketchWithScenes extends Sketch {
                     // System.out.println(c.transform);
                 }
 
+                for (DpadButtonConfig c : Sketch.myConfig.dpadButtons) {
+                    c.scale.set(
+                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+
+                    c.transform.set(
+                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+
+                    // Construct a robot:
+                    try {
+                        robot = new Robot();
+                        robots.add(robot);
+                    } catch (AWTException e) {
+                        // It just... won't happen!
+                    }
+
+                    // Add the DPAD button:
+                    DpadButtonRendererForServer button = new DpadButtonRendererForServer(c, robot);
+                    dpadButtonRenderers.add(button);
+                }
+
                 // More button types are initialized here...
             }
 
@@ -308,10 +334,10 @@ public class SketchWithScenes extends Sketch {
                 gr.textSize(28);
                 // gr.text("AndroidGameController!", cx, cy);
 
-                if (buttonRenderers != null)
+                if (ServerRenderer.all != null)
                     // Iterating in this manner helps avoid concurrent modification:
-                    for (int i = 0; i < buttonRenderers.size(); i++) {
-                        buttonRenderers.get(i).draw(gr);
+                    for (int i = 0; i < ServerRenderer.all.size(); i++) {
+                        ServerRenderer.all.get(i).draw(gr);
                     }
 
             }
