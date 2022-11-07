@@ -4,14 +4,11 @@ import org.jetbrains.annotations.NotNull;
 
 import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
-import com.brahvim.androidgamecontroller.server.Sketch;
 
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
 public class ButtonRendererForServer extends ButtonRendererBase {
-    public static float textOffX, textOffY;
-
     public ButtonRendererForServer(@NotNull ButtonConfig p_config) {
         super(p_config);
     }
