@@ -10,16 +10,20 @@ import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
 import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
+import com.brahvim.androidgamecontroller.render.TouchpadRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
+import com.brahvim.androidgamecontroller.serial.config.TouchpadConfig;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
+import com.brahvim.androidgamecontroller.serial.state.TouchpadState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
 import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
 import com.brahvim.androidgamecontroller.server.render.DpadButtonRendererForServer;
 import com.brahvim.androidgamecontroller.server.render.ServerRenderer;
+import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer;
 
 public class SketchWithScenes extends Sketch {
     void initFirstScene() {
@@ -269,6 +273,7 @@ public class SketchWithScenes extends Sketch {
             ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of `Robot` for each type of control.
             ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
             ArrayList<DpadButtonRendererForServer> dpadButtonRenderers = new ArrayList<>();
+            ArrayList<TouchpadRendererForServer> touchpadRenderers = new ArrayList<>();
 
             @Override
             public void setup() {
@@ -325,6 +330,28 @@ public class SketchWithScenes extends Sketch {
                     // Add the DPAD button:
                     DpadButtonRendererForServer button = new DpadButtonRendererForServer(c, robot);
                     dpadButtonRenderers.add(button);
+                }
+
+                for (TouchpadConfig c : Sketch.myConfig.touchpads) {
+                    c.scale.set(
+                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+
+                    c.transform.set(
+                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+
+                    // Construct a robot:
+                    try {
+                        robot = new Robot();
+                        robots.add(robot);
+                    } catch (AWTException e) {
+                        // It just... won't happen!
+                    }
+
+                    // Add the DPAD button:
+                    TouchpadRendererForServer button = new TouchpadRendererForServer(c, robot);
+                    touchpadRenderers.add(button);
                 }
 
                 // More button types are initialized here...
@@ -392,17 +419,22 @@ public class SketchWithScenes extends Sketch {
                         System.out.println("The packet contained data for a button!");
                         for (int i = 0; i < buttonRenderers.size(); i++) {
                             ButtonRendererBase r = buttonRenderers.get(i);
-                            if (r.config.controlNumber == buttonState.controlNumber) {
+                            if (r.config.controlNumber == buttonState.controlNumber)
                                 r.state = buttonState;
-                            }
                         }
                     } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
                         System.out.println("The packet contained data for a DPAD button!");
                         for (int i = 0; i < dpadButtonRenderers.size(); i++) {
                             DpadButtonRendererBase r = dpadButtonRenderers.get(i);
-                            if (r.config.controlNumber == dpadButtonState.controlNumber) {
+                            if (r.config.controlNumber == dpadButtonState.controlNumber)
                                 r.state = dpadButtonState;
-                            }
+                        }
+                    } else if (receivedObject instanceof TouchpadState touchpadState) {
+                        System.out.println("The packet contained data for a touchpad!");
+                        for (int i = 0; i < touchpadRenderers.size(); i++) {
+                            TouchpadRendererBase r = touchpadRenderers.get(i);
+                            if (r.config.controlNumber == touchpadState.controlNumber)
+                                r.state = touchpadState;
                         }
                     } else {
                         System.out.println("RECEIVED A PACKET FOR AN UNKNOWN CONTROL.");

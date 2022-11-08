@@ -61,8 +61,4 @@ public class ButtonRendererBase {
     public boolean isPressed() {
         return this.state.pressed;
     }
-
-    public long configHash() {
-        return this.config.hashCode();
-    }
 }

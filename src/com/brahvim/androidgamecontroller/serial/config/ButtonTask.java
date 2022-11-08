@@ -1,6 +1,6 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-public enum ButtonTask {
+public enum ButtonTask /*implements Serializable*/ {
     AGC_TASK(), // It's another ordinary button that presses a key on the keyboard.
 
     // QUICK1(), QUICK2(), QUICK3(),

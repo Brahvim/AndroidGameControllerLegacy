@@ -12,10 +12,7 @@ public class TouchpadState extends StateBase {
     public boolean doubleTapped, pdoubleTapped;
 
     public TouchpadState() {
-    }
-
-    public int count() {
-        return this.touches.size();
+        this.touches = new ArrayList<>();
     }
 
 }

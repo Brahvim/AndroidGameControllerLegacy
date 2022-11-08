@@ -34,9 +34,9 @@ public class ConfigurationPacket implements Serializable {
 
     public boolean anyConfigArrayisNull() {
         return this.buttons == null &&
-                this.dpadButtons == null &&
-                this.thumbsticks == null &&
-                this.touchpads == null;
+          this.dpadButtons == null &&
+          this.thumbsticks == null &&
+          this.touchpads == null;
     }
 
     // public boolean anythingIsNull() {
@@ -47,22 +47,22 @@ public class ConfigurationPacket implements Serializable {
 
     public <T> T addObject(Object p_object) {
         if (p_object instanceof ButtonConfig)
-            this.buttons.add((ButtonConfig) p_object);
+            this.buttons.add((ButtonConfig)p_object);
 
         else if (p_object instanceof DpadButtonConfig)
-            this.dpadButtons.add((DpadButtonConfig) p_object);
+            this.dpadButtons.add((DpadButtonConfig)p_object);
 
         else if (p_object instanceof ThumbstickConfig)
-            this.thumbsticks.add((ThumbstickConfig) p_object);
+            this.thumbsticks.add((ThumbstickConfig)p_object);
 
         else if (p_object instanceof TouchpadConfig)
-            this.touchpads.add((TouchpadConfig) p_object);
+            this.touchpads.add((TouchpadConfig)p_object);
 
         else
             throw new IllegalArgumentException();
 
         @SuppressWarnings("unchecked")
-        T ret = (T) p_object;
+        T ret = (T)p_object;
         return ret;
     }
 

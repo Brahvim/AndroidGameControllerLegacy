@@ -11,6 +11,7 @@ import processing.core.PConstants;
 import processing.core.PGraphics;
 
 public class ButtonRendererForServer extends ButtonRendererBase implements ServerRenderer {
+    @SuppressWarnings("unused")
     private Robot robot;
 
     // public ButtonRendererForServer(@NotNull ButtonConfig p_config) {

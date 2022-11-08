@@ -1,16 +1,17 @@
 package com.brahvim.androidgamecontroller.server.render;
 
 import java.awt.Robot;
+
 import org.jetbrains.annotations.NotNull;
 
 import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
 import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
-import com.brahvim.androidgamecontroller.server.Sketch;
 
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
 public class DpadButtonRendererForServer extends DpadButtonRendererBase implements ServerRenderer {
+    @SuppressWarnings("unused")
     private Robot robot;
 
     public DpadButtonRendererForServer(@NotNull DpadButtonConfig p_config) {

@@ -1,8 +1,10 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
+import java.io.Serializable;
+
 import processing.core.PVector;
 
-public class ThumbstickConfig extends ControlConfigBase {
+public class ThumbstickConfig extends ControlConfigBase implements Serializable {
     public final static long serialVersionUID = -6618151523553691071L;
 
     public ThumbstickConfig() {
@@ -12,7 +14,7 @@ public class ThumbstickConfig extends ControlConfigBase {
     // Of course, thumbsticks don't have rotation.
     // ...unless I put a fancy texture with shadows on them.
 
-    ThumbstickConfig(PVector p_transform, PVector p_scale) {
+    public ThumbstickConfig(PVector p_scale, PVector p_transform) {
         super(p_scale, p_transform);
     }
 }
