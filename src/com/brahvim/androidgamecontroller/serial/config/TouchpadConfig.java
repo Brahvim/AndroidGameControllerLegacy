@@ -1,10 +1,8 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class TouchpadConfig extends ControlConfigBase implements Serializable {
+public class TouchpadConfig extends ControlConfigBase {
     public final static long serialVersionUID = 7084394767346371323L;
 
     public TouchpadConfig() {
@@ -39,7 +37,7 @@ public class TouchpadConfig extends ControlConfigBase implements Serializable {
         result = prime * result + super.scale.x;
         result = prime * result + super.scale.y;
 
-        return (int)result;
+        return (int) result;
     }
 
 }

@@ -2,11 +2,9 @@ package com.brahvim.androidgamecontroller.serial.config;
 
 import com.brahvim.androidgamecontroller.serial.ButtonShape;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class ButtonConfig extends ControlConfigBase implements Serializable {
+public class ButtonConfig extends ControlConfigBase {
     public final static long serialVersionUID = 3448431857528425173L;
 
     public String text;
@@ -21,8 +19,8 @@ public class ButtonConfig extends ControlConfigBase implements Serializable {
      */
     public ButtonConfig(float p_x, float p_y, String p_text) {
         super(
-          new PVector(400, 400),
-          new PVector(p_x, p_y, 0)); // The `z` is rotation.
+                new PVector(400, 400),
+                new PVector(p_x, p_y, 0)); // The `z` is rotation.
 
         this.text = p_text;
         this.shape = ButtonShape.RECTANGLE;
@@ -39,7 +37,8 @@ public class ButtonConfig extends ControlConfigBase implements Serializable {
     }
 
     /**
-     * Create a button at the desired position, with the desired shape and size, with text.
+     * Create a button at the desired position, with the desired shape and size,
+     * with text.
      */
     public ButtonConfig(PVector p_transform, PVector p_scale, String p_text, ButtonShape p_shape) {
         super(p_scale, p_transform); // The `z` is rotation.
@@ -48,9 +47,9 @@ public class ButtonConfig extends ControlConfigBase implements Serializable {
         this.shape = p_shape;
     }
 
-
     /**
-     * Create a circular button at the desired position with the desired radius and text.
+     * Create a circular button at the desired position with the desired radius and
+     * text.
      */
     public ButtonConfig(PVector p_transform, float p_radius, String p_text) {
         super(new PVector(p_radius, p_radius), p_transform);
@@ -72,7 +71,7 @@ public class ButtonConfig extends ControlConfigBase implements Serializable {
 
         // result = prime * result + ((shape == null) ? 0 : shape.hashCode());
         result = prime * result + textHash;
-        result = prime * result + (shape == null? 0 : shape.ordinal() + 1);
+        result = prime * result + (shape == null ? 0 : shape.ordinal() + 1);
 
         return result;
     }

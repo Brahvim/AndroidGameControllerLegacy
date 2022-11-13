@@ -22,6 +22,9 @@ public class AgcClientWindow extends PApplet {
     public ArrayList<TouchpadState> touchpadStates;
     public KeyboardState keyboardState;
 
+    private AgcClientWindow() {
+    }
+
     AgcClientWindow(AgcClient p_client) {
         this.parentClient = p_client;
 
@@ -29,6 +32,10 @@ public class AgcClientWindow extends PApplet {
         // this.config.buttons
 
         PApplet.runSketch(new String[] { this.getClass().getName() }, this);
+    }
+
+    public static AgcClientWindow buildForMainWindow() {
+        return new AgcClientWindow();
     }
 
     @Override

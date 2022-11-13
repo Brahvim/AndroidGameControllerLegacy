@@ -144,9 +144,108 @@ public class AgcServerSocket extends UdpSocket {
         }
     }
 
+    public AgcClient getClientFromIp(String p_ip) {
+        for (AgcClient c : this.clients)
+            if (c.getIp().equals(p_ip))
+                return c;
+        return null;
+    }
+
+    public void unbanClient(String p_ip) {
+        for (AgcClient c : this.bannedClients)
+            if (c.ip.equals(p_ip)) {
+                this.bannedClients.remove(c);
+                break;
+            }
+    }
+
+    public void banClient(String p_ip, int p_port) {
+        String clientName = null;
+
+        for (AgcClient c : this.clients) {
+            if (c.ip.equals(p_ip))
+                clientName = c.deviceName;
+        }
+
+        if (clientName == null)
+            clientName = new String(p_ip);
+
+        this.bannedClients.add(new AgcClient(this, p_ip, -1, clientName));
+    }
+
+    public void banClient(AgcClient p_client) {
+        this.bannedClients.add(p_client);
+    }
+
+    public boolean isClientBanned(AgcClient p_client) {
+        return this.bannedClients.size() == 0 ? false
+                : this.bannedClients.contains(p_client);
+    }
+
+    public boolean isIpBanned(String p_ip) {
+        for (AgcClient c : this.bannedClients)
+            if (c.ip.equals(p_ip))
+                return true;
+        return false;
+    }
     // #endregion
 
+    public void restartReceiver() {
+        super.receiver.stop();
+        super.receiver.start();
+        System.out.println("Restarted some receiver...");
+    }
+
     // #region Custom methods.
+    // From back when the `bannedIpStrings` and `bannedClientNames`
+    // `ArrayList<String>`s were-a-thing!:
+
+    /*
+     * public void unbanIp(String p_ip) {
+     * this.bannedIpStrings.remove(p_ip);
+     * }
+     * 
+     * public void banClient(AgcClient p_client) {
+     * this.bannedIpStrings.add(p_client.ip);
+     * this.bannedClientNames.add(p_client.deviceName);
+     * }
+     * 
+     * public void banClient(String p_ip, String p_name) {
+     * this.bannedIpStrings.add(p_ip);
+     * this.bannedClientNames.add(p_name);
+     * }
+     * 
+     * public void banClient(String p_ip) {
+     * String name = null;
+     * 
+     * for (AgcClient c : this.clients) {
+     * if (c.ip.equals(p_ip)) {
+     * name = c.deviceName;
+     * }
+     * }
+     * 
+     * if (name == null) {
+     * name = "`".concat(p_ip).concat("`");
+     * }
+     * 
+     * this.bannedIpStrings.add(p_ip);
+     * this.bannedClientNames.add(name);
+     * }
+     * 
+     * public boolean isClientBanned(@NotNull AgcClient p_client) {
+     * if (this.bannedIpStrings.size() == 0)
+     * return false;
+     * 
+     * String clientIp = p_client.getIp();
+     * 
+     * for (String s : this.bannedIpStrings)
+     * if (s.equals(clientIp))
+     * return true;
+     * return false;
+     * }
+     * 
+     */
+
     // Using `AgcServerSocket.AgcClient`s:
     public void sendCode(RequestCode p_code, AgcClient p_client) {
         this.sendCode(p_code, p_client.ip, p_client.port);
@@ -278,113 +377,13 @@ public class AgcServerSocket extends UdpSocket {
     }
     // #endregion
 
+    // #region Overrides.
     @Override
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
         if (Scene.currentScene != null)
             Scene.currentScene.onReceive(p_data, p_ip, p_port);
     }
 
-    public AgcClient getClientFromIp(String p_ip) {
-        for (AgcClient c : this.clients)
-            if (c.getIp().equals(p_ip))
-                return c;
-        return null;
-    }
-
-    public void unbanClient(String p_ip) {
-        for (AgcClient c : this.bannedClients)
-            if (c.ip.equals(p_ip)) {
-                this.bannedClients.remove(c);
-                break;
-            }
-    }
-
-    public void banClient(String p_ip, int p_port) {
-        String clientName = null;
-
-        for (AgcClient c : this.clients) {
-            if (c.ip.equals(p_ip))
-                clientName = c.deviceName;
-        }
-
-        if (clientName == null)
-            clientName = new String(p_ip);
-
-        this.bannedClients.add(new AgcClient(this, p_ip, -1, clientName));
-    }
-
-    public void banClient(AgcClient p_client) {
-        this.bannedClients.add(p_client);
-    }
-
-    public boolean isClientBanned(AgcClient p_client) {
-        return this.bannedClients.size() == 0 ? false
-                : this.bannedClients.contains(p_client);
-    }
-
-    public boolean isIpBanned(String p_ip) {
-        for (AgcClient c : this.bannedClients)
-            if (c.ip.equals(p_ip))
-                return true;
-        return false;
-    }
-
-    public void restartReceiver() {
-        super.receiver.stop();
-        super.receiver.start();
-        System.out.println("Restarted some receiver...");
-    }
-
-    // From back when the `bannedIpStrings` and `bannedClientNames`
-    // `ArrayList<String>`s were-a-thing!:
-
-    /*
-     * public void unbanIp(String p_ip) {
-     * this.bannedIpStrings.remove(p_ip);
-     * }
-     * 
-     * public void banClient(AgcClient p_client) {
-     * this.bannedIpStrings.add(p_client.ip);
-     * this.bannedClientNames.add(p_client.deviceName);
-     * }
-     * 
-     * public void banClient(String p_ip, String p_name) {
-     * this.bannedIpStrings.add(p_ip);
-     * this.bannedClientNames.add(p_name);
-     * }
-     * 
-     * public void banClient(String p_ip) {
-     * String name = null;
-     * 
-     * for (AgcClient c : this.clients) {
-     * if (c.ip.equals(p_ip)) {
-     * name = c.deviceName;
-     * }
-     * }
-     * 
-     * if (name == null) {
-     * name = "`".concat(p_ip).concat("`");
-     * }
-     * 
-     * this.bannedIpStrings.add(p_ip);
-     * this.bannedClientNames.add(name);
-     * }
-     * 
-     * public boolean isClientBanned(@NotNull AgcClient p_client) {
-     * if (this.bannedIpStrings.size() == 0)
-     * return false;
-     * 
-     * String clientIp = p_client.getIp();
-     * 
-     * for (String s : this.bannedIpStrings)
-     * if (s.equals(clientIp))
-     * return true;
-     * return false;
-     * }
-     * 
-     */
-
-    // #region Non-so-important Overrides.
     @Override
     protected void onStart() {
         // this.setPort(RequestCodes.get("SERVER_PORT"));

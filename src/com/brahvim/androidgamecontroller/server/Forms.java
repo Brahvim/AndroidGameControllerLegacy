@@ -2,6 +2,8 @@ package com.brahvim.androidgamecontroller.server;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JDialog;
 
@@ -297,18 +299,50 @@ public class Forms {
     // #endregion
 
     // #region Functions that show forms:
-    public static void showSettingsForm() {
+    public static void showSettingsForm(AgcClientWindow p_win) {
         Forms.settingsForm = Forms.showRichForm(Forms.settingsForm, Forms.settingsFormBuild);
         JDialog window = Forms.settingsForm.getWindow();
-
-        // None of these listeners respond...
-        Forms.addEscapeToCloseListener(Forms.settingsForm);
 
         window.setSize(Forms.settingsWidth, window.getHeight());
 
         window.setLocation(
                 Sketch.SKETCH.sketchFrame.getX(), Sketch.SKETCH.sketchFrame.getY());
         window.setResizable(false);
+
+        p_win.getSurface().setAlwaysOnTop(false); // Wait, so this actuall IS thread-safe?!
+
+        window.addWindowListener(new WindowListener() {
+            @Override
+            public void windowClosing(WindowEvent p_windowEvent) {
+                p_win.getSurface().setAlwaysOnTop(true);
+            }
+
+            // #region Unused:
+            @Override
+            public void windowOpened(WindowEvent p_windowEvent) {
+            }
+
+            @Override
+            public void windowClosed(WindowEvent p_windowEvent) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent p_windowEvent) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent p_windowEvent) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent p_windowEvent) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent p_windowEvent) {
+            }
+            // #endregion
+        });
     }
     // #endregion
 

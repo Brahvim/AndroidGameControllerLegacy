@@ -1,10 +1,8 @@
 package com.brahvim.androidgamecontroller.serial.config;
 
-import java.io.Serializable;
-
 import processing.core.PVector;
 
-public class ThumbstickConfig extends ControlConfigBase implements Serializable {
+public class ThumbstickConfig extends ControlConfigBase {
     public final static long serialVersionUID = -6618151523553691071L;
 
     public ThumbstickConfig() {

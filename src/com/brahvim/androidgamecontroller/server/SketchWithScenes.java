@@ -36,14 +36,14 @@ public class SketchWithScenes extends Sketch {
 
     public void settingsMenuCheck() {
         if (mouseButton == MouseEvent.BUTTON3 && !Forms.isFormOpen(Forms.settingsForm)) {
-            Forms.showSettingsForm();
+            Forms.showSettingsForm(Sketch.myWindow);
         }
     }
 
     public void settingsMenuKbCheck() {
         // `525` is the context menu key / "right-click key" *at least* on my keyboard.
         if (keyCode == KeyEvent.VK_SPACE || keyCode == 525)
-            Forms.showSettingsForm();
+            Forms.showSettingsForm(Sketch.myWindow);
     }
 
     public void noClientsCheck() {
@@ -52,7 +52,7 @@ public class SketchWithScenes extends Sketch {
     }
 
     public void registerClientConfig(byte[] p_data, AgcClient p_client) {
-        System.out.println("Received the configuration form the client.");
+        System.out.println("Received the configuration from the client.");
 
         byte[] extraData = RequestCode.getPacketExtras(p_data);
 
@@ -152,6 +152,7 @@ public class SketchWithScenes extends Sketch {
 
             public void confirmConnection(AgcClient p_client) {
                 // BlockingConfirmDialog.create(
+
                 Forms.ui.showConfirmDialog(
                         Forms.getString("ConfirmConnection.message")
                                 .replace("<name>", p_client.getName())
@@ -217,9 +218,6 @@ public class SketchWithScenes extends Sketch {
                 if (socket.isIpBanned(p_ip))
                     return;
 
-                System.out.printf("Received `%d` bytes saying \"%s\" from IP: `%s`, port: `%d`.\n",
-                        p_data.length, new String(p_data), p_ip, p_port);
-
                 if (RequestCode.packetHasCode(p_data)) {
                     switch (RequestCode.fromPacket(p_data)) {
                         case ADD_ME: { // Limits the stack so
@@ -254,8 +252,9 @@ public class SketchWithScenes extends Sketch {
                             break;
 
                         case CLIENT_SENDS_CONFIG:
-                            if (socket.clients.size() != 0)
+                            if (socket.clients.size() != 0) {
                                 socket.clients.get(0).window = Sketch.myWindow;
+                            }
 
                             registerClientConfig(p_data, socket.getClientFromIp(p_ip));
                             Scene.setScene(workScene);
@@ -263,6 +262,11 @@ public class SketchWithScenes extends Sketch {
 
                         default:
                             noClientsCheck();
+
+                            System.out.printf("""
+                                    Received a `%d`-byte long unrecognizzed sequence of bytes saying
+                                        \"%s\" from IP: `%s`, port: `%d`.\n""",
+                                    p_data.length, new String(p_data), p_ip, p_port);
                             break;
                     }
                 }

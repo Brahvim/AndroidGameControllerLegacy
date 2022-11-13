@@ -51,7 +51,7 @@ public class Sketch extends PApplet {
     public PImage surfaceIcon;
     public PVector minExtent, maxExtent;
 
-    // Ma' boilerplate :D
+    // Ma'h boilerplate :D
     public static float cx, cy, qx, qy, q3x, q3y;
     public static int pwidth, pheight;
 
@@ -117,7 +117,7 @@ public class Sketch extends PApplet {
         // ^^^ The `surface` or its `JFrame`, ..or even the `JPanel`.
         // NOBODY takes this request!
 
-        // Networking:
+        // Networking, plus AGC stuff!:
         socket = new AgcServerSocket();
 
         // The very LAST thing to do:
@@ -244,7 +244,6 @@ public class Sketch extends PApplet {
         });
 
         // #region The `JPanel`:
-
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics p_javaGaphics) {

@@ -172,7 +172,7 @@ public class UdpSocket {
 
                             // System.out.println("Calling `onReceive()`!");
 
-                            // The user's code can throw exception that pause our thread :)
+                            // The user's code can throw exceptions that pause our thread :)
                             try {
                                 byte[] copy = new byte[byteData.length];
 
@@ -183,6 +183,10 @@ public class UdpSocket {
                                     byteData[i] = 0;
                                 // ...but I just didn't want to use `System.arraycopy()`
                                 // with a freshly allocated array. What a WASTE!
+
+                                // PS It IS TWO WHOLE ORDERS OF MAGNITUDE faster to allocate
+                                // than to do a loop and set values.
+                                // I'm only worried about de-allocation.
 
                                 onReceive(copy,
                                         addr.toString().substring(1),
