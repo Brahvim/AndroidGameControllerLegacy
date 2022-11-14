@@ -96,10 +96,20 @@ public class UdpSocket {
          * Sets the size of the buffer (in bytes) data is received into. The maximum
          * possible size is {@code 65535} bytes.
          *
-         * @implNote Should be {@code 576} by default. To know why, please see
-         *           {@link <a href=
-         *           "https://stackoverflow.com/a/9235558/13951505">...</a>}.
+         * @deprecated This should not be something you need to worry about. Modern
+         *             computers are good enough already, and a `65`kb allocation when
+         *             your application already takes `200`MB won't be a big problem.
+         *
+         * @apiNote Is {@code 65535} {@link Receiver#PACKET_MAX_SIZE} by default.
+         * @implNote <i>Should</i> be {@code 576} by default. To know why,
+         *           please see
+         *           {@link<a href=
+         *           "https://stackoverflow.com/a/9235558/13951505">this</a>}.
          */
+
+        @Deprecated
+        // PS The reason mentioned for deprecation is *probably* one of
+        // ***the worst*** decisions of my life! :joy:
         public Integer packetMaxSize = Receiver.PACKET_MAX_SIZE;
         // ^^^ PS a more precise number is `543` bytes.
 
@@ -142,6 +152,7 @@ public class UdpSocket {
                     // No mutual exclusion locking here, by the way. This
                     // `short`(`byteArrayMaxSize`) *should* be fine here?
                     // Ehh, it's fine. Is it THAT important to use `AtomicShort` right-away anyway?
+                    // (...or `volatile`?)
 
                     byte[] byteData = new byte[packetMaxSize /* 65535 */];
                     // ^^^ B I G ___ A L L O C A T I O N !

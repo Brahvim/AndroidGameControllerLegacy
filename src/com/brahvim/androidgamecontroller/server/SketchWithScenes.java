@@ -66,10 +66,10 @@ public class SketchWithScenes extends Sketch {
                     c.config = (ConfigurationPacket) ByteSerial.decode(extraData);
             }
 
-        System.out.println("Config hashes:");
-        for (ButtonConfig c : Sketch.myConfig.buttons) {
-            System.out.println(c.hashCode());
-        }
+        // System.out.println("Config hashes:");
+        // for (ButtonConfig c : Sketch.myConfig.buttons) {
+        // System.out.println(c.hashCode());
+        // }
 
         socket.sendCode(RequestCode.SERVER_GOT_CONFIG, p_client);
 
