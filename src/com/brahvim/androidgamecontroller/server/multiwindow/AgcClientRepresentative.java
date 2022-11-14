@@ -28,7 +28,6 @@ import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
-import processing.core.PGraphics;
 
 // "Do I make a factory or something? Hmmm..."
 // - Brahvim, 2022.
@@ -37,6 +36,17 @@ public class AgcClientRepresentative extends PApplet {
     AgcClient guyImRepresenting;
     Scene currentScene;
     UdpSocket socket;
+
+    // #region Scene definitions!
+    Scene workScene, exitScene;
+    {
+        workScene = new Scene() {
+        };
+
+        exitScene = new Scene() {
+        };
+    }
+    // #endregion
 
     // #region Renderer lists
     ArrayList<ButtonRendererForServer> buttonRenderers;
