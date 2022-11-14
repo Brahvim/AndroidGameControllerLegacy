@@ -1,25 +1,27 @@
 package com.brahvim.androidgamecontroller;
 
-import java.util.ArrayList;
+// Do not use this `Scene` class in other projects!
+// It's now focused on this one!
 
 public class Scene {
-    public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
-    public static Scene currentScene;
+    // region Not used in AGC anymore!:
+    // public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
+    // public static Scene currentScene;
 
-    // region "`static`s".
-    public static void setScene(Scene p_scene) {
-        Scene.currentScene = p_scene;
-        p_scene.setup();
-    }
+    // public static void setScene(Scene p_scene) {
+    // Scene.currentScene = p_scene;
+    // p_scene.setup();
+    // }
 
-    public static void addScene(Scene p_scene) {
-        Scene.SCENES.add(p_scene);
-    }
+    // public static void addScene(Scene p_scene) {
+    // Scene.SCENES.add(p_scene);
+    // }
+    // endregion
 
     public Scene() {
-        Scene.SCENES.add(this);
+        // Not in AGC!...:
+        // Scene.SCENES.add(this);
     }
-    // endregion
 
     // region Application callback structure.
     public void setup() {

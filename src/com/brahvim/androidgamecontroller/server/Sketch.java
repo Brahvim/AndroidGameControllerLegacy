@@ -42,13 +42,14 @@ public class Sketch extends PApplet {
     public static AgcServerSocket socket;
     public static AgcClientWindow myWindow; // The primary client's window AKA the main window! :D
     public static AgcConfigurationPacket myConfig; // The primary client's configuration.
+    public static Scene currentScene;
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public static float frameStartTime, pframeTime, frameTime;
     // #endregion
 
     // #region Window coordinates and states.
-    public PImage surfaceIcon;
+    public static PImage surfaceIcon;
     public static PVector minExtent, maxExtent;
 
     // Ma'h boilerplate :D
@@ -80,6 +81,11 @@ public class Sketch extends PApplet {
     }
     // #endregion
 
+    // #region Scene management.
+    public static void setScene(Scene p_scene) {
+        Sketch.currentScene = p_scene;
+    }
+
     // #region Processing's `setup()`, `draw()` and other callbacks.
     public void dispose() {
         agcExit(); // This used to be a part of the comment, LOL.
@@ -93,9 +99,9 @@ public class Sketch extends PApplet {
 
         updateRatios();
 
-        // Window setup:
+        // Window setup. This one, is only done once:
         surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
-        surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
+        surface.setIcon(Sketch.surfaceIcon = loadImage("data/icon-192.png"));
         surface.setLocation(displayWidth / 2 - (int) cx, displayHeight / 2 + (int) cy);
         Sketch.minExtent = new PVector();
         Sketch.maxExtent = new PVector(displayWidth - width, displayHeight - height);

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 
 import com.brahvim.androidgamecontroller.RequestCode;
-import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.UdpSocket;
 import com.brahvim.androidgamecontroller.serial.config.AgcConfigurationPacket;
 
@@ -380,8 +379,8 @@ public class AgcServerSocket extends UdpSocket {
     // #region Overrides.
     @Override
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
-        if (Scene.currentScene != null)
-            Scene.currentScene.onReceive(p_data, p_ip, p_port);
+        if (Sketch.currentScene != null)
+            Sketch.currentScene.onReceive(p_data, p_ip, p_port);
     }
 
     @Override

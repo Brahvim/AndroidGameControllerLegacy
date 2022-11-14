@@ -36,14 +36,16 @@ import processing.core.PGraphics;
 // - Brahvim, 2022.
 
 public class AgcClientRepresentative extends PApplet {
+    // AGC stuff!:
     public AgcClient guyImRepresenting;
     public Scene currentScene;
     public UdpSocket socket;
-    public PGraphics gr;
 
-    // Ma'h boilerplate :D
+    // #region Window coordinates and states.
     public static float cx, cy, qx, qy, q3x, q3y;
     public static int pwidth, pheight;
+
+    public PGraphics gr;
 
     public JFrame sketchFrame; // We do not rely on the Processing 3 'dummy' variable!
 
@@ -55,11 +57,13 @@ public class AgcClientRepresentative extends PApplet {
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public float frameStartTime, pframeTime, frameTime;
+    // #endregion
 
     // #region Scene definitions!
     Scene workScene, exitScene;
     {
-        workScene = new Scene() {
+        // Oooh! JavaScript!:
+        this.workScene = new Scene() {
             // Rendering goes here...
         };
 
@@ -83,47 +87,49 @@ public class AgcClientRepresentative extends PApplet {
 
     @Override
     public void settings() {
-        size(Sketch.AGC_WIDTH, Sketch.AGC_HEIGHT, JAVA2D);
+        super.size(Sketch.AGC_WIDTH, Sketch.AGC_HEIGHT, JAVA2D);
     }
 
     @Override
     public void setup() {
-
+        super.surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
+        super.surface.setIcon(Sketch.surfaceIcon);
+        super.surface.setLocation(displayWidth / 2 - (int) cx, displayHeight / 2 + (int) cy);
     }
 
     public void pre() {
-        Scene.currentScene.pre();
+        this.currentScene.pre();
     }
 
     public void draw() {
-        frameStartTime = millis(); // Timestamp.
-        frameTime = frameStartTime - pframeTime;
-        pframeTime = frameStartTime;
+        this.frameStartTime = millis(); // Timestamp.
+        this.frameTime = this.frameStartTime - this.pframeTime;
+        this.pframeTime = this.frameStartTime;
 
         // #region Window dragging logic:
-        pwinMouseX = winMouseX;
-        pwinMouseY = winMouseY;
+        this.pwinMouseX = this.winMouseX;
+        this.pwinMouseY = this.winMouseY;
 
-        winMouseX = MouseInfo.getPointerInfo().getLocation().x;
-        winMouseY = MouseInfo.getPointerInfo().getLocation().y;
+        this.winMouseX = MouseInfo.getPointerInfo().getLocation().x;
+        this.winMouseY = MouseInfo.getPointerInfo().getLocation().y;
 
-        if (mousePressed) {
-            surfaceX = winMouseX - pmousePressX;
-            surfaceY = winMouseY - pmousePressY;
+        if (this.mousePressed) {
+            this.surfaceX = this.winMouseX - this.pmousePressX;
+            this.surfaceY = this.winMouseY - this.pmousePressY;
 
-            if (surfaceX < Sketch.minExtent.x)
-                surfaceX = (int) Sketch.minExtent.x;
+            if (this.surfaceX < Sketch.minExtent.x)
+                this.surfaceX = (int) Sketch.minExtent.x;
 
-            if (surfaceY < Sketch.minExtent.y)
-                surfaceY = (int) Sketch.minExtent.y;
+            if (this.surfaceY < Sketch.minExtent.y)
+                this.surfaceY = (int) Sketch.minExtent.y;
 
-            if (surfaceX > Sketch.maxExtent.x)
-                surfaceX = (int) Sketch.maxExtent.x;
+            if (this.surfaceX > Sketch.maxExtent.x)
+                this.surfaceX = (int) Sketch.maxExtent.x;
 
-            if (surfaceY > Sketch.maxExtent.y)
-                surfaceY = (int) Sketch.maxExtent.y;
+            if (this.surfaceY > Sketch.maxExtent.y)
+                this.surfaceY = (int) Sketch.maxExtent.y;
 
-            surface.setLocation(surfaceX, surfaceY);
+            super.surface.setLocation(surfaceX, surfaceY);
         }
 
         mouseInWin = winMouseX > sketchFrame.getX() &&
@@ -132,19 +138,21 @@ public class AgcClientRepresentative extends PApplet {
                 winMouseY < sketchFrame.getY() + height;
         // #endregion
 
-        sketchFrame.setBackground(new Color(0, 0, 0, 0));
+        this.sketchFrame.setBackground(new Color(0, 0, 0, 0));
 
-        gr.beginDraw();
-        gr.background(bgColor);
+        this.gr.beginDraw();
+        this.gr.background(bgColor);
 
-        if (Scene.currentScene != null)
-            Scene.currentScene.draw();
+        // This! This! This! Not the scene from the 'global' current scene!
+        // That's for the client app!
+        if (this.currentScene != null)
+            this.currentScene.draw();
 
-        gr.endDraw();
+        this.gr.endDraw();
     }
 
     public void post() {
-        Scene.currentScene.post();
+        this.currentScene.post();
     }
 
     public JFrame createSketchPanel(AgcClientRepresentative p_clientWindow) {

@@ -34,6 +34,7 @@ public class SketchWithScenes extends Sketch {
         // #endregion
     }
 
+    // #region Methods used by all scenes!:
     public void settingsMenuCheck() {
         if (mouseButton == MouseEvent.BUTTON3 && !Forms.isFormOpen(Forms.settingsForm)) {
             Forms.showSettingsForm(Sketch.myWindow);
@@ -75,6 +76,7 @@ public class SketchWithScenes extends Sketch {
 
         System.out.println("Told client that we got the config.!");
     }
+    // #endregion
 
     // "Please never make any `Scene` instances `static`."
     Scene awaitingConnectionScene, workScene, exitScene;
