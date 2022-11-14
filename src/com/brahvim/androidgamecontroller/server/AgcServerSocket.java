@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
 import com.brahvim.androidgamecontroller.UdpSocket;
-import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.config.AgcConfigurationPacket;
 
 public class AgcServerSocket extends UdpSocket {
-    class AgcClient {
+    public class AgcClient {
         public AgcClientWindow window;
-        public ConfigurationPacket config;
+        public AgcConfigurationPacket config;
 
         private String ip;
         private int port;

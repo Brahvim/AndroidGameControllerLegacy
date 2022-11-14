@@ -13,7 +13,7 @@ import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
 import com.brahvim.androidgamecontroller.render.TouchpadRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
 import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
-import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.config.AgcConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.TouchpadConfig;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
@@ -58,12 +58,12 @@ public class SketchWithScenes extends Sketch {
 
         // If it is the primary client, the main window's controller should be changed!:
         if (p_client.equals(socket.clients.get(0)))
-            Sketch.myConfig = (ConfigurationPacket) ByteSerial.decode(extraData);
+            Sketch.myConfig = (AgcConfigurationPacket) ByteSerial.decode(extraData);
         else
             // Okay, okay, which client?
             for (AgcClient c : socket.clients) {
                 if (c.equals(p_client))
-                    c.config = (ConfigurationPacket) ByteSerial.decode(extraData);
+                    c.config = (AgcConfigurationPacket) ByteSerial.decode(extraData);
             }
 
         // System.out.println("Config hashes:");
