@@ -49,7 +49,7 @@ public class Sketch extends PApplet {
 
     // #region Window coordinates and states.
     public PImage surfaceIcon;
-    public static PVector minExtent, maxExtent;
+    public PVector minExtent, maxExtent;
 
     // Ma'h boilerplate :D
     public static float cx, cy, qx, qy, q3x, q3y;
@@ -97,8 +97,8 @@ public class Sketch extends PApplet {
         surface.setTitle("AndroidGameController Server ".concat(Sketch.VERSION));
         surface.setIcon(surfaceIcon = loadImage("data/icon-192.png"));
         surface.setLocation(displayWidth / 2 - (int) cx, displayHeight / 2 + (int) cy);
-        Sketch.minExtent = new PVector();
-        Sketch.maxExtent = new PVector(displayWidth - width, displayHeight - height);
+        minExtent = new PVector();
+        maxExtent = new PVector(displayWidth - width, displayHeight - height);
 
         // Forms:
         Forms.init(new UiBooster(UiBoosterOptions.Theme.DARK_THEME));
@@ -144,17 +144,17 @@ public class Sketch extends PApplet {
             surfaceX = winMouseX - pmousePressX;
             surfaceY = winMouseY - pmousePressY;
 
-            if (surfaceX < Sketch.minExtent.x)
-                surfaceX = (int) Sketch.minExtent.x;
+            if (surfaceX < minExtent.x)
+                surfaceX = (int) minExtent.x;
 
-            if (surfaceY < Sketch.minExtent.y)
-                surfaceY = (int) Sketch.minExtent.y;
+            if (surfaceY < minExtent.y)
+                surfaceY = (int) minExtent.y;
 
-            if (surfaceX > Sketch.maxExtent.x)
-                surfaceX = (int) Sketch.maxExtent.x;
+            if (surfaceX > maxExtent.x)
+                surfaceX = (int) maxExtent.x;
 
-            if (surfaceY > Sketch.maxExtent.y)
-                surfaceY = (int) Sketch.maxExtent.y;
+            if (surfaceY > maxExtent.y)
+                surfaceY = (int) maxExtent.y;
 
             surface.setLocation(surfaceX, surfaceY);
         }

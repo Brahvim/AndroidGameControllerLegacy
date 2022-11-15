@@ -1,7 +1,5 @@
 package com.brahvim.androidgamecontroller.server.multiwindow;
 
-// Again, `Ctrl + Shift + [` to fold, just as in Visual Studio!
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -30,46 +28,27 @@ import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
-import processing.core.PGraphics;
 
 // "Do I make a factory or something? Hmmm..."
 // - Brahvim, 2022.
 
 public class AgcClientRepresentative extends PApplet {
-    public AgcClient guyImRepresenting;
-    public Scene currentScene;
-    public UdpSocket socket;
-    public PGraphics gr;
-
-    // Ma'h boilerplate :D
-    public static float cx, cy, qx, qy, q3x, q3y;
-    public static int pwidth, pheight;
-
-    public JFrame sketchFrame; // We do not rely on the Processing 3 'dummy' variable!
-
-    public boolean mouseInWin;
-    public int pwinMouseX, pwinMouseY;
-    public int winMouseX, winMouseY;
-    public int surfaceX, surfaceY; // Used to constrain the position of the overlay.
-    public int pmousePressX, pmousePressY; // Where was the mouse when it was last clicked?
-
-    public int bgColor = color(0, 150); // Exit fade animation, et cetera.
-    public float frameStartTime, pframeTime, frameTime;
+    AgcClient guyImRepresenting;
+    Scene currentScene;
+    UdpSocket socket;
 
     // #region Scene definitions!
     Scene workScene, exitScene;
     {
         workScene = new Scene() {
-            // Rendering goes here...
         };
 
         exitScene = new Scene() {
-            // "Exeunt!"
         };
     }
     // #endregion
 
-    // #region Renderer lists.
+    // #region Renderer lists
     ArrayList<ButtonRendererForServer> buttonRenderers;
     ArrayList<DpadButtonRendererForServer> dpadButtonRenderers;
     ArrayList<TouchpadRendererForServer> touchpadRenderers;
@@ -91,60 +70,8 @@ public class AgcClientRepresentative extends PApplet {
 
     }
 
-    public void pre() {
-        Scene.currentScene.pre();
-    }
-
+    @Override
     public void draw() {
-        frameStartTime = millis(); // Timestamp.
-        frameTime = frameStartTime - pframeTime;
-        pframeTime = frameStartTime;
-
-        // #region Window dragging logic:
-        pwinMouseX = winMouseX;
-        pwinMouseY = winMouseY;
-
-        winMouseX = MouseInfo.getPointerInfo().getLocation().x;
-        winMouseY = MouseInfo.getPointerInfo().getLocation().y;
-
-        if (mousePressed) {
-            surfaceX = winMouseX - pmousePressX;
-            surfaceY = winMouseY - pmousePressY;
-
-            if (surfaceX < Sketch.minExtent.x)
-                surfaceX = (int) Sketch.minExtent.x;
-
-            if (surfaceY < Sketch.minExtent.y)
-                surfaceY = (int) Sketch.minExtent.y;
-
-            if (surfaceX > Sketch.maxExtent.x)
-                surfaceX = (int) Sketch.maxExtent.x;
-
-            if (surfaceY > Sketch.maxExtent.y)
-                surfaceY = (int) Sketch.maxExtent.y;
-
-            surface.setLocation(surfaceX, surfaceY);
-        }
-
-        mouseInWin = winMouseX > sketchFrame.getX() &&
-                winMouseX < sketchFrame.getX() + width &&
-                winMouseY > sketchFrame.getY() &&
-                winMouseY < sketchFrame.getY() + height;
-        // #endregion
-
-        sketchFrame.setBackground(new Color(0, 0, 0, 0));
-
-        gr.beginDraw();
-        gr.background(bgColor);
-
-        if (Scene.currentScene != null)
-            Scene.currentScene.draw();
-
-        gr.endDraw();
-    }
-
-    public void post() {
-        Scene.currentScene.post();
     }
 
     public JFrame createSketchPanel(AgcClientRepresentative p_clientWindow) {
