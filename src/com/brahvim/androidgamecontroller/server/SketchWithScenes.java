@@ -30,7 +30,7 @@ public class SketchWithScenes extends Sketch {
         // #region "Are Wii gunna have a problem?""
         Scene firstScene = awaitingConnectionScene;
         firstScene.setup();
-        Sketch.currentScene = firstScene;
+        Scene.currentScene = firstScene;
         // #endregion
     }
 
@@ -49,7 +49,7 @@ public class SketchWithScenes extends Sketch {
 
     public void noClientsCheck() {
         if (socket.clients.size() == 0)
-            Sketch.setScene(awaitingConnectionScene);
+            Scene.setScene(awaitingConnectionScene);
     }
 
     public void registerClientConfig(byte[] p_data, AgcClient p_client) {
@@ -259,7 +259,7 @@ public class SketchWithScenes extends Sketch {
                             }
 
                             registerClientConfig(p_data, socket.getClientFromIp(p_ip));
-                            Sketch.setScene(workScene);
+                            Scene.setScene(workScene);
                             break;
 
                         default:

@@ -131,7 +131,7 @@ public class Sketch extends PApplet {
     }
 
     public void pre() {
-        Sketch.currentScene.pre();
+        Scene.currentScene.pre();
     }
 
     public void draw() {
@@ -176,14 +176,14 @@ public class Sketch extends PApplet {
         gr.beginDraw();
         gr.background(bgColor);
 
-        if (Sketch.currentScene != null)
-            Sketch.currentScene.draw();
+        if (Scene.currentScene != null)
+            Scene.currentScene.draw();
 
         gr.endDraw();
     }
 
     public void post() {
-        Sketch.currentScene.post();
+        Scene.currentScene.post();
     }
     // #endregion
 
@@ -201,7 +201,7 @@ public class Sketch extends PApplet {
         if (Forms.isFormOpen(Forms.settingsForm))
             Forms.settingsForm.close();
 
-        Sketch.setScene(Sketch.SKETCH.exitScene);
+        Scene.setScene(Sketch.SKETCH.exitScene);
     }
 
     public JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
@@ -332,7 +332,7 @@ public class Sketch extends PApplet {
         // PS Notice how this uses `KeyAdapter` instead for
         panel.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (Sketch.currentScene == Sketch.SKETCH.exitScene)
+                if (Scene.currentScene == Sketch.SKETCH.exitScene)
                     return;
 
                 if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
@@ -355,54 +355,54 @@ public class Sketch extends PApplet {
     // #region Processing's keyboard event callbacks.
     @Override
     public void keyPressed() {
-        Sketch.currentScene.keyPressed();
+        Scene.currentScene.keyPressed();
     }
 
     @Override
     public void keyReleased() {
-        Sketch.currentScene.keyReleased();
+        Scene.currentScene.keyReleased();
     }
 
     @Override
     public void keyTyped() {
-        Sketch.currentScene.keyTyped();
+        Scene.currentScene.keyTyped();
     }
     // #endregion
 
     // #region Processing's mouse event callbacks.
     @Override
     public void mouseMoved() {
-        Sketch.currentScene.mouseMoved();
+        Scene.currentScene.mouseMoved();
     }
 
     @Override
     public void mouseWheel(processing.event.MouseEvent p_mouseEvent) {
-        Sketch.currentScene.mouseWheel(p_mouseEvent);
+        Scene.currentScene.mouseWheel(p_mouseEvent);
     }
 
     @Override
     public void mouseClicked() {
-        Sketch.currentScene.mouseClicked();
+        Scene.currentScene.mouseClicked();
     }
 
     @Override
     public void mouseDragged() {
-        Sketch.currentScene.mouseDragged();
+        Scene.currentScene.mouseDragged();
     }
 
     @Override
     public void mouseExited() {
-        Sketch.currentScene.mouseExited();
+        Scene.currentScene.mouseExited();
     }
 
     @Override
     public void mouseEntered() {
-        Sketch.currentScene.mouseEntered();
+        Scene.currentScene.mouseEntered();
     }
 
     @Override
     public void mouseReleased() {
-        Sketch.currentScene.mouseReleased();
+        Scene.currentScene.mouseReleased();
     }
 
     @Override
@@ -410,7 +410,7 @@ public class Sketch extends PApplet {
         pmousePressX = mouseX;
         pmousePressY = mouseY;
 
-        Sketch.currentScene.mousePressed();
+        Scene.currentScene.mousePressed();
     }
     // #endregion
 

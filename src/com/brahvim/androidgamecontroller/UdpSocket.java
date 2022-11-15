@@ -10,8 +10,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * The {@link UdpSocket} helps two applications running on different machines
  * connect via networks following the "User Datagram Protocol" and let them
@@ -343,7 +341,7 @@ public class UdpSocket {
      *               the first character of the string.
      * @apiNote {@code public} so you can generate fake events ;) *
      */
-    public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
+    public void onReceive(byte[] p_data, String p_ip, int p_port) {
     }
 
     /**
