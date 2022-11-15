@@ -62,9 +62,10 @@ public class AgcClientRepresentative extends PApplet {
     // #region Scene definitions!
     Scene workScene, exitScene;
     {
-        // Oooh! JavaScript!:
-        this.workScene = new Scene() {
+        workScene = new Scene() {
             // Rendering goes here...
+
+            
         };
 
         exitScene = new Scene() {
@@ -153,6 +154,16 @@ public class AgcClientRepresentative extends PApplet {
 
     public void post() {
         this.currentScene.post();
+    }
+
+    // #region Custom methods!
+    public void updateRatios() {
+        cx = width * 0.5f;
+        cy = height * 0.5f;
+        qx = cx * 0.5f;
+        qy = cy * 0.5f;
+        q3x = cx + qx;
+        q3y = cy + qy;
     }
 
     public JFrame createSketchPanel(AgcClientRepresentative p_clientWindow) {
@@ -303,5 +314,6 @@ public class AgcClientRepresentative extends PApplet {
         // #endregion
         return ret;
     }
+    // #endregion
 
 }

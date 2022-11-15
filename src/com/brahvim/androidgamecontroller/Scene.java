@@ -7,6 +7,7 @@ public class Scene {
     // region Not used in AGC anymore!:
     // public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
     // public static Scene currentScene;
+    // ^^^ The client app extends this class to *re-add* these anyway...
 
     // public static void setScene(Scene p_scene) {
     // Scene.currentScene = p_scene;
