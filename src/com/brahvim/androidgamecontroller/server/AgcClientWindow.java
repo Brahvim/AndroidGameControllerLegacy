@@ -2,7 +2,7 @@ package com.brahvim.androidgamecontroller.server;
 
 import java.util.ArrayList;
 
-import com.brahvim.androidgamecontroller.serial.config.AgcConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 import com.brahvim.androidgamecontroller.serial.state.ButtonState;
 import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
 import com.brahvim.androidgamecontroller.serial.state.KeyboardState;
@@ -28,7 +28,7 @@ public class AgcClientWindow extends PApplet {
     AgcClientWindow(AgcClient p_client) {
         this.parentClient = p_client;
 
-        this.parentClient.config = new AgcConfigurationPacket();
+        this.parentClient.config = new ConfigurationPacket();
         // this.config.buttons
 
         PApplet.runSketch(new String[] { this.getClass().getName() }, this);

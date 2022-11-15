@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import com.brahvim.androidgamecontroller.Scene;
-import com.brahvim.androidgamecontroller.serial.config.AgcConfigurationPacket;
+import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
 
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
@@ -41,7 +41,7 @@ public class Sketch extends PApplet {
     public PGraphics gr;
     public static AgcServerSocket socket;
     public static AgcClientWindow myWindow; // The primary client's window AKA the main window! :D
-    public static AgcConfigurationPacket myConfig; // The primary client's configuration.
+    public static ConfigurationPacket myConfig; // The primary client's configuration.
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
     public static float frameStartTime, pframeTime, frameTime;
@@ -199,6 +199,7 @@ public class Sketch extends PApplet {
     }
 
     public JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
+        // This is the dummy variable from Processing.
         JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) p_sketch.getSurface().getNative()).getFrame();
         ret.removeNotify();
         ret.setUndecorated(true);

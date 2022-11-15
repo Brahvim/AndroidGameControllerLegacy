@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import processing.core.PVector;
 
-public class AgcConfigurationPacket implements Serializable {
+public class ConfigurationPacket implements Serializable {
     public final static long serialVersionUID = 8505272624450677291L;
 
     public String AGC_VERSION;
@@ -26,7 +26,7 @@ public class AgcConfigurationPacket implements Serializable {
     public ArrayList<ThumbstickConfig> thumbsticks;
     public ArrayList<TouchpadConfig> touchpads;
 
-    public AgcConfigurationPacket() {
+    public ConfigurationPacket() {
         // Please set `this.appStartMilliSinceEpoch` in this manner!:
         // this.appStartMilliSinceEpoch = System.currentTimeMillis() -
         // MainActivity.sketch.millis();
@@ -68,10 +68,10 @@ public class AgcConfigurationPacket implements Serializable {
 
     // We return a new object instead so you can *revert if needed or something I
     // dunno:*
-    public static AgcConfigurationPacket parse(InputStream p_fileStream) {
+    public static ConfigurationPacket parse(InputStream p_fileStream) {
         // int lineNumber = 0;
 
-        AgcConfigurationPacket ret = new AgcConfigurationPacket();
+        ConfigurationPacket ret = new ConfigurationPacket();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(p_fileStream))) {
             String section = "", property, value;
