@@ -267,7 +267,7 @@ public class SketchWithScenes extends Sketch {
                                     Received a `%d`-byte long unrecognizzed sequence of bytes saying
                                         \"%s\" from IP: `%s`, port: `%d`.\n""",
                                     p_data.length, new String(p_data), p_ip, p_port);
-                            break;  
+                            break;
                     }
                 }
             };
