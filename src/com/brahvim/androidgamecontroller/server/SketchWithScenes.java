@@ -27,8 +27,8 @@ import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer
 
 public class SketchWithScenes extends Sketch {
     public void initFirstScene() {
-        // #region "Are Wii gunna have a problem?""
         Scene firstScene = awaitingConnectionScene;
+        // #region "Are Wii gunna have a problem?""
         firstScene.setup();
         Scene.currentScene = firstScene;
         // #endregion
@@ -66,20 +66,16 @@ public class SketchWithScenes extends Sketch {
                     c.config = (ConfigurationPacket) ByteSerial.decode(extraData);
             }
 
-        // System.out.println("Config hashes:");
-        // for (ButtonConfig c : Sketch.myConfig.buttons) {
-        // System.out.println(c.hashCode());
-        // }
-
         socket.sendCode(RequestCode.SERVER_GOT_CONFIG, p_client);
 
         System.out.println("Told client that we got the config.!");
     }
 
     // "Please never make any `Scene` instances `static`."
-    Scene awaitingConnectionScene, workScene, exitScene;
+    Scene awaitingConnectionScene, workScene, exitScene, mainSketchIdleScene;
 
     { // Scene definitions.
+        mainSketchIdleScene = null; // Saves memory! `Sketch` doesn't complain about it!
 
         awaitingConnectionScene = new Scene() {
             boolean noMorePings = false;

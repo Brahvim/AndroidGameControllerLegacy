@@ -190,13 +190,13 @@ public class AgcServerSocket extends UdpSocket {
     }
     // #endregion
 
+    // #region Custom methods.
     public void restartReceiver() {
         super.receiver.stop();
         super.receiver.start();
         System.out.println("Restarted some receiver...");
     }
 
-    // #region Custom methods.
     // From back when the `bannedIpStrings` and `bannedClientNames`
     // `ArrayList<String>`s were-a-thing!:
 
@@ -246,7 +246,7 @@ public class AgcServerSocket extends UdpSocket {
      * 
      */
 
-    // Using `AgcServerSocket.AgcClient`s:
+    // #region Using `AgcServerSocket.AgcClient`s:
     public void sendCode(RequestCode p_code, AgcClient p_client) {
         this.sendCode(p_code, p_client.ip, p_client.port);
     }
@@ -264,6 +264,7 @@ public class AgcServerSocket extends UdpSocket {
         for (AgcClient c : this.clients)
             this.sendCode(p_code, p_extraData, c);
     }
+    // #endregion
 
     /*
      * Older versions:

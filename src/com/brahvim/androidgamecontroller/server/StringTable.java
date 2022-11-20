@@ -11,6 +11,7 @@ public class StringTable {
             .parseTable("AgcStringTable.ini");
 
     // Singleton! No constructor...
+    // ...and yet I used `static` everywhere.
     private StringTable() {
     }
 
@@ -79,7 +80,7 @@ public class StringTable {
         return parsedMap;
     }
 
-    public static String getString(String p_key) {
+    public static synchronized String getString(String p_key) {
         String ret = StringTable.table.get(p_key);
 
         if (ret == null) {
