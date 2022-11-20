@@ -26,7 +26,7 @@ import com.brahvim.androidgamecontroller.server.render.ServerRenderer;
 import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer;
 
 public class SketchWithScenes extends Sketch {
-    void initFirstScene() {
+    public void initFirstScene() {
         // #region "Are Wii gunna have a problem?""
         Scene firstScene = awaitingConnectionScene;
         firstScene.setup();
@@ -87,7 +87,7 @@ public class SketchWithScenes extends Sketch {
 
             @Override
             public void setup() {
-                shownText = Forms.getString("AwaitingConnectionsScene.text");
+                shownText = StringTable.getString("AwaitingConnectionsScene.text");
 
                 /*
                  * // "Can you serialize enums?" YES!
@@ -154,11 +154,11 @@ public class SketchWithScenes extends Sketch {
                 // BlockingConfirmDialog.create(
 
                 Forms.ui.showConfirmDialog(
-                        Forms.getString("ConfirmConnection.message")
+                        StringTable.getString("ConfirmConnection.message")
                                 .replace("<name>", p_client.getName())
                                 .replace("<address>", p_client.getIp()),
                         // Window title:
-                        Forms.getString("ConfirmConnection.windowTitle"),
+                        StringTable.getString("ConfirmConnection.windowTitle"),
                         // If yes,
                         new Runnable() {
                             @Override
@@ -182,19 +182,19 @@ public class SketchWithScenes extends Sketch {
                         // Older stuff that used `.concat()`:
                         /*
                          * // Forms.ui.showConfirmDialog(
-                         * // Forms.getString("RejectConnection.begin")
+                         * // StringTable.getString("RejectConnection.begin")
                          * // .concat(" \"")
                          * // .concat(p_client.getName())
                          * // .concat("\" (IP: `")
                          * // .concat(p_client.getIp())
                          * // .concat("`)? "),
-                         * // Forms.getString("RejectConnection.windowTitle"),
+                         * // StringTable.getString("RejectConnection.windowTitle"),
                          */
 
-                        Forms.getString("RejectConnection.message")
+                        StringTable.getString("RejectConnection.message")
                                 .replace("<name>", p_client.getName()),
 
-                        Forms.getString("RejectConnection.windowTitle"),
+                        StringTable.getString("RejectConnection.windowTitle"),
 
                         new Runnable() {
                             @Override
@@ -461,7 +461,7 @@ public class SketchWithScenes extends Sketch {
                 windowFadeWave.endWhenAngleIs(90);
                 windowFadeWave.start();
 
-                thankYouText = Forms.getString("ExitScene.text");
+                thankYouText = StringTable.getString("ExitScene.text");
                 socket.tellAllClients(RequestCode.SERVER_CLOSE);
                 socket.close();
             }

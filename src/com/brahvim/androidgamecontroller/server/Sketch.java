@@ -122,11 +122,15 @@ public class Sketch extends PApplet {
         socket = new AgcServerSocket();
 
         // The very LAST thing to do:
-        Sketch.SKETCH.initFirstScene();
+        initFirstScene();
+        // Sketch.SKETCH.initFirstScene();
     }
 
     public void pre() {
         Scene.currentScene.pre();
+    }
+
+    public void initFirstScene() {
     }
 
     public void draw() {

@@ -7,9 +7,14 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class StringTable {
-    public static HashMap<String, String> table = StringTable.parse("AgcStringTable.ini");
+    private static HashMap<String, String> table = StringTable
+            .parseTable("AgcStringTable.ini");
 
-    public static HashMap<String, String> parse /* parseStringTableFromFile */ (String p_fileName) {
+    // Singleton! No constructor...
+    private StringTable() {
+    }
+
+    public static HashMap<String, String> parseTable /* parseStringTableFromFile */ (String p_fileName) {
         HashMap<String, String> parsedMap = new HashMap<>();
         File tableFile = new File("data", p_fileName);
 
@@ -74,7 +79,15 @@ public class StringTable {
         return parsedMap;
     }
 
-    public static String get(String p_key) {
-        return StringTable.table.get(p_key);
+    public static String getString(String p_key) {
+        String ret = StringTable.table.get(p_key);
+
+        if (ret == null) {
+            System.err.printf("String table key `%s` not found!\n", p_key);
+            return "";
+        }
+
+        return ret;
     }
+
 }
