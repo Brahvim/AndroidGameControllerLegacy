@@ -51,7 +51,7 @@ public class Sketch extends PApplet {
     public PImage surfaceIcon;
     public PVector minExtent, maxExtent;
 
-    // Ma'h boilerplate :D
+    // #region Ma'h boilerplate :D
     public static float cx, cy, qx, qy, q3x, q3y;
     public static int pwidth, pheight;
 
@@ -62,6 +62,7 @@ public class Sketch extends PApplet {
     public int winMouseX, winMouseY;
     public int surfaceX, surfaceY; // Used to constrain the position of the overlay.
     public int pmousePressX, pmousePressY; // Where was the mouse when it was last clicked?
+    // #endregion
     // #endregion
     // #endregion Fields.
 
@@ -198,6 +199,12 @@ public class Sketch extends PApplet {
         Scene.setScene(Sketch.SKETCH.exitScene);
     }
 
+    /**
+     * @param p_sketch         The `PApplet` instance you are working with.
+     * @param p_sketchGraphics A graphics buffer into which you will draw.
+     * @return The new {@code JFrame} assigned to your sketch's surface / "window".
+     *         Better store it somewhere!
+     */
     public JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
         // This is the dummy variable from Processing.
         JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) p_sketch.getSurface().getNative()).getFrame();

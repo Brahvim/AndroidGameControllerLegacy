@@ -54,32 +54,4 @@ public class AgcClientWindow extends PApplet {
     public void onReceive(byte[] p_data) {
 
     }
-
-    /**
-     * @return the parentClient
-     */
-    public AgcClient getParentClient() {
-        return parentClient;
-    }
-
-    /**
-     * @param parentClient the parentClient to set
-     */
-    public void setParentClient(AgcClient parentClient) {
-        this.parentClient = parentClient;
-    }
-
-    /**
-     * @return the sKETCH
-     */
-    public AgcClientWindow getSKETCH() {
-        return SKETCH;
-    }
-
-    /**
-     * @param sKETCH the sKETCH to set
-     */
-    public void setSKETCH(AgcClientWindow sKETCH) {
-        SKETCH = sKETCH;
-    }
 }
