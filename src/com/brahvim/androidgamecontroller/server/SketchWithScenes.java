@@ -1,36 +1,20 @@
 package com.brahvim.androidgamecontroller.server;
 
-import java.awt.AWTException;
-import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
-import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
-import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
-import com.brahvim.androidgamecontroller.render.TouchpadRendererBase;
 import com.brahvim.androidgamecontroller.serial.ByteSerial;
-import com.brahvim.androidgamecontroller.serial.config.ButtonConfig;
 import com.brahvim.androidgamecontroller.serial.config.ConfigurationPacket;
-import com.brahvim.androidgamecontroller.serial.config.DpadButtonConfig;
-import com.brahvim.androidgamecontroller.serial.config.TouchpadConfig;
-import com.brahvim.androidgamecontroller.serial.state.ButtonState;
-import com.brahvim.androidgamecontroller.serial.state.DpadButtonState;
-import com.brahvim.androidgamecontroller.serial.state.TouchpadState;
 import com.brahvim.androidgamecontroller.server.AgcServerSocket.AgcClient;
-import com.brahvim.androidgamecontroller.server.render.ButtonRendererForServer;
-import com.brahvim.androidgamecontroller.server.render.DpadButtonRendererForServer;
-import com.brahvim.androidgamecontroller.server.render.ServerRenderer;
-import com.brahvim.androidgamecontroller.server.render.TouchpadRendererForServer;
 
 public class SketchWithScenes extends Sketch {
     public void initFirstScene() {
         Scene firstScene = awaitingConnectionScene;
         // #region "Are Wii gunna have a problem?""
         firstScene.setup();
-        Scene.currentScene = firstScene;
+        Sketch.currentScene = firstScene;
         // #endregion
     }
 
@@ -161,6 +145,7 @@ public class SketchWithScenes extends Sketch {
                             public void run() {
                                 socket.addClientIfAbsent(p_client);
                                 socket.sendCode(RequestCode.CLIENT_WAS_REGISTERED, p_client);
+                                new AgcClientWindow(p_client);
                             }
                         },
                         // If no,
@@ -253,7 +238,7 @@ public class SketchWithScenes extends Sketch {
                             }
 
                             registerClientConfig(p_data, socket.getClientFromIp(p_ip));
-                            Scene.setScene(workScene);
+                            // Scene.setScene(workScene);
                             break;
 
                         default:
@@ -269,182 +254,193 @@ public class SketchWithScenes extends Sketch {
             };
         };
 
-        workScene = new Scene() {
-            ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of `Robot` for each type of control.
-            ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
-            ArrayList<DpadButtonRendererForServer> dpadButtonRenderers = new ArrayList<>();
-            ArrayList<TouchpadRendererForServer> touchpadRenderers = new ArrayList<>();
-
-            @Override
-            public void setup() {
-                Robot robot = null; // Used for iteration, I guess.
-
-                // Coordinate mapping and addition to the 'buttonRenderers'! :joy:...
-                for (ButtonConfig c : Sketch.myConfig.buttons) {
-                    // System.out.println("Old scale and transform:");
-                    // System.out.println(c.scale);
-                    // System.out.println(c.transform);
-
-                    c.scale.set(
-                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    c.transform.set(
-                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    // Construct a robot:
-                    try {
-                        robot = new Robot();
-                        robots.add(robot);
-                    } catch (AWTException e) {
-                        // It just... won't happen!
-                    }
-
-                    // Add the button:
-                    ButtonRendererForServer button = new ButtonRendererForServer(c, robot);
-                    buttonRenderers.add(button);
-
-                    // System.out.println("New, mapped scale and transform:");
-                    // System.out.println(c.scale);
-                    // System.out.println(c.transform);
-                }
-
-                for (DpadButtonConfig c : Sketch.myConfig.dpadButtons) {
-                    c.scale.set(
-                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    c.transform.set(
-                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    // Construct a robot:
-                    try {
-                        robot = new Robot();
-                        robots.add(robot);
-                    } catch (AWTException e) {
-                        // It just... won't happen!
-                    }
-
-                    // Add the DPAD button:
-                    DpadButtonRendererForServer button = new DpadButtonRendererForServer(c, robot);
-                    dpadButtonRenderers.add(button);
-                }
-
-                for (TouchpadConfig c : Sketch.myConfig.touchpads) {
-                    c.scale.set(
-                            map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    c.transform.set(
-                            map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
-                            map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
-
-                    // Construct a robot:
-                    try {
-                        robot = new Robot();
-                        robots.add(robot);
-                    } catch (AWTException e) {
-                        // It just... won't happen!
-                    }
-
-                    // Add the DPAD button:
-                    TouchpadRendererForServer button = new TouchpadRendererForServer(c, robot);
-                    touchpadRenderers.add(button);
-                }
-
-                // More button types are initialized here...
-            }
-
-            @Override
-            public void draw() {
-                gr.textAlign(CENTER);
-                gr.textSize(28);
-                // gr.text("AndroidGameController!", cx, cy);
-
-                if (ServerRenderer.all != null)
-                    // Iterating in this manner helps avoid concurrent modification:
-                    for (int i = 0; i < ServerRenderer.all.size(); i++)
-                        ServerRenderer.all.get(i).draw(gr);
-
-            }
-
-            @Override
-            public void mousePressed() {
-                settingsMenuCheck();
-            }
-
-            @Override
-            public void keyPressed() {
-                settingsMenuKbCheck();
-            }
-
-            public void onReceive(byte[] p_data, String p_ip, int p_port) {
-                // System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n",
-                // p_ip, p_port);
-
-                if (RequestCode.packetHasCode(p_data)) {
-                    RequestCode code = RequestCode.fromPacket(p_data);
-                    System.out.printf("Received a code, `%s`!\n", code.toString());
-                    switch (code) {
-                        case CLIENT_CLOSE:
-                        case CLIENT_LOW_BATTERY:
-                            socket.removeClient(p_ip);
-                            noClientsCheck();
-                            break;
-
-                        case CLIENT_SENDS_CONFIG:
-                            registerClientConfig(p_data, socket.getClientFromIp(p_ip));
-
-                        default:
-                            break;
-                    } // End of `packetHasCode()` check,
-                } // End of `onReceive()`.
-                else {
-                    System.out.println("Received a packet of button data.");
-                    Object receivedObject = ByteSerial.decode(p_data);
-
-                    if (receivedObject == null || Sketch.myConfig == null)
-                        return;
-
-                    AgcClient client = Sketch.socket.getClientFromIp(p_ip);
-
-                    if (client == null)
-                        return;
-
-                    // System.out.println("Config hash info:");
-
-                    if (receivedObject instanceof ButtonState buttonState) {
-                        System.out.println("The packet contained data for a button!");
-                        for (int i = 0; i < buttonRenderers.size(); i++) {
-                            ButtonRendererBase r = buttonRenderers.get(i);
-                            if (r.config.controlNumber == buttonState.controlNumber)
-                                r.state = buttonState;
-                        }
-                    } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
-                        System.out.println("The packet contained data for a DPAD button!");
-                        for (int i = 0; i < dpadButtonRenderers.size(); i++) {
-                            DpadButtonRendererBase r = dpadButtonRenderers.get(i);
-                            if (r.config.controlNumber == dpadButtonState.controlNumber)
-                                r.state = dpadButtonState;
-                        }
-                    } else if (receivedObject instanceof TouchpadState touchpadState) {
-                        System.out.println("The packet contained data for a touchpad!");
-                        for (int i = 0; i < touchpadRenderers.size(); i++) {
-                            TouchpadRendererBase r = touchpadRenderers.get(i);
-                            if (r.config.controlNumber == touchpadState.controlNumber)
-                                r.state = touchpadState;
-                        }
-                    } else {
-                        System.out.println("RECEIVED A PACKET FOR AN UNKNOWN CONTROL.");
-                    }
-
-                }
-
-                // End of packet data check,
-            } // End of `onReceive()`,
-        }; // End of `workScene`'s definition'.
+        /*
+         * workScene = new Scene() {
+         * ArrayList<Robot> robots = new ArrayList<>(); // Holds a new instance of
+         * `Robot` for each type of control.
+         * ArrayList<ButtonRendererForServer> buttonRenderers = new ArrayList<>();
+         * ArrayList<DpadButtonRendererForServer> dpadButtonRenderers = new
+         * ArrayList<>();
+         * ArrayList<TouchpadRendererForServer> touchpadRenderers = new ArrayList<>();
+         * 
+         * @Override
+         * public void setup() {
+         * Robot robot = null; // Used for iteration, I guess.
+         * 
+         * // Coordinate mapping and addition to the 'buttonRenderers'! :joy:...
+         * for (ButtonConfig c : Sketch.myConfig.buttons) {
+         * // System.out.println("Old scale and transform:");
+         * // System.out.println(c.scale);
+         * // System.out.println(c.transform);
+         * 
+         * c.scale.set(
+         * map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+         * map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+         * 
+         * c.transform.set(
+         * map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0,
+         * Sketch.AGC_WIDTH),
+         * map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0,
+         * Sketch.AGC_HEIGHT));
+         * 
+         * // Construct a robot:
+         * try {
+         * robot = new Robot();
+         * robots.add(robot);
+         * } catch (AWTException e) {
+         * // It just... won't happen!
+         * }
+         * 
+         * // Add the button:
+         * ButtonRendererForServer button = new ButtonRendererForServer(c, robot);
+         * buttonRenderers.add(button);
+         * 
+         * // System.out.println("New, mapped scale and transform:");
+         * // System.out.println(c.scale);
+         * // System.out.println(c.transform);
+         * }
+         * 
+         * for (DpadButtonConfig c : Sketch.myConfig.dpadButtons) {
+         * c.scale.set(
+         * map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+         * map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+         * 
+         * c.transform.set(
+         * map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0,
+         * Sketch.AGC_WIDTH),
+         * map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0,
+         * Sketch.AGC_HEIGHT));
+         * 
+         * // Construct a robot:
+         * try {
+         * robot = new Robot();
+         * robots.add(robot);
+         * } catch (AWTException e) {
+         * // It just... won't happen!
+         * }
+         * 
+         * // Add the DPAD button:
+         * DpadButtonRendererForServer button = new DpadButtonRendererForServer(c,
+         * robot);
+         * dpadButtonRenderers.add(button);
+         * }
+         * 
+         * for (TouchpadConfig c : Sketch.myConfig.touchpads) {
+         * c.scale.set(
+         * map(c.scale.x, 0, Sketch.myConfig.screenDimensions.x, 0, Sketch.AGC_WIDTH),
+         * map(c.scale.y, 0, Sketch.myConfig.screenDimensions.y, 0, Sketch.AGC_HEIGHT));
+         * 
+         * c.transform.set(
+         * map(c.transform.x, 0, Sketch.myConfig.screenDimensions.x, 0,
+         * Sketch.AGC_WIDTH),
+         * map(c.transform.y, 0, Sketch.myConfig.screenDimensions.y, 0,
+         * Sketch.AGC_HEIGHT));
+         * 
+         * // Construct a robot:
+         * try {
+         * robot = new Robot();
+         * robots.add(robot);
+         * } catch (AWTException e) {
+         * // It just... won't happen!
+         * }
+         * 
+         * // Add the DPAD button:
+         * TouchpadRendererForServer button = new TouchpadRendererForServer(c, robot);
+         * touchpadRenderers.add(button);
+         * }
+         * 
+         * // More button types are initialized here...
+         * }
+         * 
+         * @Override
+         * public void draw() {
+         * gr.textAlign(CENTER);
+         * gr.textSize(28);
+         * // gr.text("AndroidGameController!", cx, cy);
+         * 
+         * if (ServerRenderer.all != null)
+         * // Iterating in this manner helps avoid concurrent modification:
+         * for (int i = 0; i < ServerRenderer.all.size(); i++)
+         * ServerRenderer.all.get(i).draw(gr);
+         * 
+         * }
+         * 
+         * @Override
+         * public void mousePressed() {
+         * settingsMenuCheck();
+         * }
+         * 
+         * @Override
+         * public void keyPressed() {
+         * settingsMenuKbCheck();
+         * }
+         * 
+         * public void onReceive(byte[] p_data, String p_ip, int p_port) {
+         * // System.out.printf("Received *some* bytes from IP: `%s`, on port:`%d`.\n",
+         * // p_ip, p_port);
+         * 
+         * if (RequestCode.packetHasCode(p_data)) {
+         * RequestCode code = RequestCode.fromPacket(p_data);
+         * System.out.printf("Received a code, `%s`!\n", code.toString());
+         * switch (code) {
+         * case CLIENT_CLOSE:
+         * case CLIENT_LOW_BATTERY:
+         * socket.removeClient(p_ip);
+         * noClientsCheck();
+         * break;
+         * 
+         * case CLIENT_SENDS_CONFIG:
+         * registerClientConfig(p_data, socket.getClientFromIp(p_ip));
+         * 
+         * default:
+         * break;
+         * } // End of `packetHasCode()` check,
+         * } // End of `onReceive()`.
+         * else {
+         * System.out.println("Received a packet of button data.");
+         * Object receivedObject = ByteSerial.decode(p_data);
+         * 
+         * if (receivedObject == null || Sketch.myConfig == null)
+         * return;
+         * 
+         * AgcClient client = Sketch.socket.getClientFromIp(p_ip);
+         * 
+         * if (client == null)
+         * return;
+         * 
+         * // System.out.println("Config hash info:");
+         * 
+         * if (receivedObject instanceof ButtonState buttonState) {
+         * System.out.println("The packet contained data for a button!");
+         * for (int i = 0; i < buttonRenderers.size(); i++) {
+         * ButtonRendererBase r = buttonRenderers.get(i);
+         * if (r.config.controlNumber == buttonState.controlNumber)
+         * r.state = buttonState;
+         * }
+         * } else if (receivedObject instanceof DpadButtonState dpadButtonState) {
+         * System.out.println("The packet contained data for a DPAD button!");
+         * for (int i = 0; i < dpadButtonRenderers.size(); i++) {
+         * DpadButtonRendererBase r = dpadButtonRenderers.get(i);
+         * if (r.config.controlNumber == dpadButtonState.controlNumber)
+         * r.state = dpadButtonState;
+         * }
+         * } else if (receivedObject instanceof TouchpadState touchpadState) {
+         * System.out.println("The packet contained data for a touchpad!");
+         * for (int i = 0; i < touchpadRenderers.size(); i++) {
+         * TouchpadRendererBase r = touchpadRenderers.get(i);
+         * if (r.config.controlNumber == touchpadState.controlNumber)
+         * r.state = touchpadState;
+         * }
+         * } else {
+         * System.out.println("RECEIVED A PACKET FOR AN UNKNOWN CONTROL.");
+         * }
+         * 
+         * }
+         * 
+         * // End of packet data check,
+         * } // End of `onReceive()`,
+         * }; // End of `workScene`'s definition'.
+         */
 
         exitScene = new Scene() {
             String thankYouText;
@@ -484,6 +480,7 @@ public class SketchWithScenes extends Sketch {
                         bgColor = color(0, abs(1 - wave) * 150);
                     }
                 }
+
             }
         };
 

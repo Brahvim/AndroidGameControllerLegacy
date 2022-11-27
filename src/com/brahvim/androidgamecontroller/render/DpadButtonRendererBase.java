@@ -24,7 +24,7 @@ public class DpadButtonRendererBase {
         p_graphics.pushStyle();
 
         p_graphics.translate(this.config.transform.x,
-          this.config.transform.y);
+                this.config.transform.y);
         p_graphics.scale(this.config.scale.x, this.config.scale.x);
 
         switch (this.config.dir) {
@@ -48,7 +48,7 @@ public class DpadButtonRendererBase {
                 break;
         }
 
-        p_graphics.fill(230, this.state.pressed? 100 : 50);
+        p_graphics.fill(230, this.state.pressed ? 100 : 50);
         p_graphics.noStroke();
 
         p_graphics.beginShape(PConstants.POLYGON);
@@ -63,13 +63,5 @@ public class DpadButtonRendererBase {
 
         p_graphics.popMatrix();
         p_graphics.popStyle();
-    }
-
-    public boolean wasPressed() {
-        return this.state.ppressed;
-    }
-
-    public boolean isPressed() {
-        return this.state.pressed;
     }
 }

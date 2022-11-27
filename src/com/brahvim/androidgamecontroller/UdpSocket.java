@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * The {@link UdpSocket} helps two applications running on different machines
+ * {@link UdpSocket} helps two applications running on different machines
  * connect via networks following the "User Datagram Protocol" and let them
  * listen to each other on a different thread for easier asynchronous
  * multitasking.<br>
@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Brahvim Bhaktvatsal
  */
+
 public class UdpSocket {
     // #region Fields:
     /**

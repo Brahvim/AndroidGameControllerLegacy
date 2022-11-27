@@ -36,6 +36,7 @@ public class Sketch extends PApplet {
     public final static int REFRESH_RATE = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getScreenDevices()[0].getDisplayMode().getRefreshRate();
     public final static int AGC_WIDTH = 400, AGC_HEIGHT = 200;
+    public static Scene currentScene;
 
     // #region Stuff that makes AGC *go!*
     public PGraphics gr;
@@ -54,6 +55,7 @@ public class Sketch extends PApplet {
     // #region Ma'h boilerplate :D
     public static float cx, cy, qx, qy, q3x, q3y;
     public static int pwidth, pheight;
+    // #endregion
 
     public JFrame sketchFrame; // We do not rely on the Processing 3 'dummy' variable!
 
@@ -62,7 +64,6 @@ public class Sketch extends PApplet {
     public int winMouseX, winMouseY;
     public int surfaceX, surfaceY; // Used to constrain the position of the overlay.
     public int pmousePressX, pmousePressY; // Where was the mouse when it was last clicked?
-    // #endregion
     // #endregion
     // #endregion Fields.
 
@@ -127,7 +128,7 @@ public class Sketch extends PApplet {
     }
 
     public void pre() {
-        Scene.currentScene.pre();
+        Sketch.currentScene.pre();
     }
 
     public void initFirstScene() {
@@ -175,14 +176,14 @@ public class Sketch extends PApplet {
         gr.beginDraw();
         gr.background(bgColor);
 
-        if (Scene.currentScene != null)
-            Scene.currentScene.draw();
+        if (Sketch.currentScene != null)
+            Sketch.currentScene.draw();
 
         gr.endDraw();
     }
 
     public void post() {
-        Scene.currentScene.post();
+        Sketch.currentScene.post();
     }
     // #endregion
 
@@ -200,7 +201,7 @@ public class Sketch extends PApplet {
         if (Forms.isFormOpen(Forms.settingsForm))
             Forms.settingsForm.close();
 
-        Scene.setScene(Sketch.SKETCH.exitScene);
+        Sketch.currentScene = Sketch.SKETCH.exitScene;
     }
 
     /**
@@ -209,9 +210,10 @@ public class Sketch extends PApplet {
      * @return The new {@code JFrame} assigned to your sketch's surface / "window".
      *         Better store it somewhere!
      */
-    public JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
-        // This is the dummy variable from Processing.
-        JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) p_sketch.getSurface().getNative()).getFrame();
+    public static JFrame createSketchPanel(PApplet p_sketch, PGraphics p_sketchGraphics) {
+        // This is NOT the dummy variable from Processing.
+        JFrame ret = (JFrame) ((PSurfaceAWT.SmoothCanvas) p_sketch.getSurface().getNative())
+                .getFrame();
         ret.removeNotify();
         ret.setUndecorated(true);
         ret.setLayout(null);
@@ -265,39 +267,48 @@ public class Sketch extends PApplet {
         };
 
         // Let the `JFrame` be visible and request for `OS` permissions:
-        ((JFrame) ret).setContentPane(panel); // This is the dummy variable from Processing.
+        ret.setContentPane(panel); // This is NOT the dummy variable from Processing.
+
         panel.setFocusable(true);
         panel.setFocusTraversalKeysEnabled(false);
         panel.requestFocus();
         panel.requestFocusInWindow();
 
-        // Listeners for handling events :+1::
+        // #region Listeners for handling events :+1::
+        // Listener for `mousePressed()` and `mouseReleased()`:
         panel.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent p_mouseEvent) {
-                mousePressed = true;
-                mouseButton = p_mouseEvent.getButton();
-                SKETCH.mousePressed();
+                p_sketch.mousePressed = true;
+                p_sketch.mouseButton = p_mouseEvent.getButton();
+                p_sketch.mousePressed();
             }
 
             public void mouseReleased(MouseEvent p_mouseEvent) {
-                mousePressed = false;
-                SKETCH.mouseReleased();
+                p_sketch.mousePressed = false;
+                p_sketch.mouseReleased();
             }
         });
 
-        // Listeners for `mouseDragged()` and `mouseMoved()`:
+        // Listener for `mouseDragged()` and `mouseMoved()`:
         panel.addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent p_mouseEvent) {
-                mouseX = MouseInfo.getPointerInfo().getLocation().x - ret.getLocation().x;
-                mouseY = MouseInfo.getPointerInfo().getLocation().y - ret.getLocation().y;
+                p_sketch.mouseX = MouseInfo.getPointerInfo()
+                        .getLocation().x - ret.getLocation().x;
 
-                SKETCH.mouseDragged();
+                p_sketch.mouseY = MouseInfo.getPointerInfo()
+                        .getLocation().y - ret.getLocation().y;
+
+                p_sketch.mouseDragged();
             }
 
-            public void mouseMoved(MouseEvent me) {
-                mouseX = MouseInfo.getPointerInfo().getLocation().x - ret.getLocation().x;
-                mouseY = MouseInfo.getPointerInfo().getLocation().y - ret.getLocation().y;
-                SKETCH.mouseMoved();
+            public void mouseMoved(MouseEvent p_mouseEvent) {
+                p_sketch.mouseX = MouseInfo.getPointerInfo()
+                        .getLocation().x - ret.getLocation().x;
+
+                p_sketch.mouseY = MouseInfo.getPointerInfo()
+                        .getLocation().y - ret.getLocation().y;
+
+                p_sketch.mouseMoved();
             }
         });
 
@@ -305,28 +316,24 @@ public class Sketch extends PApplet {
         panel.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent p_keyEvent) {
-                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
-                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
-
-                Sketch.SKETCH.keyTyped();
+                p_sketch.key = p_keyEvent.getKeyChar();
+                p_sketch.keyCode = p_keyEvent.getKeyCode();
+                p_sketch.keyTyped();
             }
 
             @Override
             public void keyPressed(KeyEvent p_keyEvent) {
-                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
-                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
-
+                p_sketch.key = p_keyEvent.getKeyChar();
+                p_sketch.keyCode = p_keyEvent.getKeyCode();
                 // System.out.println("Heard a keypress!");
-
-                Sketch.SKETCH.keyPressed();
+                p_sketch.keyPressed();
             }
 
             @Override
             public void keyReleased(KeyEvent p_keyEvent) {
-                Sketch.SKETCH.key = p_keyEvent.getKeyChar();
-                Sketch.SKETCH.keyCode = p_keyEvent.getKeyCode();
-
-                Sketch.SKETCH.keyReleased();
+                p_sketch.key = p_keyEvent.getKeyChar();
+                p_sketch.keyCode = p_keyEvent.getKeyCode();
+                p_sketch.keyReleased();
             }
         });
 
@@ -337,23 +344,25 @@ public class Sketch extends PApplet {
 
         // PS Notice how this uses `KeyAdapter` instead for
         panel.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (Scene.currentScene == Sketch.SKETCH.exitScene)
+            public void keyPressed(KeyEvent p_keyEvent) {
+                if (Sketch.currentScene == Sketch.SKETCH.exitScene)
                     return;
 
                 if (KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.ALT_DOWN_MASK) != null
-                        && e.getKeyCode() == KeyEvent.VK_F4) {
+                        && p_keyEvent.getKeyCode() == KeyEvent.VK_F4) {
 
                     // Apparently this wasn't the cause of an error I was trying to rectify.
                     // However, it *still is a good practice!*
-                    if (!Sketch.SKETCH.exitCalled()) {
+                    if (!p_sketch.exitCalled()) {
                         Sketch.agcExit();
-                        e.consume();
+                        p_keyEvent.consume();
                     }
                 }
             }
         });
         // #endregion
+        // #endregion
+
         return ret;
     }
     // #endregion
@@ -361,54 +370,54 @@ public class Sketch extends PApplet {
     // #region Processing's keyboard event callbacks.
     @Override
     public void keyPressed() {
-        Scene.currentScene.keyPressed();
+        Sketch.currentScene.keyPressed();
     }
 
     @Override
     public void keyReleased() {
-        Scene.currentScene.keyReleased();
+        Sketch.currentScene.keyReleased();
     }
 
     @Override
     public void keyTyped() {
-        Scene.currentScene.keyTyped();
+        Sketch.currentScene.keyTyped();
     }
     // #endregion
 
     // #region Processing's mouse event callbacks.
     @Override
     public void mouseMoved() {
-        Scene.currentScene.mouseMoved();
+        Sketch.currentScene.mouseMoved();
     }
 
     @Override
     public void mouseWheel(processing.event.MouseEvent p_mouseEvent) {
-        Scene.currentScene.mouseWheel(p_mouseEvent);
+        Sketch.currentScene.mouseWheel(p_mouseEvent);
     }
 
     @Override
     public void mouseClicked() {
-        Scene.currentScene.mouseClicked();
+        Sketch.currentScene.mouseClicked();
     }
 
     @Override
     public void mouseDragged() {
-        Scene.currentScene.mouseDragged();
+        Sketch.currentScene.mouseDragged();
     }
 
     @Override
     public void mouseExited() {
-        Scene.currentScene.mouseExited();
+        Sketch.currentScene.mouseExited();
     }
 
     @Override
     public void mouseEntered() {
-        Scene.currentScene.mouseEntered();
+        Sketch.currentScene.mouseEntered();
     }
 
     @Override
     public void mouseReleased() {
-        Scene.currentScene.mouseReleased();
+        Sketch.currentScene.mouseReleased();
     }
 
     @Override
@@ -416,7 +425,7 @@ public class Sketch extends PApplet {
         pmousePressX = mouseX;
         pmousePressY = mouseY;
 
-        Scene.currentScene.mousePressed();
+        Sketch.currentScene.mousePressed();
     }
     // #endregion
 

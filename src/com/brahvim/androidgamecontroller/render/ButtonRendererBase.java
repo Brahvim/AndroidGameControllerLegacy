@@ -24,11 +24,11 @@ public class ButtonRendererBase {
         p_graphics.pushStyle();
 
         p_graphics.translate(this.config.transform.x,
-          this.config.transform.y);
+                this.config.transform.y);
         p_graphics.scale(this.config.scale.x, this.config.scale.x);
         p_graphics.rotate(this.config.transform.z);
 
-        p_graphics.fill(230, this.state.pressed? 100 : 50);
+        p_graphics.fill(230, this.state.pressed ? 100 : 50);
         p_graphics.noStroke();
 
         switch (this.config.shape) {
@@ -39,7 +39,7 @@ public class ButtonRendererBase {
             case RECTANGLE:
                 // p_graphics.rectMode(PConstants.CENTER);
                 p_graphics.rect(0, 0, 1.2f, 0.55f,
-                  0.1f, 0.1f, 0.1f, 0.1f);
+                        0.1f, 0.1f, 0.1f, 0.1f);
                 break;
 
             default:
@@ -52,13 +52,5 @@ public class ButtonRendererBase {
 
         p_graphics.popMatrix();
         p_graphics.popStyle();
-    }
-
-    public boolean wasPressed() {
-        return this.state.ppressed;
-    }
-
-    public boolean isPressed() {
-        return this.state.pressed;
     }
 }

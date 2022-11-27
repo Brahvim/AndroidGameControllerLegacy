@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Scene {
     public final static ArrayList<Scene> SCENES = new ArrayList<Scene>(3);
-    public static Scene currentScene;
+    public static Scene currentScene; // Used *only* by the AGC client.
 
     // region "`static`s".
     public static void setScene(Scene p_scene) {
@@ -75,4 +75,5 @@ public class Scene {
     public void keyReleased() {
     }
     // endregion
+
 }

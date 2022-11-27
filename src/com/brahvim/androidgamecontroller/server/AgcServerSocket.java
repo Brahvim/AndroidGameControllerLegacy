@@ -381,8 +381,9 @@ public class AgcServerSocket extends UdpSocket {
     // #region Overrides.
     @Override
     public void onReceive(@NotNull byte[] p_data, String p_ip, int p_port) {
-        if (Scene.currentScene != null)
-            Scene.currentScene.onReceive(p_data, p_ip, p_port);
+        if (Scene.SCENES != null)
+            for (Scene s : Scene.SCENES)
+                s.onReceive(p_data, p_ip, p_port);
     }
 
     @Override
