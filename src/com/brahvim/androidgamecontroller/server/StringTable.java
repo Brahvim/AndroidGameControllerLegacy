@@ -74,7 +74,15 @@ public class StringTable {
         return parsedMap;
     }
 
-    public static String get(String p_key) {
-        return StringTable.table.get(p_key);
+    public static synchronized String getString(String p_key) {
+        String ret = StringTable.table.get(p_key);
+
+        if (ret == null) {
+            System.err.printf("String for key `%s` not found!\n", p_key);
+            return "";
+        }
+
+        return ret;
     }
+
 }

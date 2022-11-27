@@ -1,6 +1,6 @@
-package com.brahvim.androidgamecontroller.server;
+package com.brahvim.androidgamecontroller;
 
-class SineWave {
+public class SineWave {
     // #region Fields.
     public float angleOffset, freqMult, freq;
     public float endTime = Float.MAX_VALUE - 1, aliveTime;
@@ -111,8 +111,9 @@ class SineWave {
     // #endregion
 
     // #region Getters.
-    public float getStartTime() {
-        return Sketch.SKETCH.millis() - this.aliveTime;
+    public float getStartTime(int p_millis) {
+        // return Sketch.SKETCH.millis() - this.aliveTime;
+        return p_millis - this.aliveTime;
     }
 
     public float getTimeSinceStart() {
@@ -123,18 +124,18 @@ class SineWave {
         return this.endTime;
     }
 
-    public float get() {
+    public float get(int p_frameTime) {
         this.active = this.aliveTime <= this.endTime;
 
         if (this.active)
-            this.aliveTime += Sketch.frameTime;
+            this.aliveTime += p_frameTime;
         // ^^^ `frameTime` comes from "the Engine" by the way. (Hey - that's "Nerd"!)
         else if (this.zeroWhenInactive)
             return 0;
 
         this.freq = this.aliveTime * this.freqMult + this.angleOffset;
         return (float) Math.sin(this.freq);
-        // That looked like a matrix calculation LOL.
+        // That looks like a matrix calculation LOL.
     }
     // #endregion
 }

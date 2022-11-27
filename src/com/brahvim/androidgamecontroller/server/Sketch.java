@@ -44,7 +44,7 @@ public class Sketch extends PApplet {
     public static ConfigurationPacket myConfig; // The primary client's configuration.
 
     public int bgColor = color(0, 150); // Exit fade animation, et cetera.
-    public static float frameStartTime, pframeTime, frameTime;
+    public static int frameStartTime, pframeTime, frameTime;
     // #endregion
 
     // #region Window coordinates and states.

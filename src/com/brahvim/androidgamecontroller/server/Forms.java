@@ -37,21 +37,17 @@ public class Forms {
         Forms.ui = p_ui;
     }
 
-    public static String getString(String p_key) {
-        String ret = StringTable.get(p_key);
-        if (ret == null)
-            System.err.printf("String table key `%s` not found!\n", p_key);
-        return ret;
-    }
-
     // #region Form null-check methods:
     public static boolean isFormOpen(Form p_form) {
-        // if (p_form == null)
-        // return false;
-        // else if (p_form.isClosedByUser())
-        // return false;
-        // else
-        // return true;
+        /*
+         * if (p_form == null)
+         * return false;
+         * else if (p_form.isClosedByUser())
+         * return false;
+         * else
+         * return true;
+         */
+
         return p_form == null ? false : p_form.isClosedByUser() ? false : true;
     }
 
@@ -137,8 +133,8 @@ public class Forms {
     // #region Form creation...
     public static WaitingDialog showFindingConnectionDialog() {
         WaitingDialog ret = ui.showWaitingDialog(
-                Forms.getString("FindConnectionWaitBox.text"),
-                Forms.getString("FindConnectionWaitBox.title"));
+                StringTable.getString("FindConnectionWaitBox.text"),
+                StringTable.getString("FindConnectionWaitBox.title"));
         findingDevicesDialog = ret;
         return ret;
     }
@@ -187,34 +183,34 @@ public class Forms {
     }
 
     public static FormBuilder createSettingsForm() {
-        FormBuilder ret = ui.createForm(Forms.getString("SettingsForm.title"));
+        FormBuilder ret = ui.createForm(StringTable.getString("SettingsForm.title"));
         WindowSetting win = ret.andWindow();
         win.setSize(Forms.settingsWidth, Forms.settingsHeight);
 
-        ret.addButton(Forms.getString("SettingsForm.exitButton"), new Runnable() {
+        ret.addButton(StringTable.getString("SettingsForm.exitButton"), new Runnable() {
             @Override
             public void run() {
                 Sketch.agcExit();
             }
         });
 
-        ret.addButton(Forms.getString("SettingsForm.bansMenuButton"), new Runnable() {
+        ret.addButton(StringTable.getString("SettingsForm.bansMenuButton"), new Runnable() {
             @Override
             public void run() {
                 Forms.bansForm = Forms.showRichForm(Forms.bansForm, Forms.createBansForm());
             }
         });
 
-        ret.addSlider(Forms.getString("SettingsForm.timeoutSlider"), 2, 20, 2, 2, 0);
+        ret.addSlider(StringTable.getString("SettingsForm.timeoutSlider"), 2, 20, 2, 2, 0);
 
         return Forms.settingsFormBuild = ret;
     }
 
     public static FormBuilder createBansForm() {
-        FormBuilder ret = Forms.ui.createForm(Forms.getString("BansForm.title"));
+        FormBuilder ret = Forms.ui.createForm(StringTable.getString("BansForm.title"));
         ret.addLabel(Sketch.socket.bannedClients.size() == 0
-                ? Forms.getString("BansForm.noBans")
-                : Forms.getString("BansForm.label"));
+                ? StringTable.getString("BansForm.noBans")
+                : StringTable.getString("BansForm.label"));
 
         /*
          * for (int i = 0, max = Sketch.socket.bannedIpStrings.size(); i < max; i++) {
@@ -254,21 +250,21 @@ public class Forms {
 
     public static FormBuilder createUnbanForm(String p_clientName, String p_clientIp) {
         FormBuilder ret = Forms.ui.createForm(
-                Forms.getString("UnbansForm.title")
+                StringTable.getString("UnbansForm.title")
                         .concat(" ")
                         .concat(p_clientName)
                         .concat("?"));
 
         ret.addLabel(p_clientName.concat(" (IP: `").concat(p_clientIp).concat("`)"));
 
-        ret.addButton(Forms.getString("UnbansForm.unbanButton"), new Runnable() {
+        ret.addButton(StringTable.getString("UnbansForm.unbanButton"), new Runnable() {
             @Override
             public void run() {
                 Sketch.socket.unbanClient(p_clientName);
             }
         }).setID("btn_unban");
 
-        ret.addButton(Forms.getString("UnbansForm.permBanButton"), new Runnable() {
+        ret.addButton(StringTable.getString("UnbansForm.permBanButton"), new Runnable() {
             @Override
             public void run() {
                 // IP should be written to `AgcBannedClients.csv`

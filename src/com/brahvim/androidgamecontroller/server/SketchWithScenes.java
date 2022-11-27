@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import com.brahvim.androidgamecontroller.RequestCode;
 import com.brahvim.androidgamecontroller.Scene;
+import com.brahvim.androidgamecontroller.SineWave;
 import com.brahvim.androidgamecontroller.render.ButtonRendererBase;
 import com.brahvim.androidgamecontroller.render.DpadButtonRendererBase;
 import com.brahvim.androidgamecontroller.render.TouchpadRendererBase;
@@ -87,7 +88,7 @@ public class SketchWithScenes extends Sketch {
 
             @Override
             public void setup() {
-                shownText = Forms.getString("AwaitingConnectionsScene.text");
+                shownText = StringTable.getString("AwaitingConnectionsScene.text");
 
                 /*
                  * // "Can you serialize enums?" YES!
@@ -154,11 +155,11 @@ public class SketchWithScenes extends Sketch {
                 // BlockingConfirmDialog.create(
 
                 Forms.ui.showConfirmDialog(
-                        Forms.getString("ConfirmConnection.message")
+                        StringTable.getString("ConfirmConnection.message")
                                 .replace("<name>", p_client.getName())
                                 .replace("<address>", p_client.getIp()),
                         // Window title:
-                        Forms.getString("ConfirmConnection.windowTitle"),
+                        StringTable.getString("ConfirmConnection.windowTitle"),
                         // If yes,
                         new Runnable() {
                             @Override
@@ -182,19 +183,19 @@ public class SketchWithScenes extends Sketch {
                         // Older stuff that used `.concat()`:
                         /*
                          * // Forms.ui.showConfirmDialog(
-                         * // Forms.getString("RejectConnection.begin")
+                         * // StringTable.getString("RejectConnection.begin")
                          * // .concat(" \"")
                          * // .concat(p_client.getName())
                          * // .concat("\" (IP: `")
                          * // .concat(p_client.getIp())
                          * // .concat("`)? "),
-                         * // Forms.getString("RejectConnection.windowTitle"),
+                         * // StringTable.getString("RejectConnection.windowTitle"),
                          */
 
-                        Forms.getString("RejectConnection.message")
+                        StringTable.getString("RejectConnection.message")
                                 .replace("<name>", p_client.getName()),
 
-                        Forms.getString("RejectConnection.windowTitle"),
+                        StringTable.getString("RejectConnection.windowTitle"),
 
                         new Runnable() {
                             @Override
@@ -267,7 +268,7 @@ public class SketchWithScenes extends Sketch {
                                     Received a `%d`-byte long unrecognizzed sequence of bytes saying
                                         \"%s\" from IP: `%s`, port: `%d`.\n""",
                                     p_data.length, new String(p_data), p_ip, p_port);
-                            break;  
+                            break;
                     }
                 }
             };
@@ -461,7 +462,7 @@ public class SketchWithScenes extends Sketch {
                 windowFadeWave.endWhenAngleIs(90);
                 windowFadeWave.start();
 
-                thankYouText = Forms.getString("ExitScene.text");
+                thankYouText = StringTable.getString("ExitScene.text");
                 socket.tellAllClients(RequestCode.SERVER_CLOSE);
                 socket.close();
             }
@@ -476,8 +477,8 @@ public class SketchWithScenes extends Sketch {
                 }
 
                 if (windowFadeWave != null) {
-                    float wave = windowFadeWave.get();
-                    if (wave == 0) {
+                    float wave = windowFadeWave.get(frameTime);
+                    if (wave == 0) { // I have no idea how, but it can and IS this perfect!
                         windowFadeWave.end();
 
                         while (!Forms.isFormClosed(Forms.settingsForm))
