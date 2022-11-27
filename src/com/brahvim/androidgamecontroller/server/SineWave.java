@@ -111,8 +111,14 @@ class SineWave {
     // #endregion
 
     // #region Getters.
-    public float getStartTime() {
-        return Sketch.SKETCH.millis() - this.aliveTime;
+    /**
+     * @param p_millis Just pass `millis()` from your `PApplet` in here.
+     * @return
+     */
+    public float getStartTime(int p_millis) {
+        return p_millis - this.aliveTime;
+        // return System.currentTimeMillis() - this.aliveTime;
+        // return Sketch.SKETCH.millis() - this.aliveTime;
     }
 
     public float getTimeSinceStart() {
